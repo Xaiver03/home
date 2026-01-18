@@ -15,29 +15,30 @@
     "pnpm": ">=8.0.0"
   },
   "scripts": {
-    "dev": "pnpm --filter \"./apps/**\" --parallel dev",
+    "dev": "concurrently -n \"homepage,blog-admin,blog-frontend,blog-api,music-api\" -c \"cyan,magenta,green,yellow,blue\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
+    "dev:all": "concurrently -n \"homepage,blog-admin,blog-frontend,blog-api,music-api\" -c \"cyan,magenta,green,yellow,blue\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
+    "dev:frontend": "concurrently -n \"homepage,blog-admin,blog-frontend\" -c \"cyan,magenta,green\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\"",
+    "dev:backend": "concurrently -n \"blog-api,music-api\" -c \"yellow,blue\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
     "dev:homepage": "pnpm --filter homepage dev",
     "dev:blog-admin": "pnpm --filter blog-admin dev",
     "dev:blog-api": "pnpm --filter blog-api serve:dev",
     "dev:blog-frontend": "pnpm --filter blog-frontend dev",
     "dev:music": "pnpm --filter music-api start:node",
-
     "build": "pnpm --filter \"./apps/**\" --filter \"./services/**\" build",
     "build:homepage": "pnpm --filter homepage build",
     "build:blog-admin": "pnpm --filter blog-admin build",
     "build:blog-frontend": "pnpm --filter blog-frontend build",
     "build:blog-api": "echo 'Blog API does not require build'",
-
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,md}\"",
     "clean": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" clean",
     "deploy": "bash scripts/deploy.sh",
-
     "test": "echo 'Tests not yet configured'",
     "typecheck": "echo 'TypeScript not yet configured'"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "concurrently": "^9.2.1",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.25.0",
     "prettier": "^3.2.5",
