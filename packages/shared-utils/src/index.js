@@ -6,19 +6,18 @@
  * Export all shared utility functions
  */
 
-// HTTP 请求相关
-// export * from './request.js';
+// 通用工具函数
+export * from './common.js';
 
 // 日期处理相关
-// export * from './date.js';
+export * from './date.js';
 
 // 验证器相关
-// export * from './validators.js';
+export * from './validators.js';
 
-// 通用工具函数
-// export * from './common.js';
+// HTTP 请求相关（待实现）
+// export * from './request.js';
 
-// 临时导出，避免空模块错误
 export const version = '1.0.0';
 
-console.log('@xld/shared-utils loaded');
+console.log('@xld/shared-utils v' + version + ' loaded');
