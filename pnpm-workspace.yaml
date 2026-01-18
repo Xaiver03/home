@@ -1,0 +1,18 @@
+# pnpm Workspace Configuration
+# pnpm 工作区配置
+#
+# This file defines the monorepo structure for the project
+# 此文件定义项目的 monorepo 结构
+
+packages:
+  # Application layer - deployable applications
+  # 应用层 - 可部署的应用程序
+  - 'apps/*'
+
+  # Service layer - independent services
+  # 服务层 - 独立服务
+  - 'services/*'
+
+  # Shared packages - internal dependencies
+  # 共享包 - 内部依赖
+  - 'packages/*'

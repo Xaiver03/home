@@ -1,47 +1,47 @@
 {
-  "name": "home",
-  "author": "灯下灯/Xaiver",
-  "github": "https://github.com/Xaiver03",
-  "home": "https://xiangleideng.site",
+  "name": "@xld/monorepo",
+  "version": "1.0.0",
   "private": true,
-  "version": "4.1.6-pwa-fix",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --host",
-    "build": "vite build",
-    "build:original": "vite build",
-    "preview": "vite preview",
-    "format": "prettier --write src/",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix"
+  "description": "邓湘雷的个人主页 + 博客系统 Monorepo",
+  "author": "灯下灯/Xaiver",
+  "license": "MIT",
+  "homepage": "https://xiangleideng.site",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xaiver03/home.git"
   },
-  "dependencies": {
-    "@worstone/vue-aplayer": "^1.0.6",
-    "aplayer": "^1.10.1",
-    "axios": "^1.6.8",
-    "dayjs": "^1.11.10",
-    "element-plus": "^2.7.1",
-    "fetch-jsonp": "^1.3.0",
-    "lodash-es": "^4.17.21",
-    "pinia": "^2.1.7",
-    "pinia-plugin-persistedstate": "^3.2.1",
-    "swiper": "^11.1.1",
-    "vue": "^3.4.24",
-    "workbox-window": "^6.6.0"
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter \"./apps/**\" --parallel dev",
+    "dev:homepage": "pnpm --filter homepage dev",
+    "dev:blog-admin": "pnpm --filter blog-admin dev",
+    "dev:blog-api": "pnpm --filter blog-api serve:dev",
+    "dev:blog-frontend": "pnpm --filter blog-frontend dev",
+    "dev:music": "pnpm --filter music-api start:node",
+
+    "build": "pnpm --filter \"./apps/**\" --filter \"./services/**\" build",
+    "build:homepage": "pnpm --filter homepage build",
+    "build:blog-admin": "pnpm --filter blog-admin build",
+    "build:blog-frontend": "pnpm --filter blog-frontend build",
+    "build:blog-api": "echo 'Blog API does not require build'",
+
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,md}\"",
+    "clean": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" clean",
+    "deploy": "bash scripts/deploy.sh",
+
+    "test": "echo 'Tests not yet configured'",
+    "typecheck": "echo 'TypeScript not yet configured'"
   },
   "devDependencies": {
-    "@icon-park/vue-next": "^1.4.2",
-    "@vicons/fa": "^0.12.0",
-    "@vicons/utils": "^0.1.4",
-    "@vitejs/plugin-vue": "^4.6.2",
+    "@types/node": "^20.11.0",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.25.0",
     "prettier": "^3.2.5",
-    "sass": "^1.75.0",
-    "terser": "^5.30.4",
-    "unplugin-auto-import": "^0.11.5",
-    "unplugin-vue-components": "^0.22.12",
-    "vite": "^4.5.3",
-    "vite-plugin-compression": "^0.5.1",
-    "vite-plugin-pwa": "^0.14.7"
-  }
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@8.15.0"
 }
