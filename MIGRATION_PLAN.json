@@ -1,0 +1,304 @@
+{
+  "project": "Monorepo 重构迁移计划",
+  "version": "1.0.0",
+  "startDate": "2026-01-18",
+  "status": "in_progress",
+  "phases": [
+    {
+      "phase": 1,
+      "name": "创建 Monorepo 基础配置",
+      "status": "in_progress",
+      "estimatedTime": "30分钟",
+      "tasks": [
+        {
+          "id": "1.1",
+          "name": "创建 pnpm-workspace.yaml",
+          "status": "pending",
+          "description": "配置 pnpm workspaces，定义子项目路径",
+          "files": ["pnpm-workspace.yaml"],
+          "commit": false
+        },
+        {
+          "id": "1.2",
+          "name": "创建根目录 package.json",
+          "status": "pending",
+          "description": "配置 monorepo 根项目，定义统一脚本",
+          "files": ["package.json"],
+          "commit": false
+        },
+        {
+          "id": "1.3",
+          "name": "更新 CLAUDE.md 添加开发规范",
+          "status": "pending",
+          "description": "添加 'easy commit, easy push' 规范",
+          "files": ["CLAUDE.md"],
+          "commit": false
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "创建共享包目录结构",
+      "status": "pending",
+      "estimatedTime": "45分钟",
+      "tasks": [
+        {
+          "id": "2.1",
+          "name": "创建 packages/shared-utils",
+          "status": "pending",
+          "description": "创建共享工具函数包",
+          "files": ["packages/shared-utils/package.json", "packages/shared-utils/src/index.js"],
+          "commit": false
+        },
+        {
+          "id": "2.2",
+          "name": "创建 packages/shared-types",
+          "status": "pending",
+          "description": "创建共享 TypeScript 类型包",
+          "files": ["packages/shared-types/package.json", "packages/shared-types/src/index.ts"],
+          "commit": false
+        },
+        {
+          "id": "2.3",
+          "name": "创建 packages/shared-config",
+          "status": "pending",
+          "description": "创建共享配置包（ESLint、Prettier等）",
+          "files": ["packages/shared-config/package.json"],
+          "commit": false
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "提取公共工具函数",
+      "status": "pending",
+      "estimatedTime": "1小时",
+      "tasks": [
+        {
+          "id": "3.1",
+          "name": "分析现有项目中的公共代码",
+          "status": "pending",
+          "description": "扫描所有项目，识别可复用的工具函数",
+          "commit": false
+        },
+        {
+          "id": "3.2",
+          "name": "提取 HTTP 请求封装",
+          "status": "pending",
+          "description": "统一 axios 封装到 shared-utils",
+          "files": ["packages/shared-utils/src/request.js"],
+          "commit": false
+        },
+        {
+          "id": "3.3",
+          "name": "提取日期处理函数",
+          "status": "pending",
+          "description": "统一 dayjs 工具函数",
+          "files": ["packages/shared-utils/src/date.js"],
+          "commit": false
+        },
+        {
+          "id": "3.4",
+          "name": "提取验证器函数",
+          "status": "pending",
+          "description": "统一表单验证、数据验证函数",
+          "files": ["packages/shared-utils/src/validators.js"],
+          "commit": false
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "创建统一代码规范配置",
+      "status": "pending",
+      "estimatedTime": "30分钟",
+      "tasks": [
+        {
+          "id": "4.1",
+          "name": "创建统一的 ESLint 配置",
+          "status": "pending",
+          "description": "根目录创建 .eslintrc.js",
+          "files": [".eslintrc.js"],
+          "commit": false
+        },
+        {
+          "id": "4.2",
+          "name": "创建统一的 Prettier 配置",
+          "status": "pending",
+          "description": "根目录创建 .prettierrc",
+          "files": [".prettierrc", ".prettierignore"],
+          "commit": false
+        },
+        {
+          "id": "4.3",
+          "name": "创建统一的 .gitignore",
+          "status": "pending",
+          "description": "合并所有项目的 .gitignore",
+          "files": [".gitignore"],
+          "commit": false
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "重组项目目录结构",
+      "status": "pending",
+      "estimatedTime": "2小时",
+      "tasks": [
+        {
+          "id": "5.1",
+          "name": "创建 apps 目录",
+          "status": "pending",
+          "description": "创建应用层目录结构",
+          "commit": false
+        },
+        {
+          "id": "5.2",
+          "name": "迁移主页项目到 apps/homepage",
+          "status": "pending",
+          "description": "移动 src、public、vite.config.js 等",
+          "files": ["apps/homepage/*"],
+          "commit": false
+        },
+        {
+          "id": "5.3",
+          "name": "迁移博客后端到 apps/blog-api",
+          "status": "pending",
+          "description": "移动 blog/space-log-express",
+          "files": ["apps/blog-api/*"],
+          "commit": false
+        },
+        {
+          "id": "5.4",
+          "name": "迁移博客管理后台到 apps/blog-admin",
+          "status": "pending",
+          "description": "移动 blog/admin",
+          "files": ["apps/blog-admin/*"],
+          "commit": false
+        },
+        {
+          "id": "5.5",
+          "name": "迁移博客前台到 apps/blog-frontend",
+          "status": "pending",
+          "description": "移动 blog/space-log-nuxt3",
+          "files": ["apps/blog-frontend/*"],
+          "commit": false
+        },
+        {
+          "id": "5.6",
+          "name": "迁移音乐 API 到 services/music-api",
+          "status": "pending",
+          "description": "移动 music/Meting-API",
+          "files": ["services/music-api/*"],
+          "commit": false
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "更新子项目依赖引用",
+      "status": "pending",
+      "estimatedTime": "1.5小时",
+      "tasks": [
+        {
+          "id": "6.1",
+          "name": "更新 homepage 的 package.json",
+          "status": "pending",
+          "description": "添加 workspace 依赖引用",
+          "files": ["apps/homepage/package.json"],
+          "commit": false
+        },
+        {
+          "id": "6.2",
+          "name": "更新 blog-api 的 package.json",
+          "status": "pending",
+          "description": "添加 workspace 依赖引用",
+          "files": ["apps/blog-api/package.json"],
+          "commit": false
+        },
+        {
+          "id": "6.3",
+          "name": "更新 blog-admin 的 package.json",
+          "status": "pending",
+          "description": "添加 workspace 依赖引用",
+          "files": ["apps/blog-admin/package.json"],
+          "commit": false
+        },
+        {
+          "id": "6.4",
+          "name": "更新所有项目的导入路径",
+          "status": "pending",
+          "description": "将本地工具函数改为引用 shared-utils",
+          "commit": false
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "测试与验证",
+      "status": "pending",
+      "estimatedTime": "1小时",
+      "tasks": [
+        {
+          "id": "7.1",
+          "name": "安装所有依赖",
+          "status": "pending",
+          "description": "运行 pnpm install",
+          "commit": false
+        },
+        {
+          "id": "7.2",
+          "name": "测试主页开发服务器",
+          "status": "pending",
+          "description": "运行 pnpm dev:homepage",
+          "commit": false
+        },
+        {
+          "id": "7.3",
+          "name": "测试博客管理后台",
+          "status": "pending",
+          "description": "运行 pnpm dev:blog-admin",
+          "commit": false
+        },
+        {
+          "id": "7.4",
+          "name": "测试博客 API",
+          "status": "pending",
+          "description": "运行 pnpm dev:blog-api",
+          "commit": false
+        },
+        {
+          "id": "7.5",
+          "name": "测试构建流程",
+          "status": "pending",
+          "description": "运行 pnpm build",
+          "commit": false
+        },
+        {
+          "id": "7.6",
+          "name": "更新部署脚本",
+          "status": "pending",
+          "description": "更新 deploy.sh 适配新结构",
+          "files": ["scripts/deploy.sh"],
+          "commit": false
+        }
+      ]
+    }
+  ],
+  "rollbackPlan": {
+    "description": "如果迁移失败，可以从备份恢复",
+    "backupLocation": "../home-backup",
+    "steps": [
+      "停止所有服务",
+      "删除当前目录",
+      "从 ../home-backup 恢复",
+      "重新安装依赖"
+    ]
+  },
+  "notes": [
+    "每完成一个任务立即 commit",
+    "每个 commit 立即 push 到远程仓库",
+    "commit message 格式：[Phase X.Y] 任务名称",
+    "遇到问题立即记录到 MIGRATION_ISSUES.md"
+  ]
+}

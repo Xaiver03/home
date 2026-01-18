@@ -2,6 +2,39 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development Workflow / 开发工作流
+
+**IMPORTANT: Git Commit Strategy / 重要：Git 提交策略**
+
+遵循 "Easy Commit, Easy Push" 原则：
+
+```bash
+# 每完成一个小任务立即提交
+git add .
+git commit -m "[Phase X.Y] 任务描述"
+git push origin dev
+
+# 示例
+git commit -m "[Phase 1.1] 创建 pnpm-workspace.yaml"
+git commit -m "[Phase 2.1] 创建 shared-utils 包"
+git commit -m "[Phase 3.2] 提取 HTTP 请求封装到 shared-utils"
+```
+
+**提交规范：**
+- ✅ **小步快跑**：每完成一个独立的小任务就提交
+- ✅ **立即推送**：每次 commit 后立即 push，避免本地积累
+- ✅ **清晰描述**：commit message 使用 `[Phase X.Y] 任务名称` 格式
+- ✅ **保持同步**：确保团队成员能实时看到进度
+- ❌ **避免大批量提交**：不要等多个任务完成后一起提交
+- ❌ **避免模糊描述**：不要使用 "update"、"fix" 等模糊词汇
+
+**任务追踪：**
+- 所有任务记录在 `MIGRATION_PLAN.json` 中
+- 每完成一个任务，更新 JSON 文件中的 `commit: true` 状态
+- 遇到问题记录到 `MIGRATION_ISSUES.md`
+
+---
+
 ## Project Overview / 项目概述
 
 This is a Vue 3-based personal homepage/portfolio website (originally "無名の主页" / The Unknown's Homepage, now customized as "邓湘雷の主页"). It's a responsive single-page application featuring music playback, weather information, social links, and customizable settings with PWA capabilities.
