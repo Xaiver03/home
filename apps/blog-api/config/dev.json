@@ -2,13 +2,14 @@
   "port": 8085,
   "mysql": {
     "host": "localhost",
-    "user": "blog_user",
-    "password": "C3AnRPL8HHGNbd33reAV",
+    "user": "root",
+    "password": "",
     "database": "space_log_blog"
   },
   "redis": {
     "host": "127.0.0.1",
-    "port": 6379
+    "port": 6379,
+    "password": ""
   },
   "mail": {
     "smtp_host": "gz-smtp.qcloudmail.com",

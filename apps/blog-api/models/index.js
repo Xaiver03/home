@@ -1,29 +1,45 @@
 // sequelize 入口文件
 const { Sequelize } = require("sequelize");
 const config = require("config");
+const path = require("path");
 
-const mysqlConfig = config.get("mysql");
+// 开发环境使用 SQLite，生产环境使用 MySQL
+const isDev = process.env.NODE_ENV === 'dev';
 
-const sequelize = new Sequelize(
-  mysqlConfig.database,
-  mysqlConfig.user,
-  mysqlConfig.password,
-  {
-    host: mysqlConfig.host,
-    dialect: "mysql",
-    port: 3306,
-    timezone: "+08:00", // 设置为中国的时区（北京时间，UTC+8）
-    pool: {
-      //数据库连接池：放若干个数据库的连接对象，提高数据库的访问效率
-      max: 20, //数据库连接池中连接对象的最大个数
-      min: 3, //数据库连接池中连接对象的最少个数
-      idle: 20000, //等待延迟的时间，单位是毫秒
-    },
-    define: {
-      charset: "utf8", //处理Mysql中中文字符问题
-    },
-  }
-);
+let sequelize;
+
+if (isDev) {
+  // 开发环境：使用 SQLite
+  const dbPath = path.join(__dirname, '../database.db');
+  sequelize = new Sequelize({
+    dialect: "sqlite",
+    storage: dbPath,
+    logging: false,
+  });
+  console.log(`使用 SQLite 数据库: ${dbPath}`);
+} else {
+  // 生产环境：使用 MySQL
+  const mysqlConfig = config.get("mysql");
+  sequelize = new Sequelize(
+    mysqlConfig.database,
+    mysqlConfig.user,
+    mysqlConfig.password,
+    {
+      host: mysqlConfig.host,
+      dialect: "mysql",
+      port: 3306,
+      timezone: "+08:00",
+      pool: {
+        max: 20,
+        min: 3,
+        idle: 20000,
+      },
+      define: {
+        charset: "utf8",
+      },
+    }
+  );
+}
 
 // 数据库连接提示信息
 sequelize
