@@ -1,0 +1,47 @@
+# Prettier 忽略文件
+# Files to ignore for Prettier formatting
+
+# Dependencies
+node_modules
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist
+build
+.nuxt
+.output
+.vercel
+.netlify
+
+# Logs
+*.log
+logs
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Generated files
+*.min.js
+*.min.css
+
+# Public assets
+public/
+static/
+
+# Config files that should keep original formatting
+.env
+.env.*
