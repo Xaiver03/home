@@ -13,6 +13,16 @@ dist-ssr
 *.local
 .env
 
+# Auto-generated files
+auto-imports.d.ts
+components.d.ts
+*.d.ts
+
+# Nuxt
+.nuxt
+.output
+.nitro
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
