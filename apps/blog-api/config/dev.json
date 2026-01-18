@@ -8,8 +8,7 @@
   },
   "redis": {
     "host": "127.0.0.1",
-    "port": 6379,
-    "password": "MrpBLxNrWvQPCkz3kznltO9CwdyCiP5S"
+    "port": 6379
   },
   "mail": {
     "smtp_host": "gz-smtp.qcloudmail.com",
@@ -18,6 +17,16 @@
     "smtp_password": "Aiaih768aUShsinxSAu",
     "from_email": "light@xiangleideng.site",
     "from_name": "邓湘雷の博客"
+  },
+  "comment": {
+    "entityType": ["Article", "Message"],
+    "adminCustomerEmail": ["light@xiangleideng.site", "allen030703@163.com"]
+  },
+  "qiniu": {
+    "accessKey": "",
+    "secretKey": "",
+    "bucket": "",
+    "domain": ""
   },
   "tokenSecretKey": "xld_blog_jwt_secret_2025_dev",
   "vipCustomerEmail": ["light@xiangleideng.site", "allen030703@163.com"],
