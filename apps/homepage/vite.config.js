@@ -94,8 +94,14 @@ export default ({ mode }) =>
       viteCompression(),
     ],
     server: {
-      port: "3000",
+      port: 3015,
       open: true,
+      host: true,
+      fs: {
+        // 允许访问项目根目录之外的文件（解决路径中有空格的问题）
+        strict: false,
+        allow: ['..']
+      }
     },
     resolve: {
       alias: [
