@@ -1,0 +1,25 @@
+{
+  "name": "@xld/shared-config",
+  "version": "1.0.0",
+  "description": "共享配置文件 - Shared configuration files",
+  "main": "./index.js",
+  "exports": {
+    "./eslint": "./eslint.config.js",
+    "./prettier": "./prettier.config.js"
+  },
+  "scripts": {
+    "dev": "echo 'Shared config loaded'",
+    "build": "echo 'Shared config does not require build'"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "config",
+    "eslint",
+    "prettier",
+    "shared",
+    "monorepo"
+  ],
+  "author": "灯下灯/Xaiver",
+  "license": "MIT"
+}

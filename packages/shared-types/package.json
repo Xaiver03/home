@@ -1,0 +1,30 @@
+{
+  "name": "@xld/shared-types",
+  "version": "1.0.0",
+  "description": "共享 TypeScript 类型定义 - Shared TypeScript type definitions",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "echo 'Shared types in watch mode'",
+    "build": "echo 'Shared types built'",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "keywords": [
+    "types",
+    "typescript",
+    "shared",
+    "monorepo"
+  ],
+  "author": "灯下灯/Xaiver",
+  "license": "MIT"
+}
