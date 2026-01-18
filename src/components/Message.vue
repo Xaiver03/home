@@ -33,28 +33,84 @@
 import { Icon } from "@vicons/utils";
 import { QuoteLeft, QuoteRight } from "@vicons/fa";
 import { Error } from "@icon-park/vue-next";
+import { getGlobalConfig } from "@/api";
 import { mainStore } from "@/store";
+
 const store = mainStore();
 
-// 主页站点logo
-const siteLogo = import.meta.env.VITE_SITE_MAIN_LOGO;
-// 站点链接
-const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "imsyy.top".split(".");
-  // 判断协议前缀
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    const urlFormat = url.replace(/^(https?:\/\/)/, "");
-    return urlFormat.split(".");
-  }
-  return url.split(".");
-});
+// 站点配置数据
+const siteLogo = ref(import.meta.env.VITE_SITE_MAIN_LOGO);
+const siteUrl = ref("xiangleideng.site".split("."));
 
 // 简介区域文字
 const descriptionText = reactive({
   hello: import.meta.env.VITE_DESC_HELLO,
   text: import.meta.env.VITE_DESC_TEXT,
 });
+
+// 备用文字（用于彩蛋）
+const alternateText = reactive({
+  hello: import.meta.env.VITE_DESC_HELLO_OTHER,
+  text: import.meta.env.VITE_DESC_TEXT_OTHER,
+});
+
+// 初始化配置
+const initConfig = async () => {
+  try {
+    const configData = await getGlobalConfig();
+
+    // 优先使用API配置，降级到环境变量
+    if (configData && configData['home-texts']) {
+      const homeTexts = configData['home-texts'].content || {};
+
+      // 站点URL
+      const apiSiteUrl = homeTexts.siteUrl || import.meta.env.VITE_SITE_URL;
+      if (apiSiteUrl) {
+        let urlFormat = apiSiteUrl;
+        if (urlFormat.startsWith("http://") || urlFormat.startsWith("https://")) {
+          urlFormat = urlFormat.replace(/^(https?:\/\/)/, "");
+        }
+        siteUrl.value = urlFormat.split(".");
+      }
+
+      // 问候语和描述
+      descriptionText.hello = homeTexts.helloText || import.meta.env.VITE_DESC_HELLO;
+      descriptionText.text = homeTexts.descText || import.meta.env.VITE_DESC_TEXT;
+      alternateText.hello = homeTexts.helloOther || import.meta.env.VITE_DESC_HELLO_OTHER;
+      alternateText.text = homeTexts.descTextOther || import.meta.env.VITE_DESC_TEXT_OTHER;
+
+      // 站点Logo
+      if (homeTexts.siteLogo) {
+        siteLogo.value = homeTexts.siteLogo;
+      }
+    } else {
+      // 完全降级到环境变量
+      const url = import.meta.env.VITE_SITE_URL;
+      if (url) {
+        let urlFormat = url;
+        if (urlFormat.startsWith("http://") || urlFormat.startsWith("https://")) {
+          urlFormat = urlFormat.replace(/^(https?:\/\/)/, "");
+        }
+        siteUrl.value = urlFormat.split(".");
+      }
+      descriptionText.hello = import.meta.env.VITE_DESC_HELLO;
+      descriptionText.text = import.meta.env.VITE_DESC_TEXT;
+      alternateText.hello = import.meta.env.VITE_DESC_HELLO_OTHER;
+      alternateText.text = import.meta.env.VITE_DESC_TEXT_OTHER;
+    }
+  } catch (error) {
+    console.warn('配置加载失败，使用环境变量:', error);
+    // 错误处理：使用环境变量
+    const url = import.meta.env.VITE_SITE_URL;
+    if (url) {
+      let urlFormat = url;
+      if (urlFormat.startsWith("http://") || urlFormat.startsWith("https://")) {
+        urlFormat = urlFormat.replace(/^(https?:\/\/)/, "");
+      }
+      siteUrl.value = urlFormat.split(".");
+    }
+  }
+};
 
 // 切换右侧功能区
 const changeBox = () => {
@@ -77,14 +133,24 @@ watch(
   () => store.boxOpenState,
   (value) => {
     if (value) {
-      descriptionText.hello = import.meta.env.VITE_DESC_HELLO_OTHER;
-      descriptionText.text = import.meta.env.VITE_DESC_TEXT_OTHER;
+      descriptionText.hello = alternateText.hello;
+      descriptionText.text = alternateText.text;
     } else {
-      descriptionText.hello = import.meta.env.VITE_DESC_HELLO;
-      descriptionText.text = import.meta.env.VITE_DESC_TEXT;
+      // 恢复到API配置的原始文字
+      initConfig().then(() => {
+        // 配置重新加载后，如果仍处于非激活状态，确保显示正确的文字
+        if (!store.boxOpenState) {
+          // 文字已在initConfig中设置
+        }
+      });
     }
   },
 );
+
+// 页面加载时初始化配置
+onMounted(() => {
+  initConfig();
+});
 </script>
 
 <style lang="scss" scoped>

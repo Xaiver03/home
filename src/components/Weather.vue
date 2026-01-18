@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { getAdcode, getWeather, getOtherWeather } from "@/api";
+import { getAdcode, getWeather, getOtherWeather, getWeatherFromBackend } from "@/api";
 import { Error } from "@icon-park/vue-next";
 
 // 高德开发者 Key
@@ -53,7 +53,37 @@ const getTemperature = (min, max) => {
 // 获取天气数据
 const getWeatherData = async () => {
   try {
-    // 获取地理位置信息
+    console.log('=== 天气组件调试信息 ===');
+    console.log('环境变量VITE_WEATHER_KEY:', mainKey);
+    console.log('Key是否有效:', !!mainKey);
+
+    // 优先尝试后端代理API
+    try {
+      console.log('尝试使用后端代理API获取天气...');
+      const backendResult = await getWeatherFromBackend();
+      console.log('后端API返回结果:', backendResult);
+
+      if (backendResult && backendResult.success && backendResult.weather && backendResult.location) {
+        weatherData.adCode = {
+          city: backendResult.location.city,
+          adcode: backendResult.location.adcode,
+        };
+        weatherData.weather = {
+          weather: backendResult.weather.weather,
+          temperature: backendResult.weather.temperature,
+          winddirection: backendResult.weather.winddirection,
+          windpower: backendResult.weather.windpower,
+        };
+        console.log('=== 天气获取成功（后端代理）===');
+        return; // 成功就直接返回
+      } else {
+        throw new Error('后端API返回数据格式异常');
+      }
+    } catch (backendError) {
+      console.warn('后端代理API失败，尝试其他方案:', backendError.message);
+    }
+
+    // 如果后端代理失败，使用原来的逻辑
     if (!mainKey) {
       console.log("未配置，使用备用天气接口");
       const result = await getOtherWeather();
@@ -72,7 +102,7 @@ const getWeatherData = async () => {
     } else {
       // 获取 Adcode
       const adCode = await getAdcode(mainKey);
-      console.log(adCode);
+      console.log('IP定位API返回:', adCode);
       if (adCode.infocode !== "10000") {
         throw "地区查询失败";
       }
@@ -81,7 +111,16 @@ const getWeatherData = async () => {
         adcode: adCode.adcode,
       };
       // 获取天气信息
+      console.log('开始调用天气API，Key:', mainKey, '城市代码:', weatherData.adCode.adcode);
       const result = await getWeather(mainKey, weatherData.adCode.adcode);
+      console.log('天气API原始返回:', result);
+      console.log('result.lives类型:', typeof result.lives, '值:', result.lives);
+
+      if (!result || !result.lives || !result.lives[0]) {
+        console.error('天气API数据结构异常:', result);
+        throw "天气API返回数据异常";
+      }
+
       weatherData.weather = {
         weather: result.lives[0].weather,
         temperature: result.lives[0].temperature,
@@ -89,6 +128,7 @@ const getWeatherData = async () => {
         windpower: result.lives[0].windpower,
       };
     }
+    console.log('=== 天气获取成功 ===');
   } catch (error) {
     console.error("天气信息获取失败:" + error);
     onError("天气信息获取失败");
@@ -108,7 +148,9 @@ const onError = (message) => {
 };
 
 onMounted(() => {
-  // 调用获取天气
-  getWeatherData();
+  // 延迟调用获取天气，避免与其他API调用冲突
+  setTimeout(() => {
+    getWeatherData();
+  }, 1000);
 });
 </script>

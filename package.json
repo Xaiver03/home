@@ -1,14 +1,15 @@
 {
   "name": "home",
-  "author": "imsyy",
-  "github": "https://github.com/imsyy/home",
-  "home": "https://imsyy.top",
+  "author": "灯下灯/Xaiver",
+  "github": "https://github.com/Xaiver03",
+  "home": "https://xiangleideng.site",
   "private": true,
-  "version": "4.1.4",
+  "version": "4.1.6-pwa-fix",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "build:original": "vite build",
     "preview": "vite preview",
     "format": "prettier --write src/",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix"
@@ -24,7 +25,8 @@
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "swiper": "^11.1.1",
-    "vue": "^3.4.24"
+    "vue": "^3.4.24",
+    "workbox-window": "^6.6.0"
   },
   "devDependencies": {
     "@icon-park/vue-next": "^1.4.2",

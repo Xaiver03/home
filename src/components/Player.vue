@@ -87,27 +87,25 @@ const listHeight = computed(() => {
 onMounted(() => {
   nextTick(() => {
     try {
-      getPlayerList(props.songServer, props.songType, props.songId).then((res) => {
-        console.log(res);
-        // 更改播放器加载状态
-        store.musicIsOk = true;
-        // 生成歌单
-        playList.value = res;
-        console.log("音乐加载完成");
-        console.log(playList.value);
-        console.log(playIndex.value, playList.value.length, props.volume);
-      });
+      getPlayerList(props.songServer, props.songType, props.songId)
+        .then((res) => {
+          console.log(res);
+          // 更改播放器加载状态
+          store.musicIsOk = true;
+          // 生成歌单
+          playList.value = res;
+          console.log("音乐加载完成");
+          console.log(playList.value);
+          console.log(playIndex.value, playList.value.length, props.volume);
+        })
+        .catch((err) => {
+          console.warn("音乐播放器加载失败，但不影响其他组件:", err?.message || err);
+          store.musicIsOk = false;
+          // 不显示错误提示，避免干扰用户体验
+        });
     } catch (err) {
-      console.error(err);
+      console.warn("音乐播放器初始化失败:", err?.message || err);
       store.musicIsOk = false;
-      ElMessage({
-        message: "播放器加载失败",
-        grouping: true,
-        icon: h(PlayWrong, {
-          theme: "filled",
-          fill: "#efefef",
-        }),
-      });
     }
   });
 });

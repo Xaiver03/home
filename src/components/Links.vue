@@ -47,15 +47,29 @@ import { Link, Blog, CompactDisc, Cloud, Compass, Book, Fire, LaptopCode } from 
 import { mainStore } from "@/store";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination, Mousewheel } from "swiper/modules";
-import siteLinks from "@/assets/siteLinks.json";
+import { getGlobalConfig } from "@/api";
 
 const store = mainStore();
+
+// 初始化默认网站链接数据
+const defaultSiteLinks = [
+  { "icon": "Blog", "name": "博客", "link": "https://xiangleideng.site/blog" },
+  { "icon": "Cloud", "name": "网盘", "link": "https://xiangleideng.site/" },
+  { "icon": "CompactDisc", "name": "音乐", "link": "https://xiangleideng.site/" },
+  { "icon": "Compass", "name": "起始页", "link": "https://xiangleideng.site/" },
+  { "icon": "Book", "name": "网址集", "link": "https://xiangleideng.site/" },
+  { "icon": "Fire", "name": "今日热榜", "link": "https://xiangleideng.site/" },
+  { "icon": "LaptopCode", "name": "站点监测", "link": "https://xiangleideng.site/" }
+];
+
+// 响应式数据 - 初始化为默认数据，确保组件始终有内容显示
+const siteLinks = ref([...defaultSiteLinks]);
 
 // 计算网站链接
 const siteLinksList = computed(() => {
   const result = [];
-  for (let i = 0; i < siteLinks.length; i += 6) {
-    const subArr = siteLinks.slice(i, i + 6);
+  for (let i = 0; i < siteLinks.value.length; i += 6) {
+    const subArr = siteLinks.value.slice(i, i + 6);
     result.push(subArr);
   }
   return result;
@@ -81,8 +95,29 @@ const jumpLink = (data) => {
   }
 };
 
+// 获取网站链接配置
+const loadSiteLinks = async () => {
+  try {
+    const config = await getGlobalConfig();
+    if (config && config['site-links'] && config['site-links'].content && Array.isArray(config['site-links'].content)) {
+      siteLinks.value = config['site-links'].content;
+      console.log('✅ 网站链接：使用后端API配置');
+    } else {
+      console.log('📄 网站链接：API无数据，保持默认配置');
+    }
+  } catch (error) {
+    console.warn('⚠️ 网站链接：API获取失败，保持默认配置', error?.message || error);
+  }
+};
+
+// 异步加载配置，但不阻塞组件渲染
 onMounted(() => {
-  console.log(siteLinks);
+  // 使用 setTimeout 确保组件已经渲染，然后再尝试加载配置
+  setTimeout(() => {
+    loadSiteLinks().catch(err => {
+      console.warn('网站链接配置加载失败，使用默认配置:', err);
+    });
+  }, 100);
 });
 </script>
 

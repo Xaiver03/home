@@ -43,6 +43,15 @@
       </div>
     </div>
   </div>
+  <!-- 隐藏的播放器组件，用于后台加载音乐数据 -->
+  <Player
+    ref="playerRef"
+    :songServer="playerData.server"
+    :songType="playerData.type"
+    :songId="playerData.id"
+    :volume="volumeNum"
+    style="display: none;"
+  />
   <!-- 音乐列表弹窗 -->
   <Transition name="fade" mode="out-in">
     <div class="music-list" v-show="musicListShow" @click="closeMusicList()">
@@ -56,7 +65,6 @@
             @click="closeMusicList()"
           />
           <Player
-            ref="playerRef"
             :songServer="playerData.server"
             :songType="playerData.type"
             :songId="playerData.id"

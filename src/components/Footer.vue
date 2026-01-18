@@ -44,27 +44,81 @@
 <script setup>
 import { MusicOne } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
+import { getGlobalConfig } from "@/api";
 import config from "@/../package.json";
 
 const store = mainStore();
 const fullYear = new Date().getFullYear();
 
-// 加载配置数据
-// const siteStartDate = ref(import.meta.env.VITE_SITE_START);
-const startYear = ref(
-  import.meta.env.VITE_SITE_START?.length >= 4 ? 
-  import.meta.env.VITE_SITE_START.substring(0, 4) : null
-);
-const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
-const siteAuthor = ref(import.meta.env.VITE_SITE_AUTHOR);
-const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "https://www.imsyy.top";
-  // 判断协议前缀
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    return "//" + url;
+// 从API获取配置数据
+const siteConfig = ref({});
+const startYear = ref(null);
+const siteIcp = ref(null);
+const siteAuthor = ref(null);
+const siteUrl = ref("https://xiangleideng.site");
+
+// 初始化配置
+const initConfig = async () => {
+  try {
+    const configData = await getGlobalConfig();
+
+    // 优先使用API配置，降级到环境变量
+    if (configData && configData['home-texts']) {
+      const homeTexts = configData['home-texts'].content || {};
+      siteIcp.value = homeTexts.siteIcp || import.meta.env.VITE_SITE_ICP;
+      siteAuthor.value = homeTexts.siteAuthor || import.meta.env.VITE_SITE_AUTHOR;
+      const siteStart = homeTexts.siteStart || import.meta.env.VITE_SITE_START;
+      if (siteStart?.length >= 4) {
+        startYear.value = siteStart.substring(0, 4);
+      }
+      const siteUrlFromApi = homeTexts.siteUrl || import.meta.env.VITE_SITE_URL;
+      if (siteUrlFromApi) {
+        if (!siteUrlFromApi.startsWith("http://") && !siteUrlFromApi.startsWith("https://")) {
+          siteUrl.value = "//" + siteUrlFromApi;
+        } else {
+          siteUrl.value = siteUrlFromApi;
+        }
+      }
+    } else {
+      // 降级到环境变量
+      siteIcp.value = import.meta.env.VITE_SITE_ICP;
+      siteAuthor.value = import.meta.env.VITE_SITE_AUTHOR;
+      const siteStart = import.meta.env.VITE_SITE_START;
+      if (siteStart?.length >= 4) {
+        startYear.value = siteStart.substring(0, 4);
+      }
+      const url = import.meta.env.VITE_SITE_URL;
+      if (url) {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          siteUrl.value = "//" + url;
+        } else {
+          siteUrl.value = url;
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('配置加载失败，使用环境变量:', error);
+    // 完全降级到环境变量
+    siteIcp.value = import.meta.env.VITE_SITE_ICP;
+    siteAuthor.value = import.meta.env.VITE_SITE_AUTHOR;
+    const siteStart = import.meta.env.VITE_SITE_START;
+    if (siteStart?.length >= 4) {
+      startYear.value = siteStart.substring(0, 4);
+    }
+    const url = import.meta.env.VITE_SITE_URL;
+    if (url) {
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        siteUrl.value = "//" + url;
+      } else {
+        siteUrl.value = url;
+      }
+    }
   }
-  return url;
+};
+
+// 页面加载时初始化配置
+onMounted(() => {
+  initConfig();
 });
 </script>
 
