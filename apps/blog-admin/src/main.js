@@ -28,7 +28,7 @@ import api from "./api/api.js";
 
 const app = createApp(App);
 // --全局变量--
-app.config.globalProperties.GLOBAL = process.env; // 引入全局环境变量
+app.config.globalProperties.GLOBAL = import.meta.env; // 引入全局环境变量
 app.config.globalProperties.$api = api; // 引入axios全局变量
 
 app.use(router).use(store).mount("#app");

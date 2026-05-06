@@ -185,7 +185,7 @@ const routes = [
 ]
 
 const router = createRouter({ // 创建路由对象
-    history:createWebHistory(process.env.NODE_ENV === 'pro' ? '/mgmt/' : '/'), // 注意这里是方法！设置base路径
+    history:createWebHistory(import.meta.env.MODE === 'pro' ? '/mgmt/' : '/'), // 注意这里是方法！设置base路径
     routes
 })
 

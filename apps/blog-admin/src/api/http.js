@@ -7,7 +7,7 @@ import { notification } from "ant-design-vue";
 // --aixos默认设置--
 axios.defaults.timeout = 30 * 1000; // 30秒 (修复：之前是5分钟，太长了)
 axios.defaults.headers.post["Content-Type"] = "application/json";
-axios.defaults.baseURL = process.env.VUE_APP_BASE_URL; // 设置默认的请求地址
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL || ''; // 设置默认的请求地址
 
 // --请求拦截器--
 // 添加Authorization请求头，用于权限处理
