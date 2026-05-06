@@ -1,0 +1,12 @@
+{
+  "testEnvironment": "node",
+  "testMatch": ["**/tests/**/*.test.js"],
+  "collectCoverageFrom": [
+    "utils/**/*.js",
+    "services/**/*.js",
+    "middlewares/**/*.js",
+    "!**/node_modules/**"
+  ],
+  "coverageReporters": ["text", "json", "html"],
+  "testTimeout": 10000
+}

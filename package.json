@@ -33,7 +33,11 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,md}\"",
     "clean": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" clean",
     "deploy": "bash scripts/deploy.sh",
-    "test": "echo 'Tests not yet configured'",
+    "test": "pnpm --filter homepage test && pnpm --filter @xld/shared-utils test && pnpm --filter blog-api test",
+    "test:homepage": "pnpm --filter homepage test",
+    "test:shared-utils": "pnpm --filter @xld/shared-utils test",
+    "test:blog-api": "pnpm --filter blog-api test",
+    "test:coverage": "pnpm --filter homepage test:coverage && pnpm --filter @xld/shared-utils test:coverage",
     "typecheck": "echo 'TypeScript not yet configured'"
   },
   "devDependencies": {
