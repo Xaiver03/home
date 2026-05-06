@@ -20,7 +20,7 @@
     "dev:frontend": "concurrently -n \"homepage,blog-admin,blog-frontend\" -c \"cyan,magenta,green\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\"",
     "dev:backend": "concurrently -n \"blog-api,music-api\" -c \"yellow,blue\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
     "dev:homepage": "pnpm --filter homepage dev",
-    "dev:blog-admin": "cross-env VUE_APP_PORT=8083 pnpm --filter blog-admin dev",
+    "dev:blog-admin": "pnpm --filter blog-admin dev",
     "dev:blog-api": "pnpm --filter blog-api serve:dev",
     "dev:blog-frontend": "pnpm --filter blog-frontend dev",
     "dev:music": "cross-env PORT=3005 pnpm --filter music-api start:node",
