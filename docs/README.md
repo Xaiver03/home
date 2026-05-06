@@ -2,36 +2,55 @@
 
 ## 快速导航
 
-- [开发指南](./guides/development.md)
-- [部署指南](./guides/deployment.md)
-- [环境变量说明](./guides/env-variables.md)
-- [架构决策记录](./adr/)
-- [历史文档归档](./archive/)
+### 开发参考
+- [开发命令速查](./guides/DEV_COMMANDS.md)
+- [快速开始](./guides/QUICK_START.md)
+- [Monorepo 说明](./guides/README_MONOREPO.md)
+- [PWA 更新指南](./guides/PWA_UPDATE_GUIDE.md)
+
+### 待创建文档
+- `docs/guides/development.md` — 完整开发指南（Task 8 创建）
+- `docs/guides/deployment.md` — 部署指南（Task 8 创建）
+- `docs/guides/env-variables.md` — 环境变量说明（Task 6 创建）
+
+### 架构决策记录
+- [ADR 目录](./adr/)（待添加）
+
+### 历史文档归档
+- [历史文档](./archive/)
+
+---
 
 ## 项目结构
 
 ```
 home/
 ├── apps/
-│   ├── homepage/        # 个人主页（Vue 3 + Vite）
-│   ├── blog-admin/      # 博客管理后台（Vue 3 + Vite）
-│   ├── blog-frontend/   # 博客前台（Nuxt 3 SSR）
-│   └── blog-api/        # 博客 API（Express.js）
+│   ├── homepage/        # 个人主页（Vue 3 + Vite，端口 3015）
+│   ├── blog-admin/      # 博客管理后台（Vue 3 + vue-cli，端口 8083）
+│   ├── blog-frontend/   # 博客前台（Nuxt 3 SSR，端口 3004）
+│   └── blog-api/        # 博客 API（Express.js，端口 8086）
 ├── packages/
 │   ├── shared-utils/    # 共享工具函数
 │   ├── shared-config/   # 共享配置
 │   └── shared-types/    # 共享类型定义
 ├── services/
-│   └── music-api/       # 音乐 API 服务（Meting）
+│   └── music-api/       # 音乐 API 服务（Meting，端口 3005）
 └── docs/                # 项目文档（本目录）
+    ├── guides/          # 开发/部署指南
+    ├── adr/             # 架构决策记录
+    ├── plans/           # 实施计划
+    └── archive/         # 历史文档归档
 ```
 
 ## 子项目说明
 
-| 子项目 | 技术栈 | 端口 | 说明 |
-|--------|--------|------|------|
+| 子项目 | 技术栈 | 开发端口 | 说明 |
+|--------|--------|----------|------|
 | homepage | Vue 3 + Vite | 3015 | 个人主页 |
-| blog-admin | Vue 3 + Vite | 8083 | 博客管理后台 |
+| blog-admin | Vue 3 + vue-cli | 8083 | 博客管理后台 |
 | blog-frontend | Nuxt 3 SSR | 3004 | 博客前台 |
 | blog-api | Express.js | 8086 | 博客 REST API |
-| music-api | Node.js | 3005 | Meting 音乐 API |
+| music-api | Node.js (Meting) | 3005 | 音乐 API 代理 |
+
+> 注：生产环境端口见 CLAUDE.md 中的部署架构说明。
