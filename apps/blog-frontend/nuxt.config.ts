@@ -15,12 +15,11 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/blog/',
     head: {
-      title: "Bokey Space",
+      title: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客",
       meta: [
         {
           name: "description",
-          content: `Bokey Space📍，希望在世界留下我的痕迹。我是Bokey，一名深圳的前端程序员，
-          在这里我会分享我的日常☕️、编程💻、成长✍🏻，我们都会成为自己想要的样子`,
+          content: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考",
         },
       ],
     },
@@ -32,6 +31,8 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_PUBLIC_API_URL || "", // 后台url
       ossUrl: process.env.NUXT_PUBLIC_OSS_URL || "", // oss的url
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "", // 本站地址
+      siteName: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客", // 站点名称
+      siteDesc: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考", // 站点描述
     },
   },
   modules: [
@@ -43,7 +44,7 @@ export default defineNuxtConfig({
     "@vueuse/motion/nuxt",
   ],
   sitemap: {
-    siteUrl: "https://bokey.space",
+    siteUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://xiangleideng.site",
     defaults: {
       changefreq: "weekly",
       priority: 0.7,
