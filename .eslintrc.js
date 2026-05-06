@@ -17,6 +17,26 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['vue'],
+  // Vue 3 Composition API 全局变量（unplugin-auto-import 自动导入）
+  globals: {
+    defineProps: 'readonly',
+    defineEmits: 'readonly',
+    withDefaults: 'readonly',
+    h: 'readonly',
+    ref: 'readonly',
+    reactive: 'readonly',
+    computed: 'readonly',
+    watch: 'readonly',
+    provide: 'readonly',
+    inject: 'readonly',
+    defineComponent: 'readonly',
+    onBeforeMount: 'readonly',
+    onMounted: 'readonly',
+    onBeforeUnmount: 'readonly',
+    nextTick: 'readonly',
+    ElMessage: 'readonly',
+    $openList: 'readonly',
+  },
   rules: {
     // Vue 规则
     'vue/multi-word-component-names': 'off',
