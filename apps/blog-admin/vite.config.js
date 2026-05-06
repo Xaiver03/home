@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -6,8 +6,6 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 import { resolve } from 'path'
 
 export default ({ mode }) => {
-  const env = loadEnv(mode, process.cwd())
-
   return defineConfig({
     base: mode === 'pro' ? '/mgmt/' : '/',
     plugins: [
@@ -58,10 +56,6 @@ export default ({ mode }) => {
           },
         },
       },
-    },
-    define: {
-      // 兼容旧代码中的 process.env 访问
-      'process.env': JSON.stringify(env),
     },
   })
 }
