@@ -53,13 +53,13 @@ const store = mainStore();
 
 // 初始化默认网站链接数据
 const defaultSiteLinks = [
-  { "icon": "Blog", "name": "博客", "link": "https://xiangleideng.site/blog" },
-  { "icon": "Cloud", "name": "网盘", "link": "https://xiangleideng.site/" },
-  { "icon": "CompactDisc", "name": "音乐", "link": "https://xiangleideng.site/" },
-  { "icon": "Compass", "name": "起始页", "link": "https://xiangleideng.site/" },
-  { "icon": "Book", "name": "网址集", "link": "https://xiangleideng.site/" },
-  { "icon": "Fire", "name": "今日热榜", "link": "https://xiangleideng.site/" },
-  { "icon": "LaptopCode", "name": "站点监测", "link": "https://xiangleideng.site/" }
+  { "icon": "Blog", "name": "博客", "link": "/blog" },
+  { "icon": "Cloud", "name": "网盘", "link": "/" },
+  { "icon": "CompactDisc", "name": "音乐", "link": "/" },
+  { "icon": "Compass", "name": "起始页", "link": "/" },
+  { "icon": "Book", "name": "网址集", "link": "/" },
+  { "icon": "Fire", "name": "今日热榜", "link": "/" },
+  { "icon": "LaptopCode", "name": "站点监测", "link": "/" }
 ];
 
 // 响应式数据 - 初始化为默认数据，确保组件始终有内容显示

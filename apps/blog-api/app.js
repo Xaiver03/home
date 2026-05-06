@@ -32,7 +32,7 @@ var userRouter = require("./routes/user");
 var articleRouter = require("./routes/article");
 var ossRouter = require("./routes/oss");
 var adminRouter = require("./routes/admin");
-// var commentRouter = require("./routes/comment"); // 禁用评论功能
+var commentRouter = require("./routes/comment");
 var friendLinkRouter = require("./routes/friendLink")
 var configurationRouter = require("./routes/configuration")
 var weatherRouter = require("./routes/weather"); // 天气API路由
@@ -81,7 +81,7 @@ app.use("/api/article", articleRouter);
 app.use("/api/user", userRouter);
 app.use("/api/oss", ossRouter);
 app.use("/api/admin", adminRouter);
-// app.use("/api/comment", commentRouter); // 禁用评论功能
+app.use("/api/comment", commentRouter);
 app.use("/api/friendLink",friendLinkRouter)
 app.use('/api/configuration',configurationRouter)
 app.use('/api/weather', weatherRouter); // 天气API路由

@@ -10,7 +10,13 @@
     "serve:beta": "cross-env NODE_ENV=beta nodemon ./bin/www",
     "serve:pro": "cross-env NODE_ENV=pro nodemon ./bin/www",
     "build": "echo 'Blog API does not require build'",
-    "clean": "rm -rf logs/*.log"
+    "clean": "rm -rf logs/*.log",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:seed:undo": "sequelize-cli db:seed:undo:all",
+    "migration:generate": "sequelize-cli migration:generate --name"
   },
   "dependencies": {
     "@xld/shared-utils": "workspace:*",
@@ -37,7 +43,8 @@
   },
   "devDependencies": {
     "cross-env": "^10.1.0",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "sequelize-cli": "^6.6.5"
   },
   "repository": {
     "type": "git",

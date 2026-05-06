@@ -12,7 +12,7 @@ export const getGlobalConfig = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const res = await fetch(`https://xiangleideng.site/api/configuration/reception/getConfig`, {
+    const res = await fetch(`/api/configuration/reception/getConfig`, {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export const getWeatherFromBackend = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const res = await fetch('https://xiangleideng.site/api/weather/current', {
+    const res = await fetch('/api/weather/current', {
       signal: controller.signal,
     });
 

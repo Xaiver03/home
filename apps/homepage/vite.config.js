@@ -97,6 +97,29 @@ export default ({ mode }) =>
       port: 3015,
       open: true,
       host: true,
+      proxy: {
+        // 代理博客前台到 3004 端口
+        '/blog': {
+          target: 'http://localhost:3004',
+          changeOrigin: true,
+        },
+        // 代理音乐 API 到 3005 端口
+        '/music': {
+          target: 'http://localhost:3005',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/music/, ''),
+        },
+        // 代理博客 API 到 8086 端口
+        '/api': {
+          target: 'http://localhost:8086',
+          changeOrigin: true,
+        },
+        // 代理博客管理后台到 8083 端口
+        '/mgmt': {
+          target: 'http://localhost:8083',
+          changeOrigin: true,
+        },
+      },
       fs: {
         // 允许访问项目根目录之外的文件（解决路径中有空格的问题）
         strict: false,
