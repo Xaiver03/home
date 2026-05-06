@@ -33,3 +33,10 @@ components.d.ts
 *.njsproj
 *.sln
 *.sw?
+
+# Sensitive config files
+apps/blog-api/config/pro.json
+apps/blog-api/config/dev.json
+.env.dev
+.env.pro
+.env.beta
