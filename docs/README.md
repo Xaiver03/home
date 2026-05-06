@@ -8,13 +8,13 @@
 - [Monorepo 说明](./guides/README_MONOREPO.md)
 - [PWA 更新指南](./guides/PWA_UPDATE_GUIDE.md)
 
-### 待创建文档
-- `docs/guides/development.md` — 完整开发指南（Task 8 创建）
-- `docs/guides/deployment.md` — 部署指南（Task 8 创建）
+### 开发与部署
+- [开发指南](./guides/development.md)
+- [部署指南](./guides/deployment.md)
 - `docs/guides/env-variables.md` — 环境变量说明（Task 6 创建）
 
 ### 架构决策记录
-- [ADR 目录](./adr/)（待添加）
+- [ADR 001: 采用 pnpm Workspace Monorepo 结构](./adr/001-monorepo-structure.md)
 
 ### 历史文档归档
 - [历史文档](./archive/)
