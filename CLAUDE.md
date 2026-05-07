@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Tool Restrictions / 工具限制
+
+**CRITICAL: 严禁使用 sed 命令**
+
+❌ **绝对禁止** 使用 `sed` 命令修改文件（包括 `sed -i`、`sed -e` 等所有形式）
+✅ **必须使用** Edit 工具进行文件编辑
+
+原因：`sed` 命令难以审查、容易出错、不可追踪，Edit 工具提供更安全可控的文件修改方式。
+
+同样禁止用于文件操作的命令：`awk`（修改文件时）、`echo >` 重定向覆盖文件、`cat <<EOF >` 覆盖文件。
+
+---
+
 ## Development Workflow / 开发工作流
 
 **IMPORTANT: Git Commit Strategy / 重要：Git 提交策略**
