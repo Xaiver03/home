@@ -76,7 +76,7 @@ else
   build_blog_admin() {
     log "构建 blog-admin..."
     cd "$REPO_DIR"
-    pnpm --filter blog-admin build 2>&1 | tail -10
+    pnpm --filter blog-admin build:pro 2>&1 | tail -10
     # 复制到 blog-api public 目录
     mkdir -p "$REPO_DIR/apps/blog-api/public/mgmt"
     cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/mgmt/"
