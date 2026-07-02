@@ -4,24 +4,27 @@ import { changeUrlQuery } from "./util.js"
 
 const get_playlist = async (id, cookie = '') => {
     const data = {
-        type: 1,
-        utf8: 1,
-        disstid: id,
-        loginUin: 0,
-        format: 'json'
+        id: id,
+        format: 'json',
+        inCharset: 'utf-8',
+        outCharset: 'utf-8',
+        platform: 'yqq',
+        newsong: 1,
+        needNewCode: 0,
     }
 
 
     const headers = {
-        Referer: 'https://y.qq.com/n/yqq/playlist',
+        Referer: `https://y.qq.com/n/ryqq/playlist/${id}`,
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/91.0.4472.120 Mobile Safari/537.36',
     }
 
-    const url = changeUrlQuery(data, 'http://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg')
+    const url = changeUrlQuery(data, 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_playlist_cp.fcg')
 
     let result = await fetch(url, { headers });
 
     result = await result.json()
-    result = result.cdlist[0].songlist
+    result = result.data.cdlist[0].songlist
 
     let jsonp
     if (config.OVERSEAS) {
@@ -29,13 +32,15 @@ const get_playlist = async (id, cookie = '') => {
         jsonp = await get_song_url(ids.join(','))
     }
     const res = await Promise.all(result.map(async song => {
+        const songmid = song.mid || song.songmid
+        const albummid = song.album?.mid || song.albummid
         let song_info = {
-            author: song.singer.reduce((i, v) => ((i ? i + " / " : i) + v.name), ''),
-            title: song.songname,
-            pic: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${song.albummid}.jpg`,
-            url: config.OVERSEAS ? '' : song.songmid,
-            lrc: song.songmid,
-            songmid: song.songmid,
+            author: song.singer.reduce((i, v) => ((i ? i + " / " : i) + (v.name || v.title)), ''),
+            title: song.title || song.songname,
+            pic: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${albummid}.jpg`,
+            url: config.OVERSEAS ? '' : songmid,
+            lrc: songmid,
+            songmid: songmid,
         }
         return song_info
     }));
