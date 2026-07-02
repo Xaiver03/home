@@ -5,7 +5,7 @@
             <a-input placeholder="请输入邮箱" v-model:value="searchData.mail" style="width: 20rem;"></a-input>
             <a-button @click="search">搜索</a-button>
             <a-button @click="clear">清空</a-button>
-            <a-button @click="createDataShow = true">新增管理员</a-button>
+            <a-button @click="openCreate">新增管理员</a-button>
         </a-space>
         <!-- 表格 -->
         <a-table :columns="listColumns" :data-source="listData" :expand-column-width="100" :rowKey="record => record.id"
@@ -21,7 +21,7 @@
                     <a-input v-if="column.dataIndex === 'mail'" v-model:value="currentColumn.mail" placeholder="请输入邮箱"
                         style="width: 20rem;" />
                     <!-- 用户名 -->
-                    <a-input v-if="column.dataIndex === 'name'" v-model:value="currentColumn.name" placeholder="请输入名称"
+                    <a-input v-if="column.dataIndex === 'username'" v-model:value="currentColumn.username" placeholder="请输入账号"
                         style="width: 15rem;" />
                 </template>
                 <!-- 操作列 -->
@@ -33,16 +33,31 @@
                             <a @click="updateCurrentData(record)">保存</a>
                             <a @click="delete currentColumn['id'];">取消</a>
                         </span>
+                        <a @click="openSetPassword(record)">设置密码</a>
                         <a @click="deleteCurrentData(record.id)">删除</a>
                     </div>
                 </template>
             </template>
         </a-table>
-        <!-- 添加管理员Model -->
+        <!-- 新增管理员Model -->
         <a-modal v-model:open="createDataShow" title="新增管理员" ok-text="确认" cancel-text="取消" @ok="createOneData">
             <a-space size="middle" direction="vertical" style="padding: 1rem 4rem;width: 100%;">
                 邮箱
                 <a-input placeholder="请输入邮箱" v-model:value="createData.mail" style="width: 20rem;"></a-input>
+                账号
+                <a-input placeholder="请输入管理员账号" v-model:value="createData.username" style="width: 20rem;"></a-input>
+                密码
+                <a-input-password placeholder="请输入密码（选填）" v-model:value="createData.password" style="width: 20rem;"></a-input-password>
+            </a-space>
+        </a-modal>
+        <!-- 设置密码Model -->
+        <a-modal v-model:open="setPasswordShow" title="设置管理员密码" ok-text="确认" cancel-text="取消" @ok="doSetPassword">
+            <a-space size="middle" direction="vertical" style="padding: 1rem 4rem;width: 100%;">
+                <p>为 <strong>{{ setPasswordTarget.mail }}</strong> 设置登录密码</p>
+                新密码
+                <a-input-password placeholder="请输入新密码" v-model:value="newPassword" style="width: 20rem;"></a-input-password>
+                确认密码
+                <a-input-password placeholder="请再次输入密码" v-model:value="newPasswordConfirm" style="width: 20rem;"></a-input-password>
             </a-space>
         </a-modal>
     </div>
@@ -51,7 +66,7 @@
 <script setup>
 import utils from "@/utils";
 import { ref, reactive, onMounted, getCurrentInstance, computed, createVNode } from 'vue'
-import { Modal } from 'ant-design-vue';
+import { Modal, notification } from 'ant-design-vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 const { proxy } = getCurrentInstance();
 const listData = ref([]) // 表格数据
@@ -65,6 +80,11 @@ const listColumns = [
         title: "邮箱",
         dataIndex: "mail",
         key: "mail"
+    },
+    {
+        title: "账号",
+        dataIndex: "username",
+        key: "username"
     },
     {
         title: "注册时间",
@@ -156,9 +176,20 @@ const clear = () => { // 清空函数
 let createDataShow = ref(false) // 新增用户model显示状态量
 let createData = reactive({
     mail: null,
+    username: null,
+    password: null,
 }) // 新增的数据
+const openCreate = () => {
+    createData.mail = null
+    createData.username = null
+    createData.password = null
+    createDataShow.value = true
+}
 const createOneData = () => { // 新增数据
-    if (utils.objHasNullOrEmpty(createData)) return
+    if (!createData.mail || !createData.username) {
+        notification.warning({ message: '邮箱和账号为必填项' })
+        return
+    }
     if (!utils.isValidEmail(createData.mail)) return
     proxy.$api.createAdmin(createData).then(res => {
         if (utils.analysisData(res)) {
@@ -166,6 +197,34 @@ const createOneData = () => { // 新增数据
         }
     })
     createDataShow.value = false
+}
+
+// 设置密码
+let setPasswordShow = ref(false)
+let setPasswordTarget = ref({})
+let newPassword = ref('')
+let newPasswordConfirm = ref('')
+const openSetPassword = (record) => {
+    setPasswordTarget.value = record
+    newPassword.value = ''
+    newPasswordConfirm.value = ''
+    setPasswordShow.value = true
+}
+const doSetPassword = () => {
+    if (!newPassword.value || newPassword.value.length < 6) {
+        notification.warning({ message: '密码至少需要6位' })
+        return
+    }
+    if (newPassword.value !== newPasswordConfirm.value) {
+        notification.warning({ message: '两次输入的密码不一致' })
+        return
+    }
+    proxy.$api.updateAdminData({ id: setPasswordTarget.value.id, password: newPassword.value }).then(res => {
+        if (utils.analysisData(res)) {
+            notification.success({ message: '密码设置成功' })
+            setPasswordShow.value = false
+        }
+    })
 }
 onMounted(() => {
     getListData()
