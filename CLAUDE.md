@@ -97,6 +97,30 @@ pnpm --filter blog-api migration:generate --name <migration-name>
 - blog-api 路由分为两类：`/api/*`（需 JWT）和 `/.*\/reception\/.*`（公开）
 - blog-frontend 的 `baseURL` 配置为 `/blog/`，部署时需确保反向代理正确处理该子路径
 - 修改 blog-api 的模型关系后，通过 Sequelize migration 而非直接修改数据库
+- **禁止生成无意义的文档 md 文件**（如 SUMMARY.md、CHANGELOG.md、FIX_REPORT.md 等），不要自行增加文档
+
+## 工作流程（极其重要）
+
+**每次代码修改完成后的强制步骤：**
+
+1. **构建** — `cd apps/blog-admin && npm run build`（前端修改时）
+2. **部署** — 将构建产物复制到 `apps/blog-api/public/mgmt/`，同步后端代码到 finlaw
+3. **Commit + Push** — 按逻辑分组提交，直接 push 到 origin/dev
+4. **🤖 监控 CI/CD** — push 后立即用 `gh run list --branch dev --limit 3` 查看触发状态，然后用 `gh run watch <RUN_ID>` 监控直到完成
+5. **验证** — CI Build Check 和 CD Deploy 两个 workflow 都必须 `completed success`
+
+**CD 部署流程：**
+- GitHub Actions 在 push dev 时自动触发
+- `test` job → 全部测试通过
+- `deploy` job → SSH 到 finlaw（124.223.13.226）→ 运行 `/opt/home/scripts/deploy.sh`
+- 服务器上：git pull → pnpm install → 构建 → pm2 restart → nginx reload
+- **严禁在 CI/CD 完成前就声称工作已完成**
+
+**推送后检查清单：**
+- [ ] `git push` 成功
+- [ ] CI Build Check `success`
+- [ ] CD Deploy `success`
+- [ ] 如有失败，根据日志修复后重新 commit+push+监控
 
 ## 知识图谱
 
