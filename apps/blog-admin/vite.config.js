@@ -7,7 +7,7 @@ import { resolve } from 'path'
 
 export default ({ mode }) => {
   return defineConfig({
-    base: mode === 'pro' ? '/mgmt/' : '/',
+    base: mode === 'dev' ? '/' : '/mgmt/',
     plugins: [
       vue(),
       AutoImport({
