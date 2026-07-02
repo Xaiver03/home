@@ -9,7 +9,7 @@ set -e
 # ============================================================
 
 REPO_DIR="/opt/home"
-LOG_FILE="/var/log/deploy.log"
+LOG_FILE="$REPO_DIR/deploy.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 RED='\033[0;31m'
