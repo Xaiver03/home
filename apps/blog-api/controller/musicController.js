@@ -245,9 +245,11 @@ exports.pollQrCode = async (req, res) => {
     // 跟随跳转：check_sig -> login_jump
     let stepRes = await followRequest(urlRefresh, {}, cookies);
     let stepCookies = stepRes.cookies || cookies;
+    console.log('[music:qr] step1 check_sig status:', stepRes.status, 'cookies count:', Object.keys(stepCookies).length);
 
     const jumpRes = await followRequest('https://graph.qq.com/oauth2.0/login_jump', {}, stepCookies);
     stepCookies = jumpRes.cookies || stepCookies;
+    console.log('[music:qr] step2 login_jump status:', jumpRes.status, 'p_skey:', !!stepCookies['p_skey']);
 
     // 调用 authorize 获取 code（禁止自动重定向，以便从 Location 读取 code）
     const pSkey = stepCookies['p_skey'] || stepCookies['skey'] || '';
@@ -276,14 +278,18 @@ exports.pollQrCode = async (req, res) => {
       },
       body: authData.toString(),
     });
+    console.log('[music:qr] step3 authorize status:', authRes.status, 'location:', (authRes.headers.location || '').slice(0, 80));
 
     if (authRes.status !== 302 || !authRes.headers.location) {
+      console.error('[music:qr] authorize 未返回302, status:', authRes.status, 'data:', authRes.data.slice(0, 200));
       return res.json({ code: -1, msg: 'authorize 未返回重定向，可能未授权', data: authRes.data.slice(0, 500) });
     }
 
     const locationUrl = new URL(authRes.headers.location, 'https://graph.qq.com');
     const code = locationUrl.searchParams.get('code');
+    console.log('[music:qr] step4 got code:', !!code);
     if (!code) {
+      console.error('[music:qr] 无code, location:', authRes.headers.location.slice(0, 200));
       return res.json({ code: -1, msg: '未从授权回调中获取到 code' });
     }
 
@@ -313,6 +319,7 @@ exports.pollQrCode = async (req, res) => {
     }
 
     const exchangeBody = exchangeJson.req || exchangeJson['QQConnectLogin.LoginServer'] || {};
+    console.log('[music:qr] step5 exchange code:', exchangeBody.code, 'has musickey:', !!exchangeBody.data?.musickey);
     if (exchangeBody.code !== 0) {
       return res.json({
         code: -1,
