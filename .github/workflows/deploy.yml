@@ -64,7 +64,7 @@ jobs:
             set -e
             cd /opt/home
             if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.skip_build }}" = "true" ]; then
-              bash scripts/deploy.sh --skip-build
+              bash deploy.sh --skip-build
             else
-              bash scripts/deploy.sh
+              bash deploy.sh
             fi

@@ -50,7 +50,7 @@ pnpm dev:music           # 音乐 API（3005）
 
 ### 生产环境
 - **网站**: https://xiangleideng.site
-- **服务器**: 121.4.24.238 (`ssh 12kmroot`)
+- **服务器**: 124.223.13.226 (`ssh finlaw`)
 
 ---
 
@@ -139,13 +139,13 @@ PORT=3016 pnpm dev:homepage
 tail -f apps/blog-api/logs/combined.log
 
 # 服务器日志
-ssh 12kmroot
+ssh finlaw
 tail -f /opt/home/logs/*.log
 ```
 
 ### Q: 如何重启生产服务？
 ```bash
-ssh 12kmroot
+ssh finlaw
 cd /opt/home
 pm2 restart spaceP_pro    # 博客 API
 pm2 restart music-api      # 音乐 API
@@ -215,7 +215,7 @@ git log --oneline -10
 
 ### 开发工具
 - **GitHub**: https://github.com/Xaiver03/home
-- **服务器**: `ssh 12kmroot`
+- **服务器**: `ssh finlaw`
 - **域名**: https://xiangleideng.site
 
 ### 第三方服务
@@ -241,7 +241,7 @@ git log --oneline -10
 ```bash
 alias home-dev="cd ~/Desktop/All\ in\ one\ Data/01_PROJECTS/home && pnpm dev"
 alias home-local="cd ~/Desktop/All\ in\ one\ Data/01_PROJECTS/home && pnpm dev:local"
-alias home-ssh="ssh 12kmroot"
+alias home-ssh="ssh finlaw"
 ```
 
 ---

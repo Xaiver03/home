@@ -4,8 +4,8 @@ set -e
 # ============================================================
 # CD 部署脚本 - xiangleideng.site
 # 由 GitHub Actions 通过 SSH 触发执行
-# 服务器路径: /opt/home/scripts/deploy.sh
-# 用法: bash scripts/deploy.sh [--skip-build]
+# 服务器路径: /opt/home/deploy.sh
+# 用法: bash deploy.sh [--skip-build]
 # ============================================================
 
 REPO_DIR="/opt/home"
@@ -136,12 +136,12 @@ fi
 
 sleep 2
 
-# ---- Step 5: 重载 Caddy ----
-step "Step 5/6: 重载 Caddy"
-if /usr/bin/caddy reload --config /etc/caddy/Caddyfile --force 2>&1; then
-  log "Caddy 重载成功"
+# ---- Step 5: 重载 Nginx ----
+step "Step 5/6: 重载 Nginx"
+if /usr/sbin/nginx -t 2>&1 && /usr/sbin/nginx -s reload 2>&1; then
+  log "Nginx 重载成功"
 else
-  warn "Caddy 重载失败，请检查配置"
+  warn "Nginx 重载失败，请检查配置"
 fi
 
 # ---- Step 6: 健康检查 ----
@@ -160,7 +160,7 @@ check_service() {
 check_service "blog-api"       "http://127.0.0.1:8086/api/article/reception/getArticleByTypeId/0/1/5"
 check_service "blog-frontend"  "http://127.0.0.1:3004"
 check_service "homepage"       "http://127.0.0.1:8086/mgmt/"  # /mgmt 走 blog-api 静态托管
-check_service "music-api"      "http://127.0.0.1:3000"
+check_service "music-api"      "http://127.0.0.1:4000"
 
 log "========== 部署完成 =========="
 log "提交: $(git -C "$REPO_DIR" log -1 --pretty='%h %s')"

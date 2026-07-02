@@ -158,7 +158,7 @@ cat docs/QUICK_REFERENCE.md
 ### 项目信息
 - **GitHub**: https://github.com/Xaiver03/home
 - **网站**: https://xiangleideng.site
-- **服务器**: 121.4.24.238
+- **服务器**: 124.223.13.226
 
 ---
 

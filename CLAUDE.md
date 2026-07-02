@@ -86,9 +86,9 @@ pnpm --filter blog-api migration:generate --name <migration-name>
 
 ## 生产服务器
 
-- **SSH**: `ssh 12kmroot`（121.4.24.238）
+- **SSH**: `ssh finlaw`（124.223.13.226，ubuntu）
 - **部署路径**: `/opt/home`
-- **Web 服务器**: Caddy（`/etc/caddy/Caddyfile`），修改后需 `systemctl reload caddy`
+- **Web 服务器**: Nginx（`/etc/nginx/sites-enabled/xiangleideng.site`），修改后需 `systemctl reload nginx`
 - **域名**: https://xiangleideng.site
 
 ## 注意事项

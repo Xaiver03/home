@@ -191,7 +191,7 @@ echo $NODE_ENV
 ### Q4: 生产环境配置在哪里？
 服务器上的配置文件：
 ```bash
-ssh 12kmroot
+ssh finlaw
 cd /opt/home
 cat .env.pro
 ```
