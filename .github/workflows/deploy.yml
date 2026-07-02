@@ -7,17 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       skip_build:
-        description: '跳过构建步骤'
+        description: '跳过服务器端构建步骤 (仅重启服务)'
         type: boolean
         default: false
         required: false
 
 jobs:
-  # ============================================================
-  # Job 1: 构建验证 (与 build.yml 保持一致)
-  # ============================================================
-  build-check:
-    name: Build Check
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -45,24 +42,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build homepage
-        run: pnpm --filter homepage build
+      - name: Run all tests
+        run: pnpm test
 
-      - name: Build blog-admin
-        run: pnpm --filter blog-admin build
-
-      - name: Build blog-frontend
-        run: pnpm --filter blog-frontend build
-
-  # ============================================================
-  # Job 2: 部署到服务器
-  # ============================================================
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
-    needs: build-check
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    # push 事件已由 on.push.branches 限定为 dev
+    needs: test
 
     steps:
       - name: Deploy via SSH
@@ -77,4 +63,8 @@ jobs:
           script: |
             set -e
             cd /opt/home
-            bash scripts/deploy.sh
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.skip_build }}" = "true" ]; then
+              bash scripts/deploy.sh --skip-build
+            else
+              bash scripts/deploy.sh
+            fi
