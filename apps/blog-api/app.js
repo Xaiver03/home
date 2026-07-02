@@ -87,6 +87,7 @@ app.use("/api/friendLink",friendLinkRouter)
 app.use('/api/configuration',configurationRouter)
 app.use('/api/weather', weatherRouter); // 天气API路由
 app.use('/api/music', musicRouter); // 音乐Cookie管理路由
+app.use('/music', musicRouter); // 音乐Cookie管理路由（兼容无前缀路径）
 
 // 管理后台路由（不带 /api 前缀）
 app.use("/mgmt", indexRouter); // 管理后台页面

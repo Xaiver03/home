@@ -1,214 +1,118 @@
-import { createRouter,createWebHistory } from "vue-router";
-import Cookies from 'js-cookie';
+import { createRouter, createWebHistory } from "vue-router";
 // 定义路由规则
 const routes = [
     {
-        path: '/login', // 管理员登录页
+        path: '/login',
         name: '登录',
-        components: {
-            all_view: () => import('../pages/LoginPage.vue')
-        },
-        meta: {
-            showView: 'allView'
-        }
+        component: () => import('../pages/LoginPage.vue'),
     },
     {
-        path: '/', // 首页
+        path: '/',
         name: '首页',
-        components: {
-            content_view: () => import('../pages/HomePage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/HomePage.vue'),
     },
     {
-        path: '/log', // 博客管理
+        path: '/log',
         name: '博客',
-        components: {
-            content_view: () => import('../pages/log/LogPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/log/LogPage.vue'),
     },
     {
-        path: '/log/list', // 博客列表
+        path: '/log/list',
         name: '博客列表',
-        components: {
-            content_view: () => import('../pages/log/LogListPage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/log/LogListPage.vue'),
     },
     {
-        path: '/log/phone-list', // 博客列表
+        path: '/log/phone-list',
         name: '博客手机列表',
-        components: {
-            content_view: () => import('../pages/log/phone/LogListPage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/log/phone/LogListPage.vue'),
     },
     {
-        path: '/log/edit', // 博客编辑
+        path: '/log/edit',
         name: '博客编辑',
-        components: {
-            content_view: () => import('../pages/log/LogEditPage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/log/LogEditPage.vue'),
     },
     {
-        path: '/log/type', // 博客类目
+        path: '/log/type',
         name: '博客类目',
-        components: {
-            content_view: () => import('../pages/log/LogTypePage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/log/LogTypePage.vue'),
     },
     {
-        path: '/log/comment', // 博客类目
+        path: '/log/comment',
         name: '评论管理',
-        components: {
-            content_view: () => import('../pages/log/LogCommentPage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/log/LogCommentPage.vue'),
     },
     {
-        path: '/message', // 留言管理
+        path: '/message',
         name: '留言',
-        components: {
-            content_view: () => import('../pages/message/MessageListPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/message/MessageListPage.vue'),
     },
     {
-        path: '/message/phone-edit', // 留言管理
+        path: '/message/phone-edit',
         name: '留言编辑手机端',
-        components: {
-            content_view: () => import('../pages/message/phone/MessageEditPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/message/phone/MessageEditPage.vue'),
     },
     {
-        path: '/message/phone-list', // 留言管理
+        path: '/message/phone-list',
         name: '留言列表手机端',
-        components: {
-            content_view: () => import('../pages/message/phone/MessageListPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/message/phone/MessageListPage.vue'),
     },
     {
-        path: '/user', // 用户管理
+        path: '/user',
         name: '用户',
-        components: {
-            content_view: () => import('../pages/user/UserPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/user/UserPage.vue'),
     },
     {
-        path: '/user/list', // 用户管理
+        path: '/user/list',
         name: '用户列表',
-        components: {
-            content_view: () => import('../pages/user/UserListPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/user/UserListPage.vue'),
     },
     {
-        path: '/user/admin', // 用户管理
+        path: '/user/admin',
         name: '管理员列表',
-        components: {
-            content_view: () => import('../pages/user/AdminListPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/user/AdminListPage.vue'),
     },
     {
-        path: '/friendLink', // 友链管理
+        path: '/friendLink',
         name: '友链',
-        components: {
-            content_view: () => import('../pages/friendLink/friendLinkListPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/friendLink/friendLinkListPage.vue'),
     },
     {
-        path: '/config', // 配置管理
+        path: '/config',
         name: '配置',
-        components: {
-            content_view: () => import('../pages/configuration/ConfigListPage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/configuration/ConfigListPage.vue'),
     },
     {
-        path: '/about', // About Me 管理
+        path: '/about',
         name: 'About管理',
-        components: {
-            content_view: () => import('../pages/about/AboutManagePage.vue'),
-        }, // 该路径下匹配的路由组件
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/about/AboutManagePage.vue'),
     },
     {
-        path: '/home-manage', // 主页管理
+        path: '/home-manage',
         name: '主页管理',
-        components: {
-            content_view: () => import('../pages/home/HomeManagePage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/home/HomeManagePage.vue'),
     },
     {
-        path: '/music', // 音乐管理
+        path: '/music',
         name: '音乐管理',
-        components: {
-            content_view: () => import('../pages/music/MusicCookiePage.vue'),
-        },
-        meta: {
-            showView: 'topView',
-        },
+        component: () => import('../pages/music/MusicCookiePage.vue'),
     },
 ]
 
-const router = createRouter({ // 创建路由对象
-    history:createWebHistory(import.meta.env.MODE === 'pro' ? '/mgmt/' : '/'), // 注意这里是方法！设置base路径
+import { getToken } from "@/utils/auth";
+
+const router = createRouter({
+    history: createWebHistory(import.meta.env.MODE === 'pro' ? '/mgmt/' : '/'),
     routes
 })
 
 // 路由守卫
-// 登录拦截守卫
-router.beforeEach((to,form,next) => {
-    const isAuthenticated = !!Cookies.get('token'); // 检查是否有 token
-    if(to.path!='/login' && !isAuthenticated) { // 若访问不是login页面也没有token，跳转到login页面
-        next({path:'/login'})
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = !!getToken();
+    if (to.path != '/login' && !isAuthenticated) {
+        next({ path: '/login' })
         return
     }
-    next() // 放行
+    next()
 })
 
-// 创建路由对象及暴露
 export default router

@@ -19,8 +19,10 @@ $medium-font-size: var(--medium-font-size,3rem); // 次要文本粗细
 $small-font-size: var(--small-font-size,2.5rem); // 次要文本粗细
 $x-small-font-size: var(--x-small-font-size,2rem); // 次要文本粗细
 $xx-small-font-size: var(--x-small-font-size,1.5rem); // 次要文本粗细
+$normal-font-size: var(--normal-font-size,1rem); // 常规文本大小
 // --交互--
 $main-color: var(--success-color,#FF6600); // 主色 白 #FF6600 黑 #0085ff
 $secondary-color: var(--info-color,#ff983f); // 副色 白 #ff983f 黑 #71c4ef
+$warn-color: var(--warn-color,#ff4d4f); // 警告色
 // --鼠标--
 $hover-cursor: pointer;

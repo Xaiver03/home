@@ -60,7 +60,7 @@ const statusTagColor = computed(() => {
 })
 
 const loadStatus = async () => {
-  const res = await http.get('/api/music/cookie/status')
+  const res = await http.get('/music/cookie/status')
   if (res.data.code === 0) status.value = res.data.data
 }
 
@@ -69,7 +69,7 @@ const loadQrCode = async () => {
   pollMsg.value = '加载中...'
   stopPoll()
   try {
-    const res = await http.get('/api/music/qrcode')
+    const res = await http.get('/music/qrcode')
     if (res.data.code === 0) {
       qrcode.value = res.data.data.qrcode
       pollMsg.value = '等待扫码...'
@@ -90,7 +90,7 @@ const loadQrCode = async () => {
 const startPoll = () => {
   pollTimer = setInterval(async () => {
     try {
-      const res = await http.get('/api/music/qrcode/poll')
+      const res = await http.get('/music/qrcode/poll')
       const { status: s, msg } = res.data
       pollStatus.value = s ?? res.data.code
       pollMsg.value = msg
@@ -122,7 +122,7 @@ const openScanModal = async () => {
 const refreshCookie = async () => {
   refreshing.value = true
   try {
-    const res = await http.post('/api/music/cookie/refresh')
+    const res = await http.post('/music/cookie/refresh')
     if (res.data.code === 0) {
       notification.success({ message: '刷新成功' })
       loadStatus()
@@ -135,7 +135,7 @@ const refreshCookie = async () => {
 }
 
 const deleteCookie = async () => {
-  await http.delete('/api/music/cookie')
+  await http.delete('/music/cookie')
   notification.success({ message: '已清除' })
   loadStatus()
 }
