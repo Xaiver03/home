@@ -1,6 +1,6 @@
 <script setup>
 import { notification, Modal, Upload } from 'ant-design-vue'
-import { ExclamationCircleOutlined, UploadOutlined, MenuOutlined, BulbOutlined } from '@ant-design/icons-vue';
+import { ExclamationCircleOutlined, UploadOutlined, MenuOutlined, BulbOutlined, HomeOutlined } from '@ant-design/icons-vue';
 import { createVNode } from 'vue';
 const router = useRouter()
 const store = useNuxtStore()
@@ -309,6 +309,10 @@ onMounted(() => {
             <div id="navi-content-phone" class="flex xl:hidden justify-between items-center py-8 px-16">
                 <h1 class="cursor-point" @click="router.push('/')">BOKEY'S SPASE</h1>
                 <a-space :size="12">
+                    <a-button class="button flex justify-center items-center h-full"
+                        @click="router.push('/')" title="返回首页">
+                        <HomeOutlined />
+                    </a-button>
                     <a-button class="button flex justify-center items-center h-full"
                         @click="currentThemeIndex ? currentThemeIndex = 0 : currentThemeIndex = 1; themeChange(colorTheme[currentThemeIndex])">
                         <BulbOutlined />{{ colorTheme[currentThemeIndex ? 0 : 1] }}
