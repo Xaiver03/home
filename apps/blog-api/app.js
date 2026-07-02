@@ -74,6 +74,19 @@ app.get('/blog/*', function(req, res, next) {
   res.sendFile(path.join(__dirname, '../space-log-nuxt3/app/.output/public/index.html'));
 });
 
+// 管理后台 SPA fallback（必须在 checkToken 之前，否则刷新页面会触发令牌校验）
+app.get('/mgmt', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/mgmt/index.html'));
+});
+app.get('/mgmt/*', function(req, res, next) {
+  // 带扩展名的是静态资源文件，交给 express.static 处理
+  const lastSegment = req.path.split('/').pop();
+  if (lastSegment && lastSegment.includes('.')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'public/mgmt/index.html'));
+});
+
 app.use(checkToken); // JWT认证 token合法性
 
 // --路由使用--
