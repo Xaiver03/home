@@ -172,8 +172,8 @@ function handleOpenChange(keys) {
     border-bottom: 1px solid $secondary-text-color;
 
     .title {
-      font-size: $normal-font-size;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       white-space: nowrap;
     }
   }

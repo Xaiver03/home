@@ -68,8 +68,12 @@ module.exports = {
   // 通过typeId获取文章 分页
   getArticleByTypeId: async (typeId, currentPage = 1, pageSize = 10) => {
     let offset = (currentPage - 1) * pageSize;
+    const where = { status: "publish" };
+    if (typeId && parseInt(typeId) > 0) {
+      where.typeId = parseInt(typeId);
+    }
     return await Article.findAndCountAll({
-      where: { typeId: typeId, status: "publish" },
+      where,
       offset,
       limit: parseInt(pageSize),
     });

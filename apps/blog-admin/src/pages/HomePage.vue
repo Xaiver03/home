@@ -23,6 +23,7 @@ import { useRouter } from "vue-router";
 const router = useRouter()
 import { useStore } from 'vuex'
 import { removeToken } from '@/utils/auth';
+import Cookies from 'js-cookie'
 const store = useStore()
 
 let beforeDate = ref(0) // 发电天数
