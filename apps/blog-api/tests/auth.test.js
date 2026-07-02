@@ -47,7 +47,7 @@ describe('auth.checkPermissions', () => {
 
     checkPermissions('admin')(req, res, next);
     expect(next).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith({ code: -1, message: '权限不足' });
+    expect(res.json).toHaveBeenCalledWith({ code: -1, msg: '权限不足' });
   });
 
   it('user 权限通过 user 检查', () => {
@@ -66,7 +66,7 @@ describe('auth.checkPermissions', () => {
 
     checkPermissions()(req, res, next);
     expect(next).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith({ code: -1, message: '权限不足' });
+    expect(res.json).toHaveBeenCalledWith({ code: -1, msg: '权限不足' });
   });
 });
 
@@ -81,7 +81,7 @@ describe('auth.JwtErrorCatch', () => {
 
     JwtErrorCatch(err, req, res, next);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ code: -1 })
+      expect.objectContaining({ code: -1 }),
     );
     expect(next).not.toHaveBeenCalled();
   });

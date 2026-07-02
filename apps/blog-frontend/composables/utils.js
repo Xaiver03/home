@@ -1,4 +1,4 @@
-import { useCookie } from "nuxt/app";
+import { useCookie } from 'nuxt/app';
 
 export const utils = {
   /**
@@ -10,10 +10,10 @@ export const utils = {
   analysisData: (res, tipOrNot = true) => {
     if (tipOrNot || res.code != 200) {
       notification.open({
-        message: typeof res.msg === "string" ? "提示💡" : res.msg.message,
+        message: typeof res.msg === 'string' ? '提示💡' : res.msg.message,
         description:
-          typeof res.msg === "string" ? res.msg : res.msg.description,
-        placement: "top",
+          typeof res.msg === 'string' ? res.msg : res.msg.description,
+        placement: 'top',
         duration: 3,
       });
     }
@@ -33,7 +33,7 @@ export const utils = {
       // 格式转化
       date = new Date(date);
     }
-    let year = date.getFullYear(); //获取完整的年份(4位)
+    const year = date.getFullYear(); //获取完整的年份(4位)
     let month = date.getMonth() + 1; //获取当前月份(0-11,0代表1月)
     let strDate = date.getDate(); // 获取当前日(1-31)
     if (month < 10) month = `0${month}`; // 如果月份是个位数，在前面补0
@@ -41,11 +41,11 @@ export const utils = {
     if (detail) {
       // 若为需要详细到时分秒的格式
       return `${year}-${month}-${strDate} ${String(
-        date.getHours() + 1
-      ).padStart(2, "0")}:${String(date.getMinutes()).padStart(
+        date.getHours(),
+      ).padStart(2, '0')}:${String(date.getMinutes()).padStart(
         2,
-        "0"
-      )}:${String(date.getSeconds()).padStart(2, "0")}`;
+        '0',
+      )}:${String(date.getSeconds()).padStart(2, '0')}`;
     }
     return `${year}-${month}-${strDate}`;
   },
@@ -60,11 +60,11 @@ export const utils = {
       return true;
     }
     // 检查是否为空对象
-    if (typeof obj === "object" && Object.keys(obj).length === 0) {
+    if (typeof obj === 'object' && Object.keys(obj).length === 0) {
       return true;
     }
     // 检查是否为空字符串
-    if (typeof obj === "string" && obj.trim() === "") {
+    if (typeof obj === 'string' && obj.trim() === '') {
       return true;
     }
     // 如果以上条件都不满足，则认为不是null、undefined或空对象
@@ -91,7 +91,7 @@ export const utils = {
     data,
     options = {
       maxAge: 60 * 60 * 24 * 10,
-    }
+    },
   ) {
     const cookie = useCookie(key);
     cookie.value = data;
@@ -138,7 +138,7 @@ export const utils = {
       return `今天 ${targetDate.getHours()}:${targetDate
         .getMinutes()
         .toString()
-        .padStart(2, "0")}`;
+        .padStart(2, '0')}`;
     }
 
     // 判断是否昨天
@@ -151,7 +151,7 @@ export const utils = {
       return `昨天 ${targetDate.getHours()}:${targetDate
         .getMinutes()
         .toString()
-        .padStart(2, "0")}`;
+        .padStart(2, '0')}`;
     }
 
     // 一个月内（基于天数差）
@@ -165,15 +165,15 @@ export const utils = {
 
     // 今年
     if (targetYear === nowYear) {
-      const month = (targetDate.getMonth() + 1).toString().padStart(2, "0");
-      const day = targetDate.getDate().toString().padStart(2, "0");
+      const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = targetDate.getDate().toString().padStart(2, '0');
       return `${month}-${day}`;
     }
 
     // 其他情况
     const year = targetDate.getFullYear();
-    const month = (targetDate.getMonth() + 1).toString().padStart(2, "0");
-    const day = targetDate.getDate().toString().padStart(2, "0");
+    const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = targetDate.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   },
 };

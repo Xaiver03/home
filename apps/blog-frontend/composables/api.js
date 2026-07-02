@@ -1,12 +1,12 @@
 export const api = {
   // --全局api--
   getGlobalConfig: () => {
-    return http.get("/configuration/reception/getConfig");
+    return http.get('/configuration/reception/getConfig');
   },
   // #region 文章api
   // 获取最热门的10篇文章
   getHottestArticleTen: () => {
-    return http.post("/article/reception/searchArticle", {
+    return http.post('/article/reception/searchArticle', {
       data: { popularity: true },
       currentPage: 1,
       pageSize: 10,
@@ -18,7 +18,7 @@ export const api = {
    * @param {*} pageSize 页大小
    */
   getArticleListOrderByTime: (data) => {
-    return http.post("/article/reception/searchArticle", {
+    return http.post('/article/reception/searchArticle', {
       data: { orderByTime: true },
       currentPage: data.currentPage,
       pageSize: data.pageSize,
@@ -31,7 +31,7 @@ export const api = {
    * @param {*} pageSize 页大小
    */
   searchArticle: (data) => {
-    return http.post("/article/reception/searchArticle", {
+    return http.post('/article/reception/searchArticle', {
       data: { topic: data.searchContent, orderByTime: true },
       currentPage: data.currentPage,
       pageSize: data.pageSize,
@@ -43,7 +43,7 @@ export const api = {
   },
   // 获取所有文章类别
   getAllArticleTypes: () => {
-    return http.get(`/article/reception/getAllArticleTypes`);
+    return http.get('/article/reception/getAllArticleTypes');
   },
   // 通过id获取文章类别
   getArticleTypeById: (id) => {
@@ -51,12 +51,12 @@ export const api = {
   },
   // 通过id点赞文章
   likeArticleById: (id) => {
-    return http.post(`/article/reception/likeArticle`, { id: id });
+    return http.post('/article/reception/likeArticle', { id });
   },
   // 通过typeId获取文章列表
   getArticleByTypeId: (typeId, currentPage, pageSize) => {
     return http.get(
-      `/article/reception/getArticleByTypeId/${typeId}/${currentPage}/${pageSize}`
+      `/article/reception/getArticleByTypeId/${typeId}/${currentPage}/${pageSize}`,
     );
   },
   getRandomArticleId: (exceptId) => {
@@ -67,19 +67,19 @@ export const api = {
   // #region 用户api
   // 获取登录验证码
   getLoginCode: (data) => {
-    return http.post(`/user/reception/getLoginCode`, data);
+    return http.post('/user/reception/getLoginCode', data);
   },
   // 登录接口
   login: (data) => {
-    return http.post(`/user/reception/login`, data);
+    return http.post('/user/reception/login', data);
   },
   // 通过token获取用户信息
   getUserDataByToken: () => {
-    return http.get(`/user/getUserDataByToken`, {});
+    return http.get('/user/getUserDataByToken', {});
   },
   // 更新用户信息
   updateUserData: (data) => {
-    return http.post(`/user/updateUser`, data);
+    return http.post('/user/updateUser', data);
   },
   // #endregion
 
@@ -94,34 +94,34 @@ export const api = {
   // 获取所有子评论
   getSubComment: async (data) => {
     return await http.getQueryIn(
-      "/comment/reception/customerGetSubComment",
-      data
+      '/comment/reception/customerGetSubComment',
+      data,
     );
   },
   // 添加评论
   addComment: async (data) => {
-    return await http.post("/comment/addComment", data);
+    return await http.post('/comment/addComment', data);
   },
   // 喜欢评论
   likeComment: async (id) => {
-    return await http.post("/comment/reception/likeComment", { id });
+    return await http.post('/comment/reception/likeComment', { id });
   },
   // #endregion
 
   // #region 友链
   // 获取所有友链
   getAllFriendLink: async () => {
-    return await http.get("/friendLink/reception/getAllFriendLink");
+    return await http.get('/friendLink/reception/getAllFriendLink');
   },
   // 随机获取一个友链
   getRandomFriendLink: async (exceptId) => {
     return await http.get(
-      `/friendLInk/reception/getRandomFriendLink/${exceptId}`
+      `/friendLink/reception/getRandomFriendLink/${exceptId}`,
     );
   },
   // 提交友链申请
   submitFriendLink: async (data) => {
-    return await http.post("/friendLink/reception/addFriendLink", data);
+    return await http.post('/friendLink/reception/addFriendLink', data);
   },
   // #endregion
 
@@ -131,7 +131,7 @@ export const api = {
    * @param {*} data 格式：{file: 文件二进制 , path: 上传到oss的路径（若uuidOrNot为false，需要包括文件名和文件后缀）,uuidOrNot: 是否生成uuid }
    */
   uploadImage: async (data) => {
-    return await http.post("/oss/customer/uploadImage", data, null, {
+    return await http.post('/oss/customer/uploadImage', data, null, {
       // "Content-Type": "multipart/form-data",
     });
   },

@@ -1,0 +1,33 @@
+{
+  "port": "BLOG_API_PORT",
+  "mysql": {
+    "host": "MYSQL_HOST",
+    "user": "MYSQL_USER",
+    "password": "MYSQL_PASSWORD",
+    "database": "MYSQL_DATABASE"
+  },
+  "redis": {
+    "host": "REDIS_HOST",
+    "port": "REDIS_PORT",
+    "password": "REDIS_PASSWORD"
+  },
+  "mail": {
+    "smtp_host": "SMTP_HOST",
+    "smtp_port": "SMTP_PORT",
+    "smtp_user": "SMTP_USER",
+    "smtp_password": "SMTP_PASSWORD",
+    "from_email": "MAIL_FROM",
+    "from_name": "MAIL_FROM_NAME"
+  },
+  "qiniu": {
+    "accessKey": "QINIU_ACCESS_KEY",
+    "secretKey": "QINIU_SECRET_KEY",
+    "bucket": "QINIU_BUCKET",
+    "domain": "QINIU_DOMAIN"
+  },
+  "tokenSecretKey": "JWT_SECRET",
+  "author": {
+    "name": "AUTHOR_NAME",
+    "website": "AUTHOR_WEBSITE"
+  }
+}
