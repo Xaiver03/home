@@ -28,10 +28,10 @@ module.exports = {
       // pro环境
       env_pro: {
         NODE_ENV: "pro",
-        name: "spaceP_customer_pro",
+        name: "blog-frontend",
         NODE_APP_INSTANCE: "pro",
         DOTENV: ".env.pro",
-        PORT: process.env.NODE_PORT,
+        PORT: 3004,
       },
     },
   ],
