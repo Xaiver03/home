@@ -24,6 +24,7 @@
   "dependencies": {
     "@xld/shared-utils": "workspace:*",
     "ali-oss": "^6.20.0",
+    "axios": "^1.7.2",
     "bcryptjs": "^3.0.3",
     "config": "^3.3.11",
     "cookie-parser": "~1.4.4",
