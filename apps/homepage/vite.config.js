@@ -42,9 +42,9 @@ export default ({ mode }) =>
           maximumFileSizeToCacheInBytes: 5000000,
 
           runtimeCaching: [
-            // 只缓存静态资源，不缓存API
+            // 只缓存 homepage 自己的静态资源，排除 /mgmt/ /blog/ /api/ 等路径
             {
-              urlPattern: /(.*?)\.(js|css)$/,
+              urlPattern: /^(?!.*\/(mgmt|blog|api|music|static)\/).*(.*?)\.(js|css)$/,
               handler: "StaleWhileRevalidate",
               options: {
                 cacheName: "static-cache",
@@ -55,7 +55,7 @@ export default ({ mode }) =>
               },
             },
             {
-              urlPattern: /(.*?)\.(png|jpe?g|svg|gif|ico|webp)$/,
+              urlPattern: /^(?!.*\/(mgmt|blog|api|music|static)\/).*(.*?)\.(png|jpe?g|svg|gif|ico|webp)$/,
               handler: "CacheFirst",
               options: {
                 cacheName: "image-cache",
@@ -94,29 +94,37 @@ export default ({ mode }) =>
       viteCompression(),
     ],
     server: {
-      port: 3015,
+      port: process.env.PORT || 3015,
       open: true,
       host: true,
       proxy: {
-        // 代理博客前台到 3004 端口
+        // 代理博客前台（本地测试时为 3008，开发环境为 3004）
         '/blog': {
-          target: 'http://localhost:3004',
+          target: process.env.VITE_BLOG_FRONTEND_PORT
+            ? `http://localhost:${process.env.VITE_BLOG_FRONTEND_PORT}`
+            : 'http://localhost:3004',
           changeOrigin: true,
         },
         // 代理音乐 API 到 3005 端口
         '/music': {
-          target: 'http://localhost:3005',
+          target: process.env.VITE_MUSIC_API_PORT
+            ? `http://localhost:${process.env.VITE_MUSIC_API_PORT}`
+            : 'http://localhost:3005',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/music/, ''),
         },
         // 代理博客 API 到 8086 端口
         '/api': {
-          target: 'http://localhost:8086',
+          target: process.env.VITE_BLOG_API_PORT
+            ? `http://localhost:${process.env.VITE_BLOG_API_PORT}`
+            : 'http://localhost:8086',
           changeOrigin: true,
         },
         // 代理博客管理后台到 8083 端口
         '/mgmt': {
-          target: 'http://localhost:8083',
+          target: process.env.VITE_BLOG_ADMIN_PORT
+            ? `http://localhost:${process.env.VITE_BLOG_ADMIN_PORT}`
+            : 'http://localhost:8083',
           changeOrigin: true,
         },
       },
