@@ -68,32 +68,29 @@ const loadQrCode = async () => {
   qrcodeLoading.value = true
   pollMsg.value = '加载中...'
   stopPoll()
-  try {
-    const res = await http.get('/music/qrcode')
-    if (res.data.code === 0) {
-      qrcode.value = res.data.data.qrcode
-      pollMsg.value = '等待扫码...'
-      pollStatus.value = 66
-      startPoll()
-    } else {
-      pollMsg.value = res.data.msg || '获取失败'
-      pollStatus.value = -2
-    }
-  } catch (e) {
-    pollMsg.value = '获取二维码失败'
+  const res = await http.get('/music/qrcode')
+  if (res.data.code === 0) {
+    qrcode.value = res.data.data.qrcode
+    pollMsg.value = '等待扫码...'
+    pollStatus.value = 66
+    startPoll()
+  } else {
+    pollMsg.value = res.data.msg || '获取失败'
     pollStatus.value = -2
-  } finally {
     qrcodeLoading.value = false
   }
 }
 
 const startPoll = () => {
   let failCount = 0
-  pollTimer = setInterval(async () => {
+  const pollAction = async () => {
     try {
       const res = await http.get('/music/qrcode/poll')
-      const { status: s, msg, code } = res.data
-      pollStatus.value = s ?? code
+      const responseData = res.data
+      const s = responseData.status
+      const msg = responseData.msg
+      const code = responseData.code
+      pollStatus.value = (s != null) ? s : code
       pollMsg.value = msg
 
       if (s === 0) {
@@ -105,21 +102,20 @@ const startPoll = () => {
         stopPoll()
         notification.warning({ message: '二维码已过期', description: '请重新获取二维码' })
       } else if (code < 0) {
-        // 后端返回错误，停止轮询并显示错误
         stopPoll()
         notification.error({ message: '登录失败', description: msg || '未知错误' })
       }
       failCount = 0
     } catch (e) {
-      failCount++
+      failCount = failCount + 1
       if (failCount > 10) {
         stopPoll()
         pollMsg.value = '网络异常，请重试'
         notification.error({ message: '轮询失败', description: '网络连接异常，请检查网络后重试' })
       }
     }
-    }
-  }, 2000)
+  }
+  pollTimer = setInterval(pollAction, 2000)
 }
 
 const stopPoll = () => {
