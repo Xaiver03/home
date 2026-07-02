@@ -28,7 +28,7 @@ log "========== CI/CD 自动部署开始 =========="
 # ---- Step 1: 拉取最新代码 ----
 step "Step 1/6: 拉取最新代码"
 cd "$REPO_DIR"
-git fetch origin
+git fetch origin --quiet
 LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse origin/dev)
 
@@ -38,7 +38,8 @@ if [ "$LOCAL" = "$REMOTE" ]; then
   exit 0
 fi
 
-git pull origin dev
+# 强制对齐远程（丢弃本地修改，确保部署一致性）
+git reset --hard origin/dev 2>&1 | tail -3
 log "代码已更新: $(git rev-parse --short HEAD) — $(git log -1 --pretty='%s')"
 
 # ---- Step 2: 安装依赖 ----
