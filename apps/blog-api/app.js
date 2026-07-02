@@ -36,6 +36,7 @@ var commentRouter = require("./routes/comment");
 var friendLinkRouter = require("./routes/friendLink")
 var configurationRouter = require("./routes/configuration")
 var weatherRouter = require("./routes/weather"); // 天气API路由
+var musicRouter = require("./routes/music"); // 音乐Cookie管理路由
 
 // 中间件引入
 var { checkToken, JwtErrorCatch } = require("./middlewares/auth");
@@ -85,6 +86,7 @@ app.use("/api/comment", commentRouter);
 app.use("/api/friendLink",friendLinkRouter)
 app.use('/api/configuration',configurationRouter)
 app.use('/api/weather', weatherRouter); // 天气API路由
+app.use('/api/music', musicRouter); // 音乐Cookie管理路由
 
 // 管理后台路由（不带 /api 前缀）
 app.use("/mgmt", indexRouter); // 管理后台页面

@@ -182,6 +182,16 @@ const routes = [
             showView: 'topView',
         },
     },
+    {
+        path: '/music', // 音乐管理
+        name: '音乐管理',
+        components: {
+            content_view: () => import('../pages/music/MusicCookiePage.vue'),
+        },
+        meta: {
+            showView: 'topView',
+        },
+    },
 ]
 
 const router = createRouter({ // 创建路由对象

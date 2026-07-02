@@ -62,6 +62,12 @@ const naviItems = ref([
         label: 'About管理',
         title: 'About管理',
         path: '/about',
+    },
+    {
+        key: 'music',
+        label: '音乐',
+        title: '音乐管理',
+        path: '/music',
     }
 ])
 const naviTo = (e) => {

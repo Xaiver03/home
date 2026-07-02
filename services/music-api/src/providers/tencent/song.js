@@ -4,8 +4,9 @@ import config from "../../config.js"
 export const get_song_url = async (id, cookie = '') => {
 
     id = id.split(',')
-    let uin = ''
-    let qqmusic_key = ''
+    const saved = config.COOKIE
+    let uin = saved.uin
+    let qqmusic_key = saved.qqmusic_key
     const typeObj = {
         s: 'M500',
         e: '.mp3',
