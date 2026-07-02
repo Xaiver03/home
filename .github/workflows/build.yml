@@ -1,46 +1,70 @@
-# Dev 分支推送部署预览
-## 仅部署 Win 端
-name: Build Dev
+name: CI Build Check
 
 on:
   push:
     branches:
       - dev
       - master
+  pull_request:
+    branches:
+      - dev
+      - master
 
 jobs:
-  release:
-    name: Build Website
-    runs-on: windows-latest
+  build:
+    name: Build All Apps
+    runs-on: ubuntu-latest
 
     steps:
-      # 检出 Git 仓库
-      - name: Check out git repository
-        uses: actions/checkout@v4.1.1
-      # 安装 Node.js
-      - name: Install Node.js
-        uses: actions/setup-node@v4.0.0
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: "18.x"
-      # 复制环境变量文件
-      - name: Copy .env.example
+          version: 8
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Create .env from example
         run: |
-          if (-not (Test-Path .env)) {
-            Copy-Item .env.example .env
-          } else {
-            Write-Host ".env file already exists. Skipping the copy step."
-          }
-      # 安装项目依赖
-      - name: Install Dependencies
-        run: npm install
-      # 构建程序
-      - name: Build Website
-        run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      # 上传构建产物
-      - name: Upload artifacts
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build homepage
+        run: pnpm --filter homepage build
+
+      - name: Build blog-admin
+        run: pnpm --filter blog-admin build
+
+      - name: Build blog-frontend
+        run: pnpm --filter blog-frontend build
+
+      - name: Upload homepage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Home
-          path: dist
+          name: homepage-dist
+          path: apps/homepage/dist
+          retention-days: 7
+
+      - name: Upload blog-admin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blog-admin-dist
+          path: apps/blog-admin/dist
+          retention-days: 7
+
+      - name: Upload blog-frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blog-frontend-output
+          path: apps/blog-frontend/.output
+          retention-days: 7
