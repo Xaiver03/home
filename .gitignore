@@ -37,6 +37,11 @@ components.d.ts
 # Sensitive config files
 apps/blog-api/config/pro.json
 apps/blog-api/config/dev.json
+apps/blog-api/config/local.json
 .env.dev
 .env.pro
 .env.beta
+
+# Credentials and sensitive information
+CREDENTIALS.md
+**/CREDENTIALS.md
