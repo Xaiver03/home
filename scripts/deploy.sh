@@ -91,12 +91,10 @@ if pm2 list | grep -q "blog-frontend"; then
   pm2 restart blog-frontend 2>&1 | tail -3
 else
   cd "$REPO_DIR/apps/blog-frontend"
-  pm2 start ecosystem.config.cjs 2>&1 | tail -5 2>/dev/null || {
-    # 若无 ecosystem 文件，手动启动
+  pm2 start ecosystem.config.cjs --env pro 2>&1 | tail -5 2>/dev/null || {
     pm2 start "PORT=3004 node .output/server/index.mjs" \
       --name blog-frontend \
       --cwd "$REPO_DIR/apps/blog-frontend" \
-      --env pro \
       2>&1 | tail -5
   }
 fi
