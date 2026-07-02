@@ -129,6 +129,9 @@ importers:
       ali-oss:
         specifier: ^6.20.0
         version: 6.23.0
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       config:
         specifier: ^3.3.11
         version: 3.3.12
@@ -234,7 +237,7 @@ importers:
         version: 2.7.0
       nuxt:
         specifier: ^3.12.3
-        version: 3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.26)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1)
+        version: 3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.38)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1)
       pinia:
         specifier: ^2.1.7
         version: 2.3.1(typescript@5.9.3)(vue@3.5.26)
@@ -690,7 +693,7 @@ packages:
     dependencies:
       '@babel/template': 7.28.6
       '@babel/traverse': 7.28.6
-      '@babel/types': 7.28.6
+      '@babel/types': 7.29.7
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1275,7 +1278,7 @@ packages:
       '@babel/core': 7.28.6
       '@babel/helper-module-transforms': 7.28.6(@babel/core@7.28.6)
       '@babel/helper-plugin-utils': 7.28.6
-      '@babel/helper-validator-identifier': 7.28.5
+      '@babel/helper-validator-identifier': 7.29.7
       '@babel/traverse': 7.28.6
     transitivePeerDependencies:
       - supports-color
@@ -1665,7 +1668,7 @@ packages:
     dependencies:
       '@babel/core': 7.28.6
       '@babel/helper-plugin-utils': 7.28.6
-      '@babel/types': 7.28.6
+      '@babel/types': 7.29.7
       esutils: 2.0.3
     dev: true
 
@@ -3852,7 +3855,7 @@ packages:
       klona: 2.0.6
       mocked-exports: 0.1.1
       nitropack: 2.13.1
-      nuxt: 3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.26)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1)
+      nuxt: 3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.38)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1)
       pathe: 2.0.3
       pkg-types: 2.3.0
       radix3: 1.1.2
@@ -3961,7 +3964,7 @@ packages:
       magic-string: 0.30.21
       mlly: 1.8.0
       mocked-exports: 0.1.1
-      nuxt: 3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.26)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1)
+      nuxt: 3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.38)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1)
       ohash: 2.0.11
       pathe: 2.0.3
       perfect-debounce: 2.0.0
@@ -6574,6 +6577,11 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       safe-buffer: 5.1.2
+    dev: false
+
+  /bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
     dev: false
 
   /before@0.0.1:
@@ -11987,7 +11995,7 @@ packages:
       - vue
     dev: false
 
-  /nuxt@3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.26)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1):
+  /nuxt@3.20.2(@types/node@20.19.30)(@vue/compiler-sfc@3.5.38)(eslint@8.57.1)(sass@1.97.2)(typescript@5.9.3)(vite@7.3.1):
     resolution: {integrity: sha512-DoayekzYjYmGj7A5iI7crBiLRTq1K8U1DLgAR/vGADh1IQfOLagn5Klg1Jn1xxIyN8x0iiFDf3dGd2JWyiKBLA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
@@ -12054,7 +12062,7 @@ packages:
       unctx: 2.5.0
       unimport: 5.6.0
       unplugin: 2.3.11
-      unplugin-vue-router: 0.19.2(@vue/compiler-sfc@3.5.26)(vue-router@4.6.4)(vue@3.5.38)
+      unplugin-vue-router: 0.19.2(@vue/compiler-sfc@3.5.38)(vue-router@4.6.4)(vue@3.5.38)
       untyped: 2.0.0
       vue: 3.5.38(typescript@5.9.3)
       vue-router: 4.6.4(vue@3.5.38)
@@ -15412,7 +15420,7 @@ packages:
       - supports-color
     dev: true
 
-  /unplugin-vue-router@0.19.2(@vue/compiler-sfc@3.5.26)(vue-router@4.6.4)(vue@3.5.38):
+  /unplugin-vue-router@0.19.2(@vue/compiler-sfc@3.5.38)(vue-router@4.6.4)(vue@3.5.38):
     resolution: {integrity: sha512-u5dgLBarxE5cyDK/hzJGfpCTLIAyiTXGlo85COuD4Nssj6G7NxS+i9mhCWz/1p/ud1eMwdcUbTXehQe41jYZUA==}
     peerDependencies:
       '@vue/compiler-sfc': ^3.5.17
@@ -15423,7 +15431,7 @@ packages:
     dependencies:
       '@babel/generator': 7.28.6
       '@vue-macros/common': 3.1.2(vue@3.5.38)
-      '@vue/compiler-sfc': 3.5.26
+      '@vue/compiler-sfc': 3.5.38
       '@vue/language-core': 3.2.2
       ast-walker-scope: 0.8.3
       chokidar: 5.0.0

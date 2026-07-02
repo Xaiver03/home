@@ -19,10 +19,10 @@
 <script setup>
 import { onMounted, ref } from "vue"
 import { notification } from "ant-design-vue";
-import Cookies from "js-cookie";
 import { useRouter } from "vue-router";
 const router = useRouter()
 import { useStore } from 'vuex'
+import { removeToken } from '@/utils/auth';
 const store = useStore()
 
 let beforeDate = ref(0) // 发电天数
@@ -39,12 +39,7 @@ const getDateBefore = (date) => { // 获取日期与现在之间的天数
   return daysDifference;
 }
 const exit = () => { // 退出登录函数
-  const allCookies = Cookies.get();
-  for (const cookieName in allCookies) {
-    if (Object.prototype.hasOwnProperty.call(allCookies, cookieName)) {
-      Cookies.remove(cookieName);
-    }
-  }
+  removeToken();
   notification.success({
     message: "退出成功♻️",
     description: "继续探索世界，谱写自己的乐章叭🎷",

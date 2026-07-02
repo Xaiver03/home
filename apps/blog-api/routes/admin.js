@@ -22,5 +22,6 @@ router.delete(
 );
 router.post("/reception/getLoginCode", adminController.sendLoginMail);
 router.post("/reception/login", adminController.adminLogin);
+router.post("/reception/loginByPassword", adminController.loginByPassword);
 
 module.exports = router;

@@ -3,6 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import router from "@/router/index";
 import { notification } from "ant-design-vue";
+import { getToken, removeToken } from "@/utils/auth";
 
 // --aixos默认设置--
 axios.defaults.timeout = 30 * 1000; // 30秒 (修复：之前是5分钟，太长了)
@@ -13,8 +14,8 @@ axios.defaults.baseURL = import.meta.env.VITE_BASE_URL || ''; // 设置默认的
 // 添加Authorization请求头，用于权限处理
 axios.interceptors.request.use(
   (config) => {
-    // 添加请求头等前置处理
-    const token = Cookies.get("token");
+    // 优先从 cookie 读取，若 cookie 丢失则回退 localStorage
+    const token = getToken();
     if (token) {
       config.headers["Authorization"] = "Bearer " + token;
     }
@@ -27,7 +28,7 @@ axios.interceptors.request.use(
   }
 );
 
-// --响应拦截器--
+// 响应拦截器
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,12 +36,7 @@ axios.interceptors.response.use(
       // 检查是否是 token 过期的错误
       if (error.response.status === 401) {
         // 清除信息
-        const allCookies = Cookies.get();
-        for (const cookieName in allCookies) {
-          if (Object.prototype.hasOwnProperty.call(allCookies, cookieName)) {
-            Cookies.remove(cookieName);
-          }
-        }
+        removeToken();
         notification.info({
           message: "登录过期",
           description: error.response.data.msg,

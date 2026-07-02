@@ -1,6 +1,7 @@
 const { Admin, Sequelize } = require("../models");
 const utils = require("../utils");
 const { Op } = require("sequelize");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
   // --获取--
@@ -33,14 +34,28 @@ module.exports = {
   getAdminByMail: async (mail) => {
     return await Admin.findOne({ where: { mail: mail } });
   },
+  // 通过账号获取管理员信息
+  getAdminByUsername: async (username) => {
+    return await Admin.findOne({ where: { username: username } });
+  },
   // --修改--
   // 添加管理员
   createAdmin: async (admin) => {
-    return await Admin.create(admin);
+    const data = { ...admin };
+    if (data.password) {
+      data.passwordHash = await bcrypt.hash(data.password, 10);
+      delete data.password;
+    }
+    return await Admin.create(data);
   },
   // 修改管理员信息
   updateAdmin: async (admin) => {
-    return await Admin.update(admin, { where: { id: admin.id } });
+    const data = { ...admin };
+    if (data.password) {
+      data.passwordHash = await bcrypt.hash(data.password, 10);
+      delete data.password;
+    }
+    return await Admin.update(data, { where: { id: admin.id } });
   },
 
   // --删除--

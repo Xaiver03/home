@@ -108,6 +108,10 @@ export default {
   adminLogin: (data) => {
     return req.post("/admin/reception/login", data);
   },
+  // 管理员账号密码登录
+  loginByPassword: (data) => {
+    return req.post("/admin/reception/loginByPassword", data);
+  },
   // 管理员请求邮箱验证码
   getLoginCode: (data) => {
     return req.post("/admin/reception/getLoginCode", data);

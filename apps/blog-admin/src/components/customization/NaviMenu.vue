@@ -11,8 +11,8 @@ import { onMounted, ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 import { notification } from "ant-design-vue";
-import Cookies from "js-cookie";
 import { useStore } from 'vuex'
+import { removeToken } from '@/utils/auth';
 const store = useStore()
 const naviItems = ref([
     {
@@ -89,12 +89,7 @@ const getLocalTheme = () => { // 获取本地主题
     }
 }
 const exit = () => { // 退出登录函数
-  const allCookies = Cookies.get();
-  for (const cookieName in allCookies) {
-    if (Object.prototype.hasOwnProperty.call(allCookies, cookieName)) {
-      Cookies.remove(cookieName);
-    }
-  }
+  removeToken();
   notification.success({
     message: "退出成功♻️",
     description: "继续探索世界，谱写自己的乐章叭🎷",

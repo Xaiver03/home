@@ -3,6 +3,7 @@ const mailService = require('../services/mailService')
 const utils = require("../utils/index");
 const redisService = require("../services/redisService");
 const tokenService = require("../services/tokenService");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
   // --获取--
@@ -55,6 +56,28 @@ module.exports = {
       return;
     }
     res.json(utils.postMessage(-1, "验证码错误❗️请检查重试", {}));
+  },
+
+  // 账号密码登录
+  loginByPassword: async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      res.json(utils.postMessage(-1, "账号和密码不能为空❗️", {}));
+      return;
+    }
+    let adminData = await adminService.getAdminByUsername(username);
+    if (!adminData || !adminData.passwordHash) {
+      res.json(utils.postMessage(-1, "账号或密码错误❗️", {}));
+      return;
+    }
+    const isValid = await bcrypt.compare(password, adminData.passwordHash);
+    if (!isValid) {
+      res.json(utils.postMessage(-1, "账号或密码错误❗️", {}));
+      return;
+    }
+    adminData = adminData.dataValues;
+    adminData.token = tokenService.getToken({ ...adminData, power: "admin" });
+    res.json(utils.postMessage(undefined, "登录成功✅欢迎您", adminData));
   },
 
   // --修改--
