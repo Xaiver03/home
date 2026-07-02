@@ -79,7 +79,7 @@ const loadQrCode = async () => {
       pollMsg.value = res.data.msg || '获取失败'
       pollStatus.value = -2
     }
-  } catch {
+  } catch (e) {
     pollMsg.value = '获取二维码失败'
     pollStatus.value = -2
   } finally {
@@ -110,7 +110,7 @@ const startPoll = () => {
         notification.error({ message: '登录失败', description: msg || '未知错误' })
       }
       failCount = 0
-    } catch {
+    } catch (e) {
       failCount++
       if (failCount > 10) {
         stopPoll()
