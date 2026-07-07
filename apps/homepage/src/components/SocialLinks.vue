@@ -19,7 +19,7 @@
     <!-- 公众号二维码弹窗 -->
     <el-dialog v-model="showWechatQr" title="关注公众号" width="320px" :align-center="true" destroy-on-close>
       <div style="text-align:center">
-        <img src="/uploads/wechat-qr.jpg" alt="公众号二维码" style="width:240px;height:240px;border-radius:8px" />
+        <img :src="'/uploads/wechat-qr.jpg'" alt="公众号二维码" style="width:240px;height:240px;border-radius:8px" />
         <p style="margin-top:12px;color:#888;font-size:13px">扫码关注「灯下灯」</p>
       </div>
     </el-dialog>
