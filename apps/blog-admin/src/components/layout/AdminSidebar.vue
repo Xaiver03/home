@@ -52,8 +52,8 @@
       <ul class="footer-menu">
         <li class="footer-menu-item">
           <button class="nav-menu-btn" @click="toggleTheme">
-            <SunOutlined v-if="currentTheme === 'Dark'" class="nav-icon" />
-            <MoonOutlined v-else class="nav-icon" />
+            <BulbOutlined v-if="currentTheme === 'Dark'" class="nav-icon" />
+            <BgColorsOutlined v-else class="nav-icon" />
             <span v-if="!collapsed">{{ currentTheme === 'Dark' ? '亮色模式' : '暗色模式' }}</span>
           </button>
         </li>
@@ -93,8 +93,8 @@ import {
   HomeOutlined,
   IdcardOutlined,
   CustomerServiceOutlined,
-  SunOutlined,
-  MoonOutlined,
+  BulbOutlined,
+  BgColorsOutlined,
 } from '@ant-design/icons-vue';
 
 const route = useRoute();
@@ -179,7 +179,7 @@ const selectedKeys = computed(() => {
 
 $sb-bg:          hsl(0, 0%, 98%);
 $sb-fg:          hsl(240, 5.3%, 26.1%);
-$sb-fg-muted:    hsl(240, 5.3%, 26.1% / 0.7);
+$sb-fg-muted:    hsla(240, 5.3%, 26.1%, 0.7);
 $sb-accent:      hsl(240, 4.8%, 95.9%);
 $sb-accent-fg:   hsl(240, 5.9%, 10%);
 $sb-border:      hsl(220, 13%, 91%);
@@ -356,7 +356,7 @@ $sb-transition:  150ms ease;
   font-size: 0.625rem;
   padding: 0.0625rem 0.375rem;
   border-radius: 9999px;
-  background: $sb-primary / 0.1;
+  background: rgba($sb-primary, 0.1);
   color: $sb-primary;
   font-weight: 600;
   line-height: 1rem;
