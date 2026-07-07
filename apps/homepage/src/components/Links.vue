@@ -97,24 +97,19 @@ const siteIcon = {
 const showWechatQr = ref(false);
 const qrImage = ref('/uploads/wechat-qr.jpg');
 
-// 链接跳转
+// 链接跳转 — 全部用原生 <a> 标签新标签页打开（除二维码弹窗）
 const jumpLink = (data) => {
   const link = data.link || '';
-  if (data.name === "音乐" && store.musicClick) {
-    if (typeof $openList === "function") $openList();
-  } else if (data.type === 'qr' || link === '#wechat-qr') {
+  if (data.type === 'qr' || link === '#wechat-qr') {
     showWechatQr.value = true;
     qrImage.value = link && link !== '#wechat-qr' ? link : '/uploads/wechat-qr.jpg';
-  } else if (link.startsWith('/')) {
-    window.location.href = link;
-  } else {
-    // 用原生 <a> 标签打开外链，避免 window.open 的 about:blank 和弹窗拦截问题
-    const a = document.createElement('a');
-    a.href = link;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.click();
+    return;
   }
+  const a = document.createElement('a');
+  a.href = link;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.click();
 };
 
 // 获取网站链接配置
