@@ -104,7 +104,11 @@ const jumpLink = (data) => {
   } else if (data.type === 'qr' || data.link === '#wechat-qr') {
     showWechatQr.value = true;
     qrImage.value = data.link && data.link !== '#wechat-qr' ? data.link : '/uploads/wechat-qr.jpg';
+  } else if (data.link.startsWith('/')) {
+    // 站内链接直接跳转
+    window.location.href = data.link;
   } else {
+    // 站外链接新标签页打开
     window.open(data.link, "_blank");
   }
 };
