@@ -99,17 +99,21 @@ const qrImage = ref('/uploads/wechat-qr.jpg');
 
 // 链接跳转
 const jumpLink = (data) => {
+  const link = data.link || '';
   if (data.name === "音乐" && store.musicClick) {
     if (typeof $openList === "function") $openList();
-  } else if (data.type === 'qr' || data.link === '#wechat-qr') {
+  } else if (data.type === 'qr' || link === '#wechat-qr') {
     showWechatQr.value = true;
-    qrImage.value = data.link && data.link !== '#wechat-qr' ? data.link : '/uploads/wechat-qr.jpg';
-  } else if (data.link.startsWith('/')) {
-    // 站内链接直接跳转
-    window.location.href = data.link;
+    qrImage.value = link && link !== '#wechat-qr' ? link : '/uploads/wechat-qr.jpg';
+  } else if (link.startsWith('/')) {
+    window.location.href = link;
   } else {
-    // 站外链接新标签页打开
-    window.open(data.link, "_blank");
+    // 用原生 <a> 标签打开外链，避免 window.open 的 about:blank 和弹窗拦截问题
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.click();
   }
 };
 
