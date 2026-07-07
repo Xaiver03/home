@@ -30,11 +30,17 @@ export default ({ mode }) =>
 
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [
-            /^\/blog/,    // 排除博客路径
-            /^\/api/,     // 排除 API 路径
-            /^\/mgmt/,    // 排除管理后台路径
-            /^\/music/,   // 排除音乐 API 路径
-            /^\/static/,  // 排除静态资源路径
+            /^\/api/,      // API 路径
+            /^\/admin/,    // 管理后台
+            /^\/about/,    // 博客-关于
+            /^\/link/,     // 博客-友链
+            /^\/log/,      // 博客-文章
+            /^\/message/,  // 博客-留言
+            /^\/reward/,   // 博客-赞赏
+            /^\/_nuxt/,    // Nuxt 静态资源
+            /^\/music/,    // 音乐 API
+            /^\/static/,   // 静态资源
+            /^\/uploads/,  // 上传文件
           ],
 
           // 缓存静态资源，但完全排除API
