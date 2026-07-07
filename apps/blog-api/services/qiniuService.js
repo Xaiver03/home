@@ -1,36 +1,39 @@
-const { client } = require('../db/qiniu');
-const stream = require('stream');
 const fs = require('fs');
-const config = require('config');
-const qiniuConfig = config.get('qiniu');
 const path = require('path');
 const { IncomingForm } = require('formidable');
-const qiniu = require('qiniu');
+const config = require('config');
+
+// 本地存储配置
+const storageConfig = config.has('storage') ? config.get('storage') : {
+  baseDir: '/opt/home/apps/blog-api/public/uploads',
+  publicUrl: '/uploads',
+};
+
+const UPLOAD_DIR = storageConfig.baseDir;
+
+// 确保上传目录存在
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 module.exports = {
   /**
-   * 读取请求中的文件
-   * @param {*} req 请求对象
-   * @returns {Object} { fields, files, tempFilePath } fields(文件字段)，files(文件)，tempFilePath(本地存储路径)
+   * 读取请求中的文件并保存到临时目录
    */
   readAndSaveFile: async (req) => {
     return new Promise((resolve, reject) => {
       const form = new IncomingForm({
-        uploadDir: path.resolve(__dirname, '../temp/images'), // 定义文件的临时存储位置
-        maxFileSize: 30 * 1024 * 1024, // 大小限制为30M
+        uploadDir: path.resolve(__dirname, '../temp/images'),
+        maxFileSize: 30 * 1024 * 1024,
       });
       form.parse(req, (err, fields, files) => {
         if (err) {
-          console.log('文件上传出错:', err);
           const error = {
-            msg: `文件上传出错，请联系管理员，错误代码：${err.code}`,
+            msg: `文件上传出错，错误代码：${err.code || err.message}`,
             status: 500,
           };
-          switch (err.code) {
-            case 1009:
-              error.msg = '文件过大，请压缩后上传（30MB以下）';
-              error.status = '500';
-              break;
+          if (err.code === 1009) {
+            error.msg = '文件过大，请压缩后上传（30MB以下）';
           }
           return reject(error);
         }
@@ -40,187 +43,91 @@ module.exports = {
     });
   },
 
+  /** 删除本地临时文件 */
+  deleteLocalFile: (filePath) => {
+    try { fs.unlinkSync(filePath); } catch (e) { /* ignore */ }
+  },
+
+  /**
+   * 上传文件到本地存储
+   * @param {String} storagePath 存储路径（包含文件名及后缀）
+   * @param {String} tempFilePath 临时文件路径
+   * @returns 上传结果
+   */
+  uploadFileStream: async (storagePath, tempFilePath) => {
+    const fullPath = path.join(UPLOAD_DIR, storagePath);
+    const dir = path.dirname(fullPath);
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    // 复制文件到存储目录
+    fs.copyFileSync(tempFilePath, fullPath);
+
+    const publicPath = storagePath.startsWith('/') ? storagePath : '/' + storagePath;
+    return {
+      code: 200,
+      msg: '上传成功',
+      url: `${publicPath}`,
+      name: publicPath,
+      res: { status: 200 },
+    };
+  },
+
+  /**
+   * 获取本地目录下的文件列表
+   */
+  getFileInPath: async (dirPath, delimiter = null) => {
+    const fullPath = path.join(UPLOAD_DIR, dirPath || '');
+    if (!fs.existsSync(fullPath)) {
+      return [];
+    }
+
+    const items = fs.readdirSync(fullPath, { withFileTypes: true });
+    return items.map(item => {
+      const relativePath = path.join(dirPath || '', item.name);
+      return {
+        name: item.isDirectory() ? relativePath + '/' : relativePath,
+        type: item.isDirectory() ? 'directory' : 'file',
+        size: item.isDirectory() ? 0 : fs.statSync(path.join(fullPath, item.name)).size,
+      };
+    });
+  },
+
   /**
    * 删除本地文件
-   * @param {String} filePath  文件位置
    */
-  deleteLocalFile: (filePath) => {
-    fs.unlinkSync(filePath); // 删除临时文件
+  deleteFile: async (filePath) => {
+    const fullPath = path.join(UPLOAD_DIR, filePath);
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+      return 200;
+    }
+    return 404;
   },
 
   /**
-   * 上传文本内容到本地文件系统指定路径，可用于覆盖原文件内容
-   * @param {String} filePath 上传文件的本地目录位置
-   * @param {String} content 文本内容
-   * @returns 若果上传成功则返回状态，否则返回-1
+   * 上传文本内容到本地文件
    */
   uploadOrUpdateFile: async (filePath, content) => {
-    try {
-      const baseDir = qiniuConfig.baseDir || '/opt/home/blog';
-      const fullPath = path.join(baseDir, filePath);
-      const dir = path.dirname(fullPath);
-
-      // 确保目录存在
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-
-      fs.writeFileSync(fullPath, content, 'utf8');
-      return 200;
-    } catch (e) {
-      console.log(e);
-      throw new Error(`${e.message}`);
+    const fullPath = path.join(UPLOAD_DIR, filePath);
+    const dir = path.dirname(fullPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
     }
+    fs.writeFileSync(fullPath, content, 'utf8');
+    return 200;
   },
 
   /**
-   * 七牛云删除文件
-   * @param {String} path 七牛云中的文件路径
-   * @param {Boolean} prefixOrNot 是否添加qiniuConfig.baseDir前缀
-   * @returns 若果删除成功则返回状态，否则返回-1
-   */
-  deleteFile: async (path, prefixOrNot = true) => {
-    try {
-      if (!client) {
-        throw new Error('七牛云客户端未初始化');
-      }
-
-      const key = (prefixOrNot ? qiniuConfig.baseDir : '') + path;
-
-      return new Promise((resolve, reject) => {
-        client.bucketManager.delete(client.bucket, key, (err, respBody, respInfo) => {
-          if (err) {
-            console.log('七牛云删除文件失败:', err);
-            reject(err);
-          } else if (respInfo.statusCode === 200) {
-            resolve(200);
-          } else {
-            console.log('七牛云删除文件失败:', respInfo.statusCode, respBody);
-            resolve(respInfo.statusCode);
-          }
-        });
-      });
-    } catch (e) {
-      console.log(e);
-      throw new Error(`${e.message}`);
-    }
-  },
-
-  /**
-   * 获取七牛云指定路径下的文件列表
-   * @param {String} path 七牛云路径 注：不以 / 开头和结尾
-   * @param {String} delimiter 默认null。若为'/'分割文件和文件夹，同时只展示当前目录下的内容
-   * @returns 若果获取成功则返回文件列表，否则返回-1
-   */
-  getFileInPath: async (path, delimiter = null) => {
-    try {
-      if (!client) {
-        throw new Error('七牛云客户端未初始化');
-      }
-
-      const prefix = qiniuConfig.baseDir.replace(/\//g, '') + path;
-
-      return new Promise((resolve, reject) => {
-        client.bucketManager.listPrefix(client.bucket, {
-          limit: 500,
-          prefix,
-          delimiter,
-        }, (err, respBody, respInfo) => {
-          if (err) {
-            console.log('七牛云获取文件列表失败:', err);
-            reject(err);
-          } else if (respInfo.statusCode === 200) {
-            const objects = respBody.items || [];
-            if (respBody.commonPrefixes) {
-              objects.push(...respBody.commonPrefixes.map(prefix => ({ name: prefix })));
-            }
-            resolve(objects);
-          } else {
-            console.log('七牛云获取文件列表失败:', respInfo.statusCode, respBody);
-            reject(new Error(`获取文件列表失败: ${respInfo.statusCode}`));
-          }
-        });
-      });
-    } catch (e) {
-      console.log(e);
-      throw new Error(`${e.message}`);
-    }
-  },
-
-  /**
-   * 获取本地指定路径下的文件内容（回退到七牛云）
-   * @param {String} filePath 本地或七牛云中的路径(包含文件名及后缀)
-   * @returns 若成功返回文本，否则返回-1
+   * 获取本地文件内容
    */
   getFileContent: async (filePath) => {
-    try {
-      const baseDir = qiniuConfig.baseDir || '/opt/home/blog';
-      const localPath = path.join(baseDir, filePath);
-
-      // 优先从本地文件读取
-      if (fs.existsSync(localPath)) {
-        return fs.readFileSync(localPath, 'utf8');
-      }
-
-      // 本地文件不存在，回退到七牛云（如果配置正确）
-      if (!client) {
-        throw new Error('本地文件不存在且七牛云客户端未初始化');
-      }
-
-      const fileUrl = `https://${client.domain}/${qiniuConfig.baseDir}${filePath}`;
-      const fetch = require('node-fetch');
-
-      const response = await fetch(fileUrl);
-      if (response.ok) {
-        return await response.text();
-      } else {
-        throw new Error(`获取文件内容失败: ${response.status}`);
-      }
-    } catch (e) {
-      console.log(e);
-      throw new Error(`${e.message}`);
+    const fullPath = path.join(UPLOAD_DIR, filePath);
+    if (fs.existsSync(fullPath)) {
+      return fs.readFileSync(fullPath, 'utf8');
     }
-  },
-
-  /**
-   * 流式上传文件到七牛云
-   * @param {String} path 七牛云中的路径(包含文件名及后缀)
-   * @param {String} filePath 文件所在位置
-   * @returns 若成功返回200状态，否则返回-1
-   */
-  uploadFileStream: async (path, filePath) => {
-    try {
-      if (!client) {
-        throw new Error('七牛云客户端未初始化');
-      }
-
-      const key = qiniuConfig.baseDir + path;
-      const uploadToken = client.uploadToken;
-
-      return new Promise((resolve, reject) => {
-        const putExtra = new qiniu.form_up.PutExtra();
-        client.formUploader.putFile(uploadToken, key, filePath, putExtra, (respErr, respBody, respInfo) => {
-          if (respErr) {
-            console.log('七牛云流式上传文件失败:', respErr);
-            reject(respErr);
-          } else if (respInfo.statusCode === 200) {
-            const result = {
-              code: 200,
-              msg: '上传图片成功✅',
-              url: `https://${client.domain}/${key}`,
-              name: key,
-              res: { status: 200 },
-            };
-            resolve(result);
-          } else {
-            console.log('七牛云流式上传文件失败:', respInfo.statusCode, respBody);
-            reject(new Error(`上传失败: ${respInfo.statusCode}`));
-          }
-        });
-      });
-    } catch (e) {
-      console.log('七牛云流式上传文件出错:', e);
-      throw new Error(`${e.message}`);
-    }
+    throw new Error(`文件不存在: ${filePath}`);
   },
 };

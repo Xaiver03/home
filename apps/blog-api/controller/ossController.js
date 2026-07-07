@@ -1,129 +1,108 @@
 const utils = require("../utils/index");
-const qiniuService = require("../services/qiniuService");
+const storageService = require("../services/qiniuService");
 const tokenService = require("../services/tokenService");
 const uuid = require("uuid");
 let path = require("path");
-const config = require("config");
-const qiniuConfig = config.get("qiniu"); // 七牛云配置
+
+// 本地存储公开 URL 前缀
+const STORAGE_URL = '/uploads';
 
 module.exports = {
-  // 上传图片到指定七牛云路径
+  // 上传图片到本地存储
   uploadImage: async (req, res) => {
-    let result = {};
-    const { fields, files, tempFilePath } = await qiniuService.readAndSaveFile(
-      req
-    );
-    const qiniuPath =
+    const { fields, files, tempFilePath } = await storageService.readAndSaveFile(req);
+    const storagePath =
       fields.path[0] +
       (fields.uuidOrNot[0] == "true"
         ? uuid.v4() + path.extname(files.file[0].originalFilename)
         : files.file[0].originalFilename);
-    result = await qiniuService.uploadFileStream(qiniuPath, tempFilePath);
-    qiniuService.deleteLocalFile(tempFilePath);
+    const result = await storageService.uploadFileStream(storagePath, tempFilePath);
+    storageService.deleteLocalFile(tempFilePath);
     res.json(
       utils.postMessage(result.code, result.msg, {
-        url: result.url,
+        url: STORAGE_URL + result.url,
         path: result.name,
       })
     );
   },
-  // 上传图片（固定格式png）到指定七牛云路径，从请求路径获取七牛云的路径
+
+  // 上传图片到本地存储（query 中指定路径）
   uploadImageQueryIn: async (req, res) => {
-    let result = {};
-    const { fields, files, tempFilePath } = await qiniuService.readAndSaveFile(
-      req
-    );
-    const qiniuPath = req.query.path + ".png";
-    result = await qiniuService.uploadFileStream(qiniuPath, tempFilePath);
-    qiniuService.deleteLocalFile(tempFilePath); // 删除临时文件
+    const { fields, files, tempFilePath } = await storageService.readAndSaveFile(req);
+    const storagePath = req.query.path + ".png";
+    const result = await storageService.uploadFileStream(storagePath, tempFilePath);
+    storageService.deleteLocalFile(tempFilePath);
     res.json(
       utils.postMessage(result.code, result.msg, {
-        url: result.url,
+        url: STORAGE_URL + result.url,
         path: result.name,
       })
     );
   },
-  // 客户端上传图片（固定格式png）
+
+  // 客户端上传图片
   customerUploadImage: async (req, res) => {
     let tokenData = tokenService.checkToken(req.headers["authorization"]);
-    const allowFilePath = [
-      "/temp/", // 测试
-      `/image/messageImage/`,
-    ]; // 限定七牛云文件路径
+    const allowFilePath = ["/temp/", `/image/messageImage/`];
     const allowFileType = [
-      "image/png",
-      "image/jpeg",
-      "image/gif",
-      "image/webp",
-      "image/tiff",
-      "image/heic",
-      "image/x-icon",
-      "	image/svg+xml",
-    ]; // 限定文件类型
-    let result = {};
-    const { fields, files, tempFilePath } = await qiniuService.readAndSaveFile(
-      req
-    );
+      "image/png", "image/jpeg", "image/gif", "image/webp",
+      "image/tiff", "image/heic", "image/x-icon", "image/svg+xml",
+    ];
+    const { fields, files, tempFilePath } = await storageService.readAndSaveFile(req);
     if (
       !allowFilePath.includes(fields.path[0]) ||
       !allowFileType.includes(files.file[0].mimetype)
     ) {
       utils.throwError(
-        {
-          message: "文件上传失败❌",
-          description: "请按上传规则上传文件（指定路径and图片格式）👀",
-        },
+        { message: "文件上传失败", description: "请按上传规则上传文件（指定路径and图片格式）" },
         403
       );
     }
-    const qiniuPath =
+    const storagePath =
       fields.path[0] +
       tokenData.data.id +
       "/" +
       (fields.uuidOrNot[0] == "true"
         ? uuid.v4() + path.extname(files.file[0].originalFilename)
         : files.file[0].originalFilename);
-    result = await qiniuService.uploadFileStream(qiniuPath, tempFilePath);
-    qiniuService.deleteLocalFile(tempFilePath);
+    const result = await storageService.uploadFileStream(storagePath, tempFilePath);
+    storageService.deleteLocalFile(tempFilePath);
     res.json(
       utils.postMessage(result.code, result.msg, {
-        url: result.url,
+        url: STORAGE_URL + result.url,
         path: result.name,
       })
     );
   },
-  // 获取七牛云指定路径下的文件列表
+
+  // 获取本地存储文件列表
   getFileInPath: async (req, res) => {
-    res.json(
-      await qiniuService.getFileInPath(req.query.path, req.query.delimiter)
-    );
+    const files = await storageService.getFileInPath(req.query.path, req.query.delimiter);
+    res.json(files);
   },
-  // 删除指定七牛云路径的图片
+
+  // 删除本地存储文件
   deleteImage: async (req, res) => {
-    let result = await qiniuService.deleteFile(req.query.path, false);
-    res.json(utils.postMessage(result, result > 0 ? "删除成功" : "删除失败"));
+    const result = await storageService.deleteFile(req.query.path);
+    res.json(utils.postMessage(result, result === 200 ? "删除成功" : "文件不存在"));
   },
-  // 客户端删除七牛云图片
+
+  // 客户端删除文件
   customerDeleteImage: async (req, res) => {
     let tokenData = tokenService.checkToken(req.headers["authorization"]);
     const allowFilePath = [
-      `${qiniuConfig.baseDir}/temp/${tokenData.data.id}/`,
-      `${qiniuConfig.baseDir}/image/messageImage/${tokenData.data.id}/`,
-    ]; // 限定七牛云文件路径
+      `/temp/${tokenData.data.id}/`,
+      `/image/messageImage/${tokenData.data.id}/`,
+    ];
     const lastSlashIndex = req.query.path.lastIndexOf("/");
-    let directory = req.query.path.substring(0, lastSlashIndex + 1); // 去除文件名，得到目录
+    let directory = req.query.path.substring(0, lastSlashIndex + 1);
     if (!directory.startsWith("/")) directory = "/" + directory;
     if (allowFilePath.includes(directory)) {
-      let result = await qiniuService.deleteFile(req.query.path, false);
-      res.json(
-        utils.postMessage(result, result > 0 ? "删除成功✅" : "删除失败❌")
-      );
+      const result = await storageService.deleteFile(req.query.path);
+      res.json(utils.postMessage(result, result === 200 ? "删除成功" : "文件不存在"));
     } else {
       utils.throwError(
-        {
-          message: "无权删除该文件❌",
-          description: "只能删除指定路径的文件哟👀",
-        },
+        { message: "无权删除该文件", description: "只能删除指定路径的文件" },
         403
       );
     }
