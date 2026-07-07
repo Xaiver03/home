@@ -97,7 +97,7 @@ const siteIcon = {
 const showWechatQr = ref(false);
 const qrImage = ref('/uploads/wechat-qr.jpg');
 
-// 链接跳转 — 全部用原生 <a> 标签新标签页打开（除二维码弹窗）
+// 链接跳转 — 全部新标签页打开（除二维码弹窗）
 const jumpLink = (data) => {
   const link = data.link || '';
   if (data.type === 'qr' || link === '#wechat-qr') {
@@ -105,11 +105,19 @@ const jumpLink = (data) => {
     qrImage.value = link && link !== '#wechat-qr' ? link : '/uploads/wechat-qr.jpg';
     return;
   }
-  const a = document.createElement('a');
-  a.href = link;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  a.click();
+  // 用完整 URL 避免 SPA 路由拦截
+  const url = link.startsWith('/') ? window.location.origin + link : link;
+  const w = window.open(url, '_blank', 'noopener');
+  // 如果弹窗被拦截，兜底用 <a> 标签
+  if (!w || w.closed) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 };
 
 // 获取网站链接配置
