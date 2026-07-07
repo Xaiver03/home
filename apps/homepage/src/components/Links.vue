@@ -38,11 +38,11 @@
       <div class="swiper-pagination" />
     </Swiper>
 
-    <!-- 公众号二维码弹窗 -->
-    <el-dialog v-model="showWechatQr" title="关注公众号" width="320px" :align-center="true" destroy-on-close>
+    <!-- 二维码弹窗 -->
+    <el-dialog v-model="showWechatQr" title="扫码查看" width="320px" :align-center="true" destroy-on-close>
       <div style="text-align:center">
-        <img src="/uploads/wechat-qr.jpg" alt="公众号二维码" style="width:240px;height:240px;border-radius:8px" />
-        <p style="margin-top:12px;color:#888;font-size:13px">扫码关注「灯下灯」</p>
+        <img :src="qrImage" alt="二维码" style="width:240px;height:240px;border-radius:8px;object-fit:cover" />
+        <p style="margin-top:12px;color:#888;font-size:13px">扫码查看详情</p>
       </div>
     </el-dialog>
   </div>
@@ -95,13 +95,15 @@ const siteIcon = {
 };
 
 const showWechatQr = ref(false);
+const qrImage = ref('/uploads/wechat-qr.jpg');
 
 // 链接跳转
 const jumpLink = (data) => {
   if (data.name === "音乐" && store.musicClick) {
     if (typeof $openList === "function") $openList();
-  } else if (data.name === "公众号") {
+  } else if (data.type === 'qr' || data.link === '#wechat-qr') {
     showWechatQr.value = true;
+    qrImage.value = data.link && data.link !== '#wechat-qr' ? data.link : '/uploads/wechat-qr.jpg';
   } else {
     window.open(data.link, "_blank");
   }

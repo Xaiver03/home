@@ -19,14 +19,35 @@
                 </div>
               </div>
               <a-row :gutter="16">
-                <a-col :span="6">
+                <a-col :span="5">
                   <a-form-item label="网站名称">
                     <a-input v-model:value="link.name" placeholder="如：博客" />
                   </a-form-item>
                 </a-col>
-                <a-col :span="10">
-                  <a-form-item label="链接地址">
+                <a-col :span="4">
+                  <a-form-item label="类型">
+                    <a-select v-model:value="link.type" placeholder="链接类型">
+                      <a-select-option value="link">普通链接</a-select-option>
+                      <a-select-option value="qr">二维码弹窗</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="7">
+                  <a-form-item v-if="link.type !== 'qr'" label="链接地址">
                     <a-input v-model:value="link.link" placeholder="完整的URL地址" />
+                  </a-form-item>
+                  <a-form-item v-else label="二维码图片">
+                    <div class="flex items-center gap-2">
+                      <a-input v-model:value="link.link" placeholder="图片URL" class="flex-1" />
+                      <a-upload
+                        :show-upload-list="false"
+                        :before-upload="(file) => handleQrUpload(file, index)"
+                        accept="image/*"
+                      >
+                        <a-button size="small">上传</a-button>
+                      </a-upload>
+                    </div>
+                    <img v-if="link.link && link.type === 'qr'" :src="link.link" class="mt-2 rounded" style="width:80px;height:80px;object-fit:cover" />
                   </a-form-item>
                 </a-col>
                 <a-col :span="6">
@@ -334,7 +355,7 @@ const moveItemDown = (array, index) => {
 
 // 网站链接管理
 const addSiteLink = () => {
-  siteLinks.value.push({ name: '', link: '', icon: 'Blog' })
+  siteLinks.value.push({ name: '', link: '', icon: 'Blog', type: 'link' })
 }
 
 const removeSiteLink = (index) => {
@@ -388,6 +409,30 @@ const handleIconUpload = async (file, index) => {
     }
   } catch (error) {
     message.error('图标上传失败: ' + error.message)
+  } finally {
+    uploading.value = false
+  }
+  return false
+}
+
+// 上传二维码图片
+const handleQrUpload = async (file, index) => {
+  uploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('path', '/image/qr/')
+    formData.append('uuidOrNot', 'true')
+
+    const response = await proxy.$api.uploadImage(formData)
+    if (response.code === 1) {
+      siteLinks.value[index].link = response.data.url
+      message.success('二维码上传成功')
+    } else {
+      message.error('二维码上传失败')
+    }
+  } catch (error) {
+    message.error('二维码上传失败: ' + error.message)
   } finally {
     uploading.value = false
   }
