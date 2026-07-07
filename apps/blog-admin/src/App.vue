@@ -1,34 +1,37 @@
 <template>
-  <!-- 登录页全屏 -->
-  <div v-if="isLoginPage" id="login-screen">
-    <router-view />
-  </div>
+  <a-config-provider :theme="antTheme">
+    <!-- 登录页全屏 -->
+    <div v-if="isLoginPage" id="login-screen">
+      <router-view />
+    </div>
 
-  <!-- 管理后台侧边栏 + Tab 布局 -->
-  <a-layout v-else class="admin-layout">
-    <AdminSidebar />
-    <a-layout>
-      <a-layout-header class="admin-header">
-        <GlobalTabBar @close-dirty="onCloseDirty" />
-      </a-layout-header>
-      <a-layout-content>
-        <TabContentPanel />
-      </a-layout-content>
+    <!-- 管理后台侧边栏 + Tab 布局 -->
+    <a-layout v-else class="admin-layout">
+      <AdminSidebar />
+      <a-layout>
+        <a-layout-header class="admin-header">
+          <GlobalTabBar @close-dirty="onCloseDirty" />
+        </a-layout-header>
+        <a-layout-content>
+          <TabContentPanel />
+        </a-layout-content>
+      </a-layout>
     </a-layout>
-  </a-layout>
 
-  <CloseTabDialog
-    :visible="dirtyDialog.visible"
-    :tab="dirtyDialog.tab"
-    @save-and-close="onSaveAndClose"
-    @close-without-save="onCloseWithoutSave"
-    @cancel="dirtyDialog.visible = false"
-  />
+    <CloseTabDialog
+      :visible="dirtyDialog.visible"
+      :tab="dirtyDialog.tab"
+      @save-and-close="onSaveAndClose"
+      @close-without-save="onCloseWithoutSave"
+      @cancel="dirtyDialog.visible = false"
+    />
+  </a-config-provider>
 </template>
 
 <script setup>
-import { onMounted, ref, watch, getCurrentInstance } from "vue";
+import { onMounted, ref, watch, getCurrentInstance, computed } from "vue";
 import { useRoute } from "vue-router";
+import { theme } from "ant-design-vue";
 import AdminSidebar from "./components/layout/AdminSidebar.vue";
 import GlobalTabBar from "./components/layout/GlobalTabBar.vue";
 import TabContentPanel from "./components/layout/TabContentPanel.vue";
@@ -38,6 +41,8 @@ import DarkConfig from "@/assets/themeConfig/Dark.json";
 import { useStore } from "vuex";
 import { useAutoTab } from "./composables/useAutoTab";
 import { useTabStore } from "./composables/useTabStore";
+
+const { defaultAlgorithm, darkAlgorithm } = theme;
 
 const store = useStore();
 const route = useRoute();
@@ -54,6 +59,16 @@ watch(
   },
   { immediate: true }
 );
+
+// Ant Design Vue 暗色主题
+const isDark = computed(() => store.state.themeMode === "Dark");
+const antTheme = computed(() => ({
+  algorithm: isDark.value ? darkAlgorithm : defaultAlgorithm,
+  token: {
+    colorPrimary: isDark.value ? '#1677ff' : '#FF6600',
+    borderRadius: 6,
+  },
+}));
 
 // --rem设置--
 const reScreenSize = () => {
@@ -77,17 +92,19 @@ const setThemeMode = () => {
   if (theme) store.commit("SET_THEME", theme);
 };
 
+const applyThemeVars = (newVal) => {
+  localStorage.setItem("theme", newVal);
+  const root = document.documentElement;
+  const config = newVal === "Dark" ? DarkConfig : LightConfig;
+  for (let attribute in config) {
+    root.style.setProperty(attribute, config[attribute]);
+  }
+};
+
 watch(
   () => store.state.themeMode,
-  (newVal) => {
-    localStorage.setItem("theme", newVal);
-    const root = document.documentElement;
-    const config = newVal == "Light" ? LightConfig : DarkConfig;
-    for (let attribute in config) {
-      root.style.setProperty(attribute, config[attribute]);
-    }
-  },
-  { immediate: true, deep: true }
+  (newVal) => applyThemeVars(newVal),
+  { immediate: true }
 );
 
 // 全局窗口改变事件
@@ -136,6 +153,7 @@ onMounted(() => {
   getGlobalConfig();
   reScreenSize();
   setThemeMode();
+  applyThemeVars(store.state.themeMode);
   window.addEventListener("load", reScreenSize);
   window.addEventListener("resize", resize);
 });
