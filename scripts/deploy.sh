@@ -74,10 +74,10 @@ else
   cd "$REPO_DIR"
   pnpm --filter blog-admin build:pro 2>&1 | tail -5
   # 复制到 blog-api public 目录，让 Express 托管静态文件
-  mkdir -p "$REPO_DIR/apps/blog-api/public/mgmt"
-  rm -rf "$REPO_DIR/apps/blog-api/public/mgmt/"*
-  cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/mgmt/"
-  log "blog-admin 构建完成，已复制到 blog-api/public/mgmt/"
+  mkdir -p "$REPO_DIR/apps/blog-api/public/admin"
+  rm -rf "$REPO_DIR/apps/blog-api/public/admin/"*
+  cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/admin/"
+  log "blog-admin 构建完成，已复制到 blog-api/public/admin/"
 
   # 3c. blog-frontend (Nuxt3 SSR)
   log "构建 blog-frontend (Nuxt3 SSR)..."
@@ -159,7 +159,7 @@ check_service() {
 
 check_service "blog-api"       "http://127.0.0.1:8086/api/article/reception/getArticleByTypeId/0/1/5"
 check_service "blog-frontend"  "http://127.0.0.1:3004"
-check_service "homepage"       "http://127.0.0.1:8086/mgmt/"  # /mgmt 走 blog-api 静态托管
+check_service "homepage"       "http://127.0.0.1:8086/admin/"  # /admin 走 blog-api 静态托管
 check_service "music-api"      "http://127.0.0.1:4000"
 
 log "========== 部署完成 =========="

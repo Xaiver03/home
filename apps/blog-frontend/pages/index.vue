@@ -40,12 +40,12 @@ const likeMessage = (message) => { // 喜欢评论
 
 <template>
   <div id="home" class="content-box">
-    <a-card hoverable id="bokey" class="relative" @click="router.push('/about')">
+    <a-card hoverable id="xaiver" class="relative" @click="router.push('/about')">
       <img class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2" :src="store.$state.config['my-avatar']?.content"
-        alt="BOKEY" v-motion-pop-visible-once>
-      <h1 class="text-center text-6xl font-bold">Bokey</h1>
+        alt="XAIVER" v-motion-pop-visible-once>
+      <h1 class="text-center text-6xl font-bold">Xaiver</h1>
       <div class="mx-auto my-8 flex justify-center items-center gap-12">
-        <div class="icon iconfont icon-github" @click="goTo('https://github.com/Bokey76', $event)" title="github"></div>
+        <div class="icon iconfont icon-github" @click="goTo('https://github.com/Xaiver03', $event)" title="github"></div>
         <div class="icon iconfont icon-xiaohongshu"
           @click="goTo('https://www.xiaohongshu.com/user/profile/5c5858380000000018037278', $event)" title="小红书"></div>
         <div class="icon iconfont icon-xinlangweibo" @click="goTo('https://weibo.com/u/6209660620', $event)" title="微博">
@@ -150,7 +150,7 @@ const likeMessage = (message) => { // 喜欢评论
     transition: all .3s;
   }
 
-  #bokey:hover img {
+  #xaiver:hover img {
     width: 25rem;
     height: 25rem;
     padding: .2rem;

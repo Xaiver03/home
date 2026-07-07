@@ -54,11 +54,11 @@ const store = mainStore();
 // 初始化默认网站链接数据
 const defaultSiteLinks = [
   { "icon": "Blog", "name": "博客", "link": "/blog" },
-  { "icon": "Cloud", "name": "网盘", "link": "/" },
+  { "icon": "Cloud", "name": "理想国文学网", "link": "https://litopia.space" },
   { "icon": "CompactDisc", "name": "音乐", "link": "/" },
   { "icon": "Compass", "name": "起始页", "link": "/" },
   { "icon": "Book", "name": "网址集", "link": "/" },
-  { "icon": "Fire", "name": "今日热榜", "link": "/" },
+  { "icon": "Fire", "name": "创业OS", "link": "https://finlaw.cloud" },
   { "icon": "LaptopCode", "name": "站点监测", "link": "/" }
 ];
 

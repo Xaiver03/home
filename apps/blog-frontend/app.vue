@@ -1,7 +1,7 @@
 <!--
   =============================================================================
   Project: space-log-nuxt3
-  Author: Bokey(github: Bokey76)
+  Author: Xaiver(github: Xaiver76)
   Created: 2025
   License: MIT License
   Description: 
@@ -73,39 +73,39 @@ const getGlobalCOnfig = async () => { // 获取并设置全局配置
 const seo = [
   {
     path: '/',
-    title: 'Bokey Space',
-    description: `Bokey Space📍，希望在世界留下我的痕迹。我是Bokey，一名深圳的前端程序员，
+    title: 'Xaiver Space',
+    description: `Xaiver Space📍，希望在世界留下我的痕迹。我是Xaiver，一名深圳的前端程序员，
           在这里我会分享我的日常☕️、编程💻、成长✍🏻，我们都会成为自己想要的样子`
   },
   {
     path: '/about',
-    title: '关于Bokey',
-    description: '关于Bokey，这里是Bokey的简介，记录着我的成长🧩'
+    title: '关于Xaiver',
+    description: '关于Xaiver，这里是Xaiver的简介，记录着我的成长🧩'
   },
   {
     path: '/log/article',
-    title: 'Bokey的文章 【 Bokey Space 】',
-    description: 'Bokey的文章详情📒'
+    title: 'Xaiver的文章 【 Xaiver Space 】',
+    description: 'Xaiver的文章详情📒'
   },
   {
     path: '/link',
-    title: 'Bokey的朋友们',
-    description: 'Bokey的友链，我们通过这种方式和世界链接，在浩瀚宇宙里，很高兴遇见你🪄'
+    title: 'Xaiver的朋友们',
+    description: 'Xaiver的友链，我们通过这种方式和世界链接，在浩瀚宇宙里，很高兴遇见你🪄'
   },
   {
     path: '/log/category',
-    title: 'Bokey的文章类目列表',
-    description: 'Bokey的文章类目，每个类下都是崭新的篇章📖'
+    title: 'Xaiver的文章类目列表',
+    description: 'Xaiver的文章类目，每个类下都是崭新的篇章📖'
   },
   {
     path: '/log/article',
-    title: 'Bokey的文章列表',
-    description: 'Bokey的文章列表，每一篇都是我的成长⭐️'
+    title: 'Xaiver的文章列表',
+    description: 'Xaiver的文章列表，每一篇都是我的成长⭐️'
   },
   {
     path: '/message',
-    title: '留言 【 Bokey Space 】',
-    description: 'Bokey Space的留言板🌐，我们在这里畅所欲言，只为在这个世界留下属于自己的痕迹🌏'
+    title: '留言 【 Xaiver Space 】',
+    description: 'Xaiver Space的留言板🌐，我们在这里畅所欲言，只为在这个世界留下属于自己的痕迹🌏'
   }
 ]
 watch(() => router.currentRoute.value.path, (newVal) => {

@@ -175,7 +175,7 @@
                 </a-col>
                 <a-col :span="12">
                   <a-form-item label="ICP备案号">
-                    <a-input v-model:value="homeTexts.siteIcp" placeholder="如：京ICP备2022018134号-1" />
+                    <a-input v-model:value="homeTexts.siteIcp" placeholder="如：湘ICP备2026026942号-1" />
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -542,7 +542,7 @@ const initializeDefaults = () => {
       descText: '一点浩然气，千里快哉风',
       descTextOther: '哎呀，这都被你发现了（ 再点击一次可关闭 ）',
       siteStart: dayjs('2025-10-18'),
-      siteIcp: '京ICP备2022018134号-1'
+      siteIcp: '湘ICP备2026026942号-1'
     }
   }
 

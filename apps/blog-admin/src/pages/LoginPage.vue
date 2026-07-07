@@ -6,7 +6,7 @@
         <div class="brand-logo">
           <DashboardOutlined class="logo-icon" />
         </div>
-        <h1 class="brand-title">Bokey Space</h1>
+        <h1 class="brand-title">Xaiver Space</h1>
         <p class="brand-subtitle">博客管理后台</p>
         <div class="feature-list">
           <div class="feature-item">

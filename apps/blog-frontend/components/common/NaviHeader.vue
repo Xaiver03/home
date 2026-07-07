@@ -218,7 +218,7 @@ onMounted(() => {
         <div id="navi-header">
             <div id="navi-content" class="hidden xl:flex justify-between items-center h-28 my-0 mx-auto px-8">
                 <a-space :size="25">
-                    <h1 class="cursor-point" @click="router.push('/')">BOKEY'S SPASE</h1>
+                    <h1 class="cursor-point" @click="router.push('/')">XAIVER'S SPACE</h1>
                     <a-dropdown v-for="naviFirst in naviData" :key="naviFirst.label">
                         <div>
                             <a href="javascript:;" v-if="naviFirst.children">{{ naviFirst.label }}</a>
@@ -307,7 +307,7 @@ onMounted(() => {
                 </a-space>
             </div>
             <div id="navi-content-phone" class="flex xl:hidden justify-between items-center py-8 px-16">
-                <h1 class="cursor-point" @click="router.push('/')">BOKEY'S SPASE</h1>
+                <h1 class="cursor-point" @click="router.push('/')">XAIVER'S SPACE</h1>
                 <a-space :size="12">
                     <a-button class="button flex justify-center items-center h-full"
                         @click="router.push('/')" title="返回首页">
@@ -389,7 +389,7 @@ onMounted(() => {
                 </a-space>
             </div>
         </div>
-        <a-drawer v-model:open="naviDrawer" class="navi-top-drawer" title="BOKEY'S SPASE" placement="top" height="auto">
+        <a-drawer v-model:open="naviDrawer" class="navi-top-drawer" title="XAIVER'S SPACE" placement="top" height="auto">
             <a-tree @select="changePath" v-model:expandedKeys="expandedKeys" :tree-data="naviData">
             </a-tree>
         </a-drawer>

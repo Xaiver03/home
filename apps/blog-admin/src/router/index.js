@@ -101,7 +101,7 @@ const routes = [
 import { getToken } from "@/utils/auth";
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.MODE === 'pro' ? '/mgmt/' : '/'),
+    history: createWebHistory(import.meta.env.MODE === 'pro' ? '/admin/' : '/'),
     routes
 })
 

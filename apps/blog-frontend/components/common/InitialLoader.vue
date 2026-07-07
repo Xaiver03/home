@@ -5,7 +5,7 @@
             <div class="rotate-box rounded-full overflow-hidden ">
                 <img class="h-[120px] w-[120px] " src="@/assets/images/bokey.png">
             </div>
-            <p class="my-[10px] text-[20px]">欢迎来到Bokey的空间🌼</p>
+            <p class="my-[10px] text-[20px]">欢迎来到Xaiver的空间🌼</p>
             <p class="text-[10px]">加载中...</p>
         </div>
     </Transition>

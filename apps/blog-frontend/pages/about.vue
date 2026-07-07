@@ -117,8 +117,8 @@ onBeforeUnmount(() => {
 
 <template>
   <div id="about-page" class="content-box overflow-hidden">
-    <!-- bokey bar -->
-    <a-card hoverable id="bokey" class="relative">
+    <!-- xaiver bar -->
+    <a-card hoverable id="xaiver" class="relative">
       <img class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2" :src="store.$state.config['my-avatar']?.content"
         :alt="basicInfo.name || 'Avatar'" v-motion-pop-visible-once>
       <h1 class="text-center text-6xl font-bold">{{ basicInfo.name || 'Name' }}</h1>
@@ -239,8 +239,8 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 #about-page {
 
-  // bokey bar
-  #bokey {
+  // xaiver bar
+  #xaiver {
 
     &:hover img {
       width: 25rem;
