@@ -17,7 +17,7 @@
 .ant-layout-header {
 
     // 背景颜色
-    .ant-menu-light{ 
+    .ant-menu-light{
         background-color: $main-background-color;
         color: $main-text-color;
     }
@@ -84,48 +84,16 @@ a:hover {
     color: $main-text-color;
 }
 
-// 按钮
-.ant-btn-primary {
-    background-color: $main-text-color;
-    color: $main-background-color;
-}
-.ant-btn-primary:not(:disabled):hover {
-    background-color: $main-text-color;
-    // color: $main-background-color;
-}
-.ant-btn:not(:disabled):focus-visible { // 取消outline
+// 按钮 — 不在 antReset 中覆盖颜色，交给 ConfigProvider darkAlgorithm
+.ant-btn:not(:disabled):focus-visible {
     outline: none;
-}
-.ant-btn-default:not(:disabled):hover {
-    color: $main-text-color;
-    border-color: $main-text-color;
 }
 .ant-btn-default:disabled {
     color: $secondary-text-color;
 }
-.ant-btn-default {
-    background-color: $main-car-color;
-    color: $main-text-color;
-}
-.ant-modal-confirm-btns {
-    .ant-btn-primary {
-        color: $main-background-color;
-        &:hover {
-            color: $main-background-color;
-        }
-    }
-}
-// btn
-.ant-btn {
-    color: $main-text-color;
-}
-.ant-btn-text:not(:disabled):hover {
-    color: $main-text-color;
-    background-color: $secondary-car-color;
-}
 
 // 日期选择器picker
-.ant-picker{ 
+.ant-picker{
     .ant-picker-input >input:placeholder-shown {
         text-align: center;
     }
@@ -157,7 +125,7 @@ a:hover {
 
     .ant-card-head {
         color: $main-text-color;
- 
+
     }
 }
 
@@ -224,7 +192,7 @@ a:hover {
     }
 }
 .ant-select-selector {
-    border-color: $main-text-color !important; // !强制focus不变色
+    border-color: $main-text-color !important;
 }
 
 // 所有的input！
@@ -251,15 +219,6 @@ input {
 // anticon
 .anticon {
     color: $main-text-color;
-}
-.ant-modal-footer {
-    .ant-btn-primary {
-        color: $main-background-color;
-
-        &:hover {
-            color: $main-background-color;
-        }
-    }
 }
 
 // table
@@ -300,7 +259,7 @@ input {
     .ant-pagination-prev button,.ant-pagination-next button {
         color: $main-text-color;
     }
-    .ant-pagination-next, .ant-pagination-disabled,.ant-pagination-prev { 
+    .ant-pagination-next, .ant-pagination-disabled,.ant-pagination-prev {
         .ant-pagination-item-link {
             display: flex;
             justify-content: center;
@@ -309,7 +268,7 @@ input {
     }
 }
 
-// breadcrumb 
+// breadcrumb
 .ant-breadcrumb .ant-breadcrumb-separator {
     color:$main-text-color;
 }
@@ -356,7 +315,7 @@ input {
 }
 
 // modal-confirm
-.ant-modal-confirm { 
+.ant-modal-confirm {
     .ant-modal-confirm-body .ant-modal-confirm-title {
         color:  $main-text-color;
     }
@@ -438,6 +397,6 @@ input {
 // picker
 .ant-picker-dropdown {
     .ant-btn {
-       color: #fff; 
-    }  
+       color: #fff;
+    }
 }
