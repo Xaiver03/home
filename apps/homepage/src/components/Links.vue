@@ -37,6 +37,14 @@
       </SwiperSlide>
       <div class="swiper-pagination" />
     </Swiper>
+
+    <!-- 公众号二维码弹窗 -->
+    <el-dialog v-model="showWechatQr" title="关注公众号" width="320px" :align-center="true" destroy-on-close>
+      <div style="text-align:center">
+        <img src="/uploads/wechat-qr.jpg" alt="公众号二维码" style="width:240px;height:240px;border-radius:8px" />
+        <p style="margin-top:12px;color:#888;font-size:13px">扫码关注「灯下灯」</p>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -55,11 +63,11 @@ const store = mainStore();
 const defaultSiteLinks = [
   { "icon": "Blog", "name": "博客", "link": "/blog" },
   { "icon": "Cloud", "name": "理想国文学网", "link": "https://litopia.space" },
-  { "icon": "CompactDisc", "name": "音乐", "link": "/" },
-  { "icon": "Compass", "name": "起始页", "link": "/" },
-  { "icon": "Book", "name": "网址集", "link": "/" },
   { "icon": "Fire", "name": "创业OS", "link": "https://finlaw.cloud" },
-  { "icon": "LaptopCode", "name": "站点监测", "link": "/" }
+  { "icon": "CompactDisc", "name": "音乐", "link": "/" },
+  { "icon": "Compass", "name": "GitHub", "link": "https://github.com/Xaiver03/" },
+  { "icon": "Book", "name": "关于我", "link": "/about" },
+  { "icon": "LaptopCode", "name": "公众号", "link": "#wechat-qr" }
 ];
 
 // 响应式数据 - 初始化为默认数据，确保组件始终有内容显示
@@ -86,10 +94,14 @@ const siteIcon = {
   LaptopCode,
 };
 
+const showWechatQr = ref(false);
+
 // 链接跳转
 const jumpLink = (data) => {
   if (data.name === "音乐" && store.musicClick) {
     if (typeof $openList === "function") $openList();
+  } else if (data.name === "公众号") {
+    showWechatQr.value = true;
   } else {
     window.open(data.link, "_blank");
   }

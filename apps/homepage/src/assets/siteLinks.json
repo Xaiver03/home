@@ -10,28 +10,28 @@
     "link": "https://litopia.space"
   },
   {
+    "icon": "Fire",
+    "name": "创业OS",
+    "link": "https://finlaw.cloud"
+  },
+  {
     "icon": "CompactDisc",
     "name": "音乐",
     "link": "https://xiangleideng.site/"
   },
   {
     "icon": "Compass",
-    "name": "起始页",
-    "link": "https://xiangleideng.site/"
+    "name": "GitHub",
+    "link": "https://github.com/Xaiver03/"
   },
   {
     "icon": "Book",
-    "name": "网址集",
-    "link": "https://xiangleideng.site/"
-  },
-  {
-    "icon": "Fire",
-    "name": "创业OS",
-    "link": "https://finlaw.cloud"
+    "name": "关于我",
+    "link": "/about"
   },
   {
     "icon": "LaptopCode",
-    "name": "站点监测",
-    "link": "https://xiangleideng.site/"
+    "name": "公众号",
+    "link": "#wechat-qr"
   }
 ]
