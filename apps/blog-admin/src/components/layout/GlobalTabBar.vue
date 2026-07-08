@@ -135,19 +135,20 @@ function handleMenuClick({ key }) {
 
 <style lang="scss" scoped>
 .global-tab-bar {
-  height: 40px;
+  height: 48px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid $secondary-text-color;
-  background: $main-background-color;
-  padding: 0 8px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+  background: $main-car-color;
+  padding: 0 12px;
   position: relative;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .tabs-wrapper {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   flex: 1;
 
@@ -160,24 +161,27 @@ function handleMenuClick({ key }) {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 4px 4px 0 0;
+  min-height: 34px;
+  padding: 7px 14px;
+  border-radius: 10px;
   cursor: pointer;
   user-select: none;
-  font-size: $x-small-font-size;
+  font-size: 14px;
+  line-height: 20px;
+  color: $secondary-text-color;
   border: 1px solid transparent;
-  border-bottom: none;
-  transition: background 0.2s;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 
   &:hover {
-    background: rgba(128, 128, 128, 0.1);
+    background: $secondary-car-color;
+    color: $main-text-color;
   }
 
   &.active {
-    background: $main-background-color;
-    border-color: $secondary-text-color;
-    border-bottom: 1px solid $main-background-color;
-    margin-bottom: -1px;
+    background: color-mix(in srgb, $main-color 12%, $main-car-color);
+    border-color: color-mix(in srgb, $main-color 36%, transparent);
+    color: $main-text-color;
+    box-shadow: inset 0 -2px 0 $main-color;
   }
 
   &.dirty .title {
@@ -201,7 +205,7 @@ function handleMenuClick({ key }) {
   }
 
   .close-icon {
-    font-size: 10px;
+    font-size: 12px;
     opacity: 0;
     transition: opacity 0.2s;
 

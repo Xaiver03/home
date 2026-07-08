@@ -73,8 +73,17 @@ const isDark = computed(() => store.state.themeMode === "Dark");
 const antTheme = computed(() => ({
   algorithm: isDark.value ? darkAlgorithm : defaultAlgorithm,
   token: {
-    colorPrimary: isDark.value ? '#1677ff' : '#FF6600',
-    borderRadius: 6,
+    colorPrimary: isDark.value ? '#60a5fa' : '#2563eb',
+    colorInfo: isDark.value ? '#38bdf8' : '#0ea5e9',
+    colorSuccess: isDark.value ? '#34d399' : '#16a34a',
+    colorWarning: '#f59e0b',
+    colorError: '#ef4444',
+    colorText: isDark.value ? '#e5e7eb' : '#111827',
+    colorTextSecondary: isDark.value ? '#9ca3af' : '#4b5563',
+    colorBgLayout: isDark.value ? '#0f172a' : '#f6f8fb',
+    colorBgContainer: isDark.value ? '#111827' : '#ffffff',
+    borderRadius: 8,
+    fontSize: 14,
   },
 }));
 
@@ -178,16 +187,18 @@ onMounted(() => {
 
 .admin-layout {
   min-height: 100vh;
+  background: $main-background-color;
 }
 
 .admin-header {
   height: auto;
   padding: 0;
-  background: $main-background-color;
+  background: $main-car-color;
   line-height: 1;
 }
 
 :deep(.ant-layout-content) {
   background: $main-background-color;
+  padding: 24px;
 }
 </style>

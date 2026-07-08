@@ -177,15 +177,15 @@ const selectedKeys = computed(() => {
 //   --sidebar-border: 220 13% 91% → #e1e3e8
 // ============================================================
 
-$sb-bg:          hsl(0, 0%, 98%);
-$sb-fg:          hsl(240, 5.3%, 26.1%);
-$sb-fg-muted:    hsla(240, 5.3%, 26.1%, 0.7);
-$sb-accent:      hsl(240, 4.8%, 95.9%);
-$sb-accent-fg:   hsl(240, 5.9%, 10%);
-$sb-border:      hsl(220, 13%, 91%);
-$sb-primary:     hsl(224, 76%, 48%);
-$sb-primary-fg:  hsl(0, 0%, 98%);
-$sb-radius:      0.375rem;  // rounded-md
+$sb-bg:          var(--admin-sidebar-bg, #ffffff);
+$sb-fg:          var(--admin-sidebar-fg, #1f2937);
+$sb-fg-muted:    var(--admin-sidebar-muted, #667085);
+$sb-accent:      var(--admin-sidebar-accent, #eff6ff);
+$sb-accent-fg:   var(--admin-sidebar-accent-fg, #1d4ed8);
+$sb-border:      var(--admin-sidebar-border, #e5e7eb);
+$sb-primary:     var(--admin-sidebar-primary, #2563eb);
+$sb-primary-fg:  #ffffff;
+$sb-radius:      8px;
 $sb-transition:  150ms ease;
 
 .admin-sidebar {
@@ -193,8 +193,11 @@ $sb-transition:  150ms ease;
   background: $sb-bg !important;
   color: $sb-fg;
   border-right: 1px solid $sb-border;
+  box-shadow: 1px 0 0 rgba(15, 23, 42, 0.02);
   display: flex;
   flex-direction: column;
+  font-size: 14px;
+  line-height: 1.5;
 
   :deep(.ant-layout-sider-children) {
     display: flex;
@@ -208,13 +211,14 @@ $sb-transition:  150ms ease;
 // Header — 对齐 SSOS SidebarHeader + SidebarMenuButton(size=lg)
 // ============================================================
 .sidebar-header {
-  padding: 0.5rem;
+  padding: 8px;
 
   .brand-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px;
     border-radius: $sb-radius;
     cursor: pointer;
     transition: background $sb-transition;
@@ -226,15 +230,16 @@ $sb-transition:  150ms ease;
 
   .brand-logo {
     flex-shrink: 0;
-    width: 2rem;
-    height: 2rem;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.375rem;
-    background: $sb-primary;
+    border-radius: 8px;
+    background: linear-gradient(135deg, $sb-primary 0%, #0ea5e9 100%);
     color: $sb-primary-fg;
-    font-size: 1.125rem;
+    font-size: 18px;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
   }
 
   .brand-info {
@@ -244,14 +249,14 @@ $sb-transition:  150ms ease;
     overflow: hidden;
 
     .brand-name {
-      font-size: 0.875rem;
+      font-size: 14px;
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .brand-desc {
-      font-size: 0.75rem;
+      font-size: 12px;
       color: $sb-fg-muted;
       white-space: nowrap;
     }
@@ -264,7 +269,7 @@ $sb-transition:  150ms ease;
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 0.25rem 0.5rem;
+  padding: 4px 8px;
 
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-thumb {
@@ -274,17 +279,17 @@ $sb-transition:  150ms ease;
 }
 
 .nav-group {
-  padding: 0.25rem 0;
+  padding: 4px 0;
 }
 
 // GroupLabel — 对齐 SSOS SidebarGroupLabel: h-8 px-2 text-xs font-medium muted
 .group-label {
   display: flex;
   align-items: center;
-  height: 2rem;
-  padding: 0 0.5rem;
-  margin: 0.125rem 0;
-  font-size: 0.75rem;
+  height: 28px;
+  padding: 0 8px;
+  margin: 8px 0 4px;
+  font-size: 12px;
   font-weight: 500;
   color: $sb-fg-muted;
   cursor: pointer;
@@ -315,12 +320,12 @@ $sb-transition:  150ms ease;
   display: flex;
   width: 100%;
   align-items: center;
-  gap: 0.5rem;
-  overflow: hidden;
+  gap: 8px;
+  min-height: 38px;
   border-radius: $sb-radius;
-  padding: 0.5rem;
+  padding: 9px 10px;
   text-align: left;
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 400;
   color: $sb-fg;
   background: transparent;
@@ -329,7 +334,7 @@ $sb-transition:  150ms ease;
   transition: background $sb-transition, color $sb-transition;
   outline: none;
   font-family: inherit;
-  line-height: 1.25rem;
+  line-height: 20px;
 
   &:hover {
     background: $sb-accent;
@@ -345,28 +350,28 @@ $sb-transition:  150ms ease;
 
   .nav-icon {
     flex-shrink: 0;
-    width: 1rem;
-    height: 1rem;
-    font-size: 1rem;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
   }
 }
 
 // Badge — 对齐 SSOS SidebarMenuBadge
 .nav-badge {
-  font-size: 0.625rem;
-  padding: 0.0625rem 0.375rem;
+  font-size: 11px;
+  padding: 1px 6px;
   border-radius: 9999px;
   background: rgba($sb-primary, 0.1);
   color: $sb-primary;
   font-weight: 600;
-  line-height: 1rem;
+  line-height: 16px;
 }
 
 // ============================================================
 // Footer — 对齐 SSOS SidebarFooter
 // ============================================================
 .sidebar-footer {
-  padding: 0.25rem 0.5rem;
+  padding: 6px 8px;
   border-top: 1px solid $sb-border;
 
   .footer-menu {
@@ -380,7 +385,7 @@ $sb-transition:  150ms ease;
 
   .footer-menu-item {
     .nav-menu-btn {
-      font-size: 0.8125rem;
+      font-size: 13px;
       font-weight: 400;
     }
   }
