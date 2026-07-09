@@ -8,6 +8,7 @@ router.get('/qrcode', checkPermissions(), musicController.getQrCode);
 router.get('/qrcode/poll', checkPermissions(), musicController.pollQrCode);
 router.get('/cookie/status', checkPermissions(), musicController.getCookieStatus);
 router.post('/cookie/refresh', checkPermissions(), musicController.refreshCookie);
+router.post('/cookie/import', checkPermissions(), musicController.importCookie);
 router.delete('/cookie', checkPermissions(), musicController.deleteCookie);
 
 module.exports = router;

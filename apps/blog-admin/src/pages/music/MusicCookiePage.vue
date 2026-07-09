@@ -16,6 +16,7 @@
 
       <a-space>
         <a-button type="primary" @click="openScanModal">扫码登录</a-button>
+        <a-button @click="openImportModal">导入 Cookie</a-button>
         <a-button v-if="status.hasKey" @click="refreshCookie" :loading="refreshing">刷新续期</a-button>
         <a-popconfirm v-if="status.hasKey" title="确认清除 musickey？" @confirm="deleteCookie">
           <a-button danger>清除</a-button>
@@ -35,6 +36,12 @@
         </template>
       </div>
     </a-modal>
+
+    <!-- Cookie 导入弹窗 -->
+    <a-modal v-model:open="importModalOpen" title="导入 QQ 音乐 Cookie" :confirm-loading="importing" @ok="importCookie" width="560px">
+      <a-alert class="mb-4" type="info" show-icon message="从 y.qq.com 登录后复制 Cookie，需包含 uin 和 qm_keyst 或 qqmusic_key。" />
+      <a-textarea v-model:value="cookieText" :rows="8" placeholder="uin=...; qm_keyst=...; qqmusic_key=..." />
+    </a-modal>
   </div>
 </template>
 
@@ -48,6 +55,9 @@ const status = ref({ hasKey: false })
 const qrcode = ref('')
 const qrcodeLoading = ref(false)
 const scanModalOpen = ref(false)
+const importModalOpen = ref(false)
+const cookieText = ref('')
+const importing = ref(false)
 const pollMsg = ref('等待扫码...')
 const pollStatus = ref(66)
 const refreshing = ref(false)
@@ -249,6 +259,31 @@ const openScanModal = async () => {
   qrSessionId.value = ''
   scanFinished = false
   await loadQrCode()
+}
+
+const openImportModal = () => {
+  importModalOpen.value = true
+}
+
+const importCookie = async () => {
+  if (!cookieText.value.trim()) {
+    notification.error({ message: '请先粘贴 Cookie' })
+    return
+  }
+  importing.value = true
+  try {
+    const res = await http.post('/music/cookie/import', { cookie: cookieText.value })
+    if (res.data.code === 0) {
+      notification.success({ message: '导入成功' })
+      importModalOpen.value = false
+      cookieText.value = ''
+      loadStatus()
+    } else {
+      notification.error({ message: res.data.msg || '导入失败' })
+    }
+  } finally {
+    importing.value = false
+  }
 }
 
 const refreshCookie = async () => {

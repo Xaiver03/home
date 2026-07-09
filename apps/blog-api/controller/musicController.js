@@ -64,6 +64,18 @@ const cookieObjToStr = (cookies) =>
     .map(([k, v]) => `${k}=${v}`)
     .join('; ');
 
+const parseCookieString = (cookieString = '') => {
+  return cookieString.split(';').reduce((acc, item) => {
+    const eqIdx = item.indexOf('=');
+    if (eqIdx > 0) {
+      const key = item.slice(0, eqIdx).trim();
+      const value = item.slice(eqIdx + 1).trim();
+      if (key) acc[key] = value;
+    }
+    return acc;
+  }, {});
+};
+
 const requestOnce = (url, options = {}) => new Promise((resolve, reject) => {
   const parsedUrl = new URL(url);
   const lib = parsedUrl.protocol === 'https:' ? https : http;
@@ -398,60 +410,106 @@ exports.getCookieStatus = (req, res) => {
   });
 };
 
+const refreshMusicCookieData = async (cookie) => {
+  const musicid = Number(cookie.uin) || 0;
+  const data = {
+    req1: {
+      module: 'QQConnectLogin.LoginServer',
+      method: 'QQLogin',
+      param: {
+        expired_in: 7776000,
+        musicid,
+        musickey: cookie.musickey,
+      },
+    },
+  };
+  const sign = md5('zza' + JSON.stringify(data));
+  const url = `https://u6.y.qq.com/cgi-bin/musics.fcg?sign=${sign}&format=json&inCharset=utf8&outCharset=utf-8&data=${encodeURIComponent(JSON.stringify(data))}`;
+  const cookieStr = `uin=o0${cookie.uin}; qqmusic_key=${cookie.musickey}; qm_keyst=${cookie.musickey}`;
+  const refreshRes = await requestOnce(url, {
+    headers: {
+      Cookie: cookieStr,
+      Referer: 'https://y.qq.com',
+    },
+  });
+
+  let refreshJson;
+  try {
+    refreshJson = JSON.parse(refreshRes.data);
+  } catch {
+    throw new Error('刷新接口返回非 JSON');
+  }
+
+  const refreshBody = refreshJson.req1 || {};
+  if (refreshBody.code !== 0 || !refreshBody.data || !refreshBody.data.musickey) {
+    throw new Error('Cookie 校验失败，请确认已从 y.qq.com 复制最新 Cookie');
+  }
+
+  const newKey = refreshBody.data.musickey;
+  return {
+    ...cookie,
+    musickey: newKey,
+    refreshToken: refreshBody.data.refresh_token || cookie.refreshToken,
+    accessToken: refreshBody.data.access_token || cookie.accessToken,
+    unionid: refreshBody.data.unionid || cookie.unionid,
+    refreshKey: refreshBody.data.refresh_key || cookie.refreshKey,
+    expiredAt: refreshBody.data.expired_at ? new Date(Number(refreshBody.data.expired_at) * 1000).toISOString() : cookie.expiredAt,
+    updatedAt: new Date().toISOString(),
+  };
+};
+
 // POST /api/music/cookie/refresh - 刷新 musickey
 exports.refreshCookie = async (req, res) => {
   const cookie = loadCookie();
   if (!cookie || !cookie.musickey) return res.json({ code: -1, msg: '尚未登录，请先扫码' });
   try {
-    const musicid = Number(cookie.uin) || 0;
-    const data = {
-      req1: {
-        module: 'QQConnectLogin.LoginServer',
-        method: 'QQLogin',
-        param: {
-          expired_in: 7776000,
-          musicid,
-          musickey: cookie.musickey,
-        },
-      },
-    };
-    const sign = md5('zza' + JSON.stringify(data));
-    const url = `https://u6.y.qq.com/cgi-bin/musics.fcg?sign=${sign}&format=json&inCharset=utf8&outCharset=utf-8&data=${encodeURIComponent(JSON.stringify(data))}`;
-    const cookieStr = `uin=o0${cookie.uin}; qqmusic_key=${cookie.musickey}; qm_keyst=${cookie.musickey}`;
-    const refreshRes = await requestOnce(url, {
-      headers: {
-        Cookie: cookieStr,
-        Referer: 'https://y.qq.com',
-      },
-    });
-
-    let refreshJson;
-    try {
-      refreshJson = JSON.parse(refreshRes.data);
-    } catch {
-      return res.json({ code: -1, msg: '刷新接口返回非 JSON', data: refreshRes.data.slice(0, 500) });
-    }
-
-    const refreshBody = refreshJson.req1 || {};
-    if (refreshBody.code !== 0 || !refreshBody.data || !refreshBody.data.musickey) {
-      return res.json({ code: -1, msg: '刷新失败，建议重新扫码', data: refreshBody });
-    }
-
-    const newKey = refreshBody.data.musickey;
-    const updated = {
-      ...cookie,
-      musickey: newKey,
-      refreshToken: refreshBody.data.refresh_token || cookie.refreshToken,
-      accessToken: refreshBody.data.access_token || cookie.accessToken,
-      unionid: refreshBody.data.unionid || cookie.unionid,
-      refreshKey: refreshBody.data.refresh_key || cookie.refreshKey,
-      expiredAt: refreshBody.data.expired_at ? new Date(Number(refreshBody.data.expired_at) * 1000).toISOString() : cookie.expiredAt,
-      updatedAt: new Date().toISOString(),
-    };
+    const updated = await refreshMusicCookieData(cookie);
     saveCookie(updated);
-    res.json({ code: 0, msg: '刷新成功', data: { musickey: newKey.slice(0, 8) + '...' } });
+    res.json({ code: 0, msg: '刷新成功' });
   } catch (e) {
     res.json({ code: -1, msg: e.message });
+  }
+};
+
+// POST /api/music/cookie/import - 手动导入 QQ 音乐 Cookie
+exports.importCookie = async (req, res) => {
+  const cookieText = String(req.body.cookie || '').trim();
+  if (!cookieText) return res.json({ code: -1, msg: '请粘贴 QQ 音乐 Cookie' });
+
+  const cookies = parseCookieString(cookieText);
+  const rawUin = cookies.uin || cookies.wxuin || cookies.qqmusic_uin || '';
+  const uin = String(rawUin).replace(/^o0/, '').replace(/\D/g, '');
+  const musickey = cookies.qm_keyst || cookies.qqmusic_key || cookies.musickey || '';
+
+  if (!uin) return res.json({ code: -1, msg: 'Cookie 中缺少 uin' });
+  if (!musickey) return res.json({ code: -1, msg: 'Cookie 中缺少 qm_keyst 或 qqmusic_key' });
+
+  const cookieData = {
+    musickey,
+    uin,
+    nickname: cookies.qqmusic_nickname || '',
+    refreshToken: '',
+    accessToken: '',
+    openid: '',
+    unionid: '',
+    refreshKey: '',
+    expiredAt: '',
+    updatedAt: new Date().toISOString(),
+  };
+
+  try {
+    const validated = await refreshMusicCookieData(cookieData);
+    saveCookie(validated);
+    pollSessions.clear();
+    latestSessionId = null;
+
+    return res.json({
+      code: 0,
+      msg: '导入成功',
+      data: { uin },
+    });
+  } catch (e) {
+    return res.json({ code: -1, msg: e.message });
   }
 };
 
