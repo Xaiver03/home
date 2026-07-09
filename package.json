@@ -15,11 +15,11 @@
     "pnpm": ">=8.0.0"
   },
   "scripts": {
-    "dev": "concurrently -n \"homepage,blog-admin,blog-frontend,blog-api,music-api\" -c \"cyan,magenta,green,yellow,blue\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
-    "dev:all": "concurrently -n \"homepage,blog-admin,blog-frontend,blog-api,music-api\" -c \"cyan,magenta,green,yellow,blue\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
-    "dev:local": "concurrently -n \"homepage,blog-frontend,blog-api,music-api\" -c \"cyan,green,yellow,blue\" \"pnpm dev:homepage:local\" \"pnpm dev:blog-frontend:local\" \"pnpm dev:blog-api:local\" \"pnpm dev:music:local\"",
+    "dev": "concurrently -n \"homepage,blog-admin,blog-frontend,blog-api,music-api,ws-gateway\" -c \"cyan,magenta,green,yellow,blue,white\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\" \"pnpm dev:blog-api\" \"pnpm dev:music\" \"pnpm dev:ws-gateway\"",
+    "dev:all": "concurrently -n \"homepage,blog-admin,blog-frontend,blog-api,music-api,ws-gateway\" -c \"cyan,magenta,green,yellow,blue,white\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\" \"pnpm dev:blog-api\" \"pnpm dev:music\" \"pnpm dev:ws-gateway\"",
+    "dev:local": "concurrently -n \"homepage,blog-frontend,blog-api,music-api,ws-gateway\" -c \"cyan,green,yellow,blue,white\" \"pnpm dev:homepage:local\" \"pnpm dev:blog-frontend:local\" \"pnpm dev:blog-api:local\" \"pnpm dev:music:local\" \"pnpm dev:ws-gateway\"",
     "dev:frontend": "concurrently -n \"homepage,blog-admin,blog-frontend\" -c \"cyan,magenta,green\" \"pnpm dev:homepage\" \"pnpm dev:blog-admin\" \"pnpm dev:blog-frontend\"",
-    "dev:backend": "concurrently -n \"blog-api,music-api\" -c \"yellow,blue\" \"pnpm dev:blog-api\" \"pnpm dev:music\"",
+    "dev:backend": "concurrently -n \"blog-api,music-api,ws-gateway\" -c \"yellow,blue,white\" \"pnpm dev:blog-api\" \"pnpm dev:music\" \"pnpm dev:ws-gateway\"",
     "dev:homepage": "pnpm --filter homepage dev",
     "dev:homepage:local": "cross-env PORT=80 VITE_BLOG_FRONTEND_PORT=3008 VITE_BLOG_API_PORT=8086 VITE_MUSIC_API_PORT=3005 pnpm --filter homepage dev",
     "dev:blog-admin": "pnpm --filter blog-admin dev",
@@ -29,6 +29,7 @@
     "dev:blog-frontend:local": "pnpm --filter blog-frontend serve:local",
     "dev:music": "cross-env PORT=3005 pnpm --filter music-api start:node",
     "dev:music:local": "cross-env PORT=3005 pnpm --filter music-api start:node",
+    "dev:ws-gateway": "cross-env PORT=4010 BLOG_API_BASE_URL=http://localhost:8086/api pnpm --filter ws-gateway dev",
     "build": "pnpm --filter \"./apps/**\" --filter \"./services/**\" build",
     "build:homepage": "pnpm --filter homepage build",
     "build:blog-admin": "pnpm --filter blog-admin build:pro",

@@ -121,7 +121,27 @@ const followRequest = async (url, options = {}, cookies = {}, maxRedirect = 8) =
   return { ...lastResponse, cookies: mergedCookies };
 };
 
-let pollSession = null;
+const QR_SESSION_TTL_MS = 180000;
+const pollSessions = new Map();
+let latestSessionId = null;
+
+const createSessionId = () => crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
+
+const getPollSession = (sessionId) => {
+  const id = sessionId || latestSessionId;
+  if (!id) return { id: null, session: null };
+  return { id, session: pollSessions.get(id) || null };
+};
+
+const removePollSession = (sessionId) => {
+  if (!sessionId) return;
+  const session = pollSessions.get(sessionId);
+  if (session?.cleanupTimer) clearTimeout(session.cleanupTimer);
+  pollSessions.delete(sessionId);
+  if (latestSessionId === sessionId) {
+    latestSessionId = pollSessions.size ? Array.from(pollSessions.keys()).at(-1) : null;
+  }
+};
 
 // GET /api/music/qrcode - 获取二维码
 exports.getQrCode = async (req, res) => {
@@ -173,15 +193,19 @@ exports.getQrCode = async (req, res) => {
       return res.json({ code: -1, msg: '获取二维码失败，未拿到 qrsig' });
     }
 
-    pollSession = {
+    const sessionId = createSessionId();
+    const cleanupTimer = setTimeout(() => removePollSession(sessionId), QR_SESSION_TTL_MS + 5000);
+    pollSessions.set(sessionId, {
       cookies: { ...cookies, ...qrCookies },
       ptLoginSig,
       qrsig,
       startTime: Date.now(),
-    };
+      cleanupTimer,
+    });
+    latestSessionId = sessionId;
 
     const base64 = qrRes.rawBuffer.toString('base64');
-    res.json({ code: 0, data: { qrcode: `data:image/png;base64,${base64}` } });
+    res.json({ code: 0, data: { qrcode: `data:image/png;base64,${base64}`, sessionId, expiresIn: Math.floor(QR_SESSION_TTL_MS / 1000) } });
   } catch (e) {
     res.json({ code: -1, msg: e.message });
   }
@@ -189,9 +213,10 @@ exports.getQrCode = async (req, res) => {
 
 // GET /api/music/qrcode/poll - 轮询扫码状态
 exports.pollQrCode = async (req, res) => {
+  const { id: sessionId, session: pollSession } = getPollSession(req.query.sessionId);
   if (!pollSession) return res.json({ code: -1, msg: '请先获取二维码' });
-  if (Date.now() - pollSession.startTime > 180000) {
-    pollSession = null;
+  if (Date.now() - pollSession.startTime > QR_SESSION_TTL_MS) {
+    removePollSession(sessionId);
     return res.json({ code: 0, status: 65, msg: '二维码已过期，请重新获取' });
   }
 
@@ -245,11 +270,9 @@ exports.pollQrCode = async (req, res) => {
     // 跟随跳转：check_sig -> login_jump
     let stepRes = await followRequest(urlRefresh, {}, cookies);
     let stepCookies = stepRes.cookies || cookies;
-    console.log('[music:qr] step1 check_sig status:', stepRes.status, 'cookies count:', Object.keys(stepCookies).length);
 
     const jumpRes = await followRequest('https://graph.qq.com/oauth2.0/login_jump', {}, stepCookies);
     stepCookies = jumpRes.cookies || stepCookies;
-    console.log('[music:qr] step2 login_jump status:', jumpRes.status, 'p_skey:', !!stepCookies['p_skey']);
 
     // 调用 authorize 获取 code（禁止自动重定向，以便从 Location 读取 code）
     const pSkey = stepCookies['p_skey'] || stepCookies['skey'] || '';
@@ -278,18 +301,14 @@ exports.pollQrCode = async (req, res) => {
       },
       body: authData.toString(),
     });
-    console.log('[music:qr] step3 authorize status:', authRes.status, 'location:', (authRes.headers.location || '').slice(0, 80));
 
     if (authRes.status !== 302 || !authRes.headers.location) {
-      console.error('[music:qr] authorize 未返回302, status:', authRes.status, 'data:', authRes.data.slice(0, 200));
-      return res.json({ code: -1, msg: 'authorize 未返回重定向，可能未授权', data: authRes.data.slice(0, 500) });
+      return res.json({ code: -1, msg: 'authorize 未返回重定向，可能未授权' });
     }
 
     const locationUrl = new URL(authRes.headers.location, 'https://graph.qq.com');
     const code = locationUrl.searchParams.get('code');
-    console.log('[music:qr] step4 got code:', !!code);
     if (!code) {
-      console.error('[music:qr] 无code, location:', authRes.headers.location.slice(0, 200));
       return res.json({ code: -1, msg: '未从授权回调中获取到 code' });
     }
 
@@ -319,19 +338,21 @@ exports.pollQrCode = async (req, res) => {
     }
 
     const exchangeBody = exchangeJson.req || exchangeJson['QQConnectLogin.LoginServer'] || {};
-    console.log('[music:qr] step5 exchange code:', exchangeBody.code, 'has musickey:', !!exchangeBody.data?.musickey);
     if (exchangeBody.code !== 0) {
       return res.json({
         code: -1,
         msg: `code 换 token 失败: ${exchangeBody.code}`,
-        data: exchangeBody,
+        data: {
+          code: exchangeBody.code,
+          msg: exchangeBody.msg || exchangeBody.message || '',
+        },
       });
     }
 
     const loginInfo = exchangeBody.data || {};
     const musickey = loginInfo.musickey || loginInfo.qqmusic_key || '';
     if (!musickey) {
-      return res.json({ code: -1, msg: '未获取到 musickey', data: loginInfo });
+      return res.json({ code: -1, msg: '未获取到 musickey' });
     }
 
     const uin = String(loginInfo.musicid || loginInfo.openId || '');
@@ -348,7 +369,7 @@ exports.pollQrCode = async (req, res) => {
       updatedAt: new Date().toISOString(),
     };
     saveCookie(cookieData);
-    pollSession = null;
+    removePollSession(sessionId);
 
     res.json({
       code: 0,
@@ -438,7 +459,8 @@ exports.refreshCookie = async (req, res) => {
 exports.deleteCookie = (req, res) => {
   try {
     if (fs.existsSync(COOKIE_FILE)) fs.unlinkSync(COOKIE_FILE);
-    pollSession = null;
+    pollSessions.clear();
+    latestSessionId = null;
     res.json({ code: 0, msg: '已清除' });
   } catch (e) {
     res.json({ code: -1, msg: e.message });

@@ -24,7 +24,7 @@
     </a-card>
 
     <!-- 扫码弹窗 -->
-    <a-modal v-model:open="scanModalOpen" title="扫码登录 QQ 音乐" :footer="null" @cancel="stopPoll" width="320px">
+    <a-modal v-model:open="scanModalOpen" title="扫码登录 QQ 音乐" :footer="null" @cancel="stopScanWatch" width="320px">
       <div class="flex flex-col items-center py-4 gap-4">
         <a-spin v-if="qrcodeLoading" tip="加载二维码..." />
         <template v-else>
@@ -42,6 +42,7 @@
 import { ref, onUnmounted, computed } from 'vue'
 import { notification } from 'ant-design-vue'
 import http from '@/api/http'
+import { getToken } from '@/utils/auth'
 
 const status = ref({ hasKey: false })
 const qrcode = ref('')
@@ -50,7 +51,12 @@ const scanModalOpen = ref(false)
 const pollMsg = ref('等待扫码...')
 const pollStatus = ref(66)
 const refreshing = ref(false)
+const qrSessionId = ref('')
 let pollTimer = null
+let wsClient = null
+let wsSubscribeTimer = null
+let wsSettled = false
+let scanFinished = false
 
 const statusTagColor = computed(() => {
   if (pollStatus.value === 0) return 'success'
@@ -64,19 +70,144 @@ const loadStatus = async () => {
   if (res.data.code === 0) status.value = res.data.data
 }
 
+const handleScanResponse = (responseData) => {
+  const s = responseData.status
+  const msg = responseData.msg
+  const code = responseData.code
+  pollStatus.value = (s != null) ? s : code
+  pollMsg.value = msg
+
+  if (s === 0) {
+    scanFinished = true
+    stopScanWatch()
+    scanModalOpen.value = false
+    notification.success({ message: '登录成功', description: 'QQ 音乐 Cookie 已保存' })
+    loadStatus()
+  } else if (s === 65) {
+    scanFinished = true
+    stopScanWatch()
+    notification.warning({ message: '二维码已过期', description: '请重新获取二维码' })
+  } else if (code < 0) {
+    scanFinished = true
+    stopScanWatch()
+    notification.error({ message: '登录失败', description: msg || '未知错误' })
+  }
+}
+
+const getWsUrl = () => {
+  if (import.meta.env.VITE_WS_BASE_URL) return import.meta.env.VITE_WS_BASE_URL
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${protocol}//${window.location.host}/ws`
+}
+
+const clearWsSubscribeTimer = () => {
+  if (wsSubscribeTimer) {
+    clearTimeout(wsSubscribeTimer)
+    wsSubscribeTimer = null
+  }
+}
+
+const closeWs = () => {
+  clearWsSubscribeTimer()
+  if (wsClient) {
+    const client = wsClient
+    wsClient = null
+    client.onclose = null
+    client.onerror = null
+    client.onmessage = null
+    client.close()
+  }
+}
+
+const fallbackToPoll = () => {
+  if (pollTimer) return
+  closeWs()
+  startPoll()
+}
+
+const startWsPush = () => {
+  const token = getToken()
+  if (!token || !qrSessionId.value || !window.WebSocket) {
+    fallbackToPoll()
+    return
+  }
+
+  wsSettled = false
+  closeWs()
+  const client = new WebSocket(getWsUrl())
+  wsClient = client
+
+  wsSubscribeTimer = setTimeout(() => {
+    if (!wsSettled) fallbackToPoll()
+  }, 3000)
+
+  client.onopen = () => {
+    client.send(JSON.stringify({
+      type: 'subscribe',
+      id: `music-qr-${Date.now()}`,
+      channel: 'music.qr',
+      token,
+      params: { sessionId: qrSessionId.value },
+    }))
+  }
+
+  client.onmessage = (event) => {
+    let message
+    try {
+      message = JSON.parse(event.data)
+    } catch {
+      fallbackToPoll()
+      return
+    }
+
+    if (message.type === 'connected') return
+
+    if (message.type === 'subscribed') {
+      wsSettled = true
+      clearWsSubscribeTimer()
+      stopPoll()
+      return
+    }
+
+    if (message.type === 'error') {
+      fallbackToPoll()
+      return
+    }
+
+    if (message.type === 'event' && message.channel === 'music.qr' && message.data) {
+      handleScanResponse(message.data)
+    }
+  }
+
+  client.onerror = () => {
+    if (scanModalOpen.value && !scanFinished && !pollTimer) fallbackToPoll()
+  }
+
+  client.onclose = () => {
+    if (scanModalOpen.value && !scanFinished && !pollTimer) fallbackToPoll()
+  }
+}
+
 const loadQrCode = async () => {
   qrcodeLoading.value = true
   pollMsg.value = '加载中...'
-  stopPoll()
-  const res = await http.get('/music/qrcode')
-  if (res.data.code === 0) {
-    qrcode.value = res.data.data.qrcode
-    pollMsg.value = '等待扫码...'
-    pollStatus.value = 66
-    startPoll()
-  } else {
-    pollMsg.value = res.data.msg || '获取失败'
+  stopScanWatch()
+  try {
+    const res = await http.get('/music/qrcode')
+    if (res.data.code === 0) {
+      qrcode.value = res.data.data.qrcode
+      qrSessionId.value = res.data.data.sessionId || ''
+      pollMsg.value = '等待扫码...'
+      pollStatus.value = 66
+      startWsPush()
+    } else {
+      pollMsg.value = res.data.msg || '获取失败'
+      pollStatus.value = -2
+    }
+  } catch (e) {
+    pollMsg.value = '获取失败，请检查网络后重试'
     pollStatus.value = -2
+  } finally {
     qrcodeLoading.value = false
   }
 }
@@ -85,26 +216,9 @@ const startPoll = () => {
   let failCount = 0
   const pollAction = async () => {
     try {
-      const res = await http.get('/music/qrcode/poll')
-      const responseData = res.data
-      const s = responseData.status
-      const msg = responseData.msg
-      const code = responseData.code
-      pollStatus.value = (s != null) ? s : code
-      pollMsg.value = msg
-
-      if (s === 0) {
-        stopPoll()
-        scanModalOpen.value = false
-        notification.success({ message: '登录成功', description: 'QQ 音乐 Cookie 已保存' })
-        loadStatus()
-      } else if (s === 65) {
-        stopPoll()
-        notification.warning({ message: '二维码已过期', description: '请重新获取二维码' })
-      } else if (code < 0) {
-        stopPoll()
-        notification.error({ message: '登录失败', description: msg || '未知错误' })
-      }
+      const url = qrSessionId.value ? `/music/qrcode/poll?sessionId=${encodeURIComponent(qrSessionId.value)}` : '/music/qrcode/poll'
+      const res = await http.get(url)
+      handleScanResponse(res.data)
       failCount = 0
     } catch (e) {
       failCount = failCount + 1
@@ -115,6 +229,7 @@ const startPoll = () => {
       }
     }
   }
+  pollAction()
   pollTimer = setInterval(pollAction, 2000)
 }
 
@@ -122,9 +237,17 @@ const stopPoll = () => {
   if (pollTimer) { clearInterval(pollTimer); pollTimer = null }
 }
 
+const stopScanWatch = () => {
+  wsSettled = false
+  stopPoll()
+  closeWs()
+}
+
 const openScanModal = async () => {
   scanModalOpen.value = true
   qrcode.value = ''
+  qrSessionId.value = ''
+  scanFinished = false
   await loadQrCode()
 }
 
@@ -149,6 +272,6 @@ const deleteCookie = async () => {
   loadStatus()
 }
 
-onUnmounted(stopPoll)
+onUnmounted(stopScanWatch)
 loadStatus()
 </script>

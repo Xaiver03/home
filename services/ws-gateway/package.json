@@ -1,0 +1,19 @@
+{
+  "name": "ws-gateway",
+  "version": "1.0.0",
+  "description": "通用 WebSocket 实时消息网关",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js",
+    "build": "echo 'ws-gateway does not require build'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.18.0"
+  }
+}
