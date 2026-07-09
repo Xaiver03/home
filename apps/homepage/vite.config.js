@@ -32,6 +32,7 @@ export default ({ mode }) =>
           navigateFallbackDenylist: [
             /^\/api/,      // API 路径
             /^\/admin/,    // 管理后台
+            /^\/blog/,     // 博客前台
             /^\/about/,    // 博客-关于
             /^\/link/,     // 博客-友链
             /^\/log/,      // 博客-文章

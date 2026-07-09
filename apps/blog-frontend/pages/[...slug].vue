@@ -6,7 +6,7 @@
     <i  class="!text-[20rem] iconfont icon-icon-test"></i>
     <p class="text-8xl">没有找到这个页面<span id="loading">📡</span></p>
     <nuxt-link to="/">
-      <a-button class="mt-16" type="primary" shape="round" size="large">返回首页</a-button>
+      <a-button class="mt-16" type="primary" shape="round" size="large">返回博客首页</a-button>
     </nuxt-link>
   </div>
 </template>

@@ -158,7 +158,7 @@ check_service() {
 }
 
 check_service "blog-api"       "http://127.0.0.1:8086/api/article/reception/getArticleByTypeId/0/1/5"
-check_service "blog-frontend"  "http://127.0.0.1:3004"
+check_service "blog-frontend"  "http://127.0.0.1:3004/blog/"
 check_service "homepage"       "http://127.0.0.1:8086/admin/"  # /admin 走 blog-api 静态托管
 check_service "music-api"      "http://127.0.0.1:4000"
 

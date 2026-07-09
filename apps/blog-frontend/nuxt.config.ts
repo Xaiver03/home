@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   ssr: true,
   compatibilityDate: "2025-10-06",
   app: {
-    baseURL: '/',
+    baseURL: '/blog/',
     head: {
       title: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客",
       meta: [

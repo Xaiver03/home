@@ -120,15 +120,20 @@ const jumpLink = (data) => {
   }
 };
 
+const normalizeBlogLink = (item) => {
+  const link = item.link || '';
+  if (link === '/log') return { ...item, link: '/blog' };
+  if (link.startsWith('/log/')) return { ...item, link: `/blog${link}` };
+  if (['/about', '/link', '/message', '/reward'].includes(link)) return { ...item, link: `/blog${link}` };
+  return item;
+};
+
 // 获取网站链接配置
 const loadSiteLinks = async () => {
   try {
     const config = await getGlobalConfig();
     if (config && config['site-links'] && config['site-links'].content && Array.isArray(config['site-links'].content)) {
-      siteLinks.value = config['site-links'].content;
-      console.log('✅ 网站链接：使用后端API配置');
-    } else {
-      console.log('📄 网站链接：API无数据，保持默认配置');
+      siteLinks.value = config['site-links'].content.map(normalizeBlogLink);
     }
   } catch (error) {
     console.warn('⚠️ 网站链接：API获取失败，保持默认配置', error?.message || error);
