@@ -76,35 +76,45 @@ const parseCookieString = (cookieString = '') => {
   }, {});
 };
 
-const requestOnce = (url, options = {}) => new Promise((resolve, reject) => {
-  const parsedUrl = new URL(url);
-  const lib = parsedUrl.protocol === 'https:' ? https : http;
-  const req = lib.request({
-    hostname: parsedUrl.hostname,
-    path: parsedUrl.pathname + parsedUrl.search,
-    method: options.method || 'GET',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-      'Referer': 'https://y.qq.com',
-      'Accept': '*/*',
-      'Accept-Language': 'zh-CN,zh;q=0.9',
-      ...(options.headers || {}),
-    },
-  }, (res) => {
-    let data = '';
-    const rawChunks = [];
-    res.on('data', chunk => { data += chunk; rawChunks.push(chunk); });
-    res.on('end', () => resolve({
-      status: res.statusCode,
-      headers: res.headers,
-      data,
-      rawBuffer: Buffer.concat(rawChunks),
-    }));
+const requestOnce = (url, options = {}) =>
+  new Promise((resolve, reject) => {
+    const parsedUrl = new URL(url);
+    const lib = parsedUrl.protocol === 'https:' ? https : http;
+    const req = lib.request(
+      {
+        hostname: parsedUrl.hostname,
+        path: parsedUrl.pathname + parsedUrl.search,
+        method: options.method || 'GET',
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+          Referer: 'https://y.qq.com',
+          Accept: '*/*',
+          'Accept-Language': 'zh-CN,zh;q=0.9',
+          ...(options.headers || {}),
+        },
+      },
+      (res) => {
+        let data = '';
+        const rawChunks = [];
+        res.on('data', (chunk) => {
+          data += chunk;
+          rawChunks.push(chunk);
+        });
+        res.on('end', () =>
+          resolve({
+            status: res.statusCode,
+            headers: res.headers,
+            data,
+            rawBuffer: Buffer.concat(rawChunks),
+          }),
+        );
+      },
+    );
+    req.on('error', reject);
+    if (options.body) req.write(options.body);
+    req.end();
   });
-  req.on('error', reject);
-  if (options.body) req.write(options.body);
-  req.end();
-});
 
 const followRequest = async (url, options = {}, cookies = {}, maxRedirect = 8) => {
   let currentUrl = url;
@@ -137,7 +147,8 @@ const QR_SESSION_TTL_MS = 180000;
 const pollSessions = new Map();
 let latestSessionId = null;
 
-const createSessionId = () => crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
+const createSessionId = () =>
+  crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
 
 const getPollSession = (sessionId) => {
   const id = sessionId || latestSessionId;
@@ -171,7 +182,9 @@ exports.getQrCode = async (req, res) => {
       pt_3rd_aid: PT_3RD_AID,
       pt_feedback_link: 'https://support.qq.com/products/77942?customInfo=.appid100497308',
     });
-    const xloginRes = await requestOnce('https://xui.ptlogin2.qq.com/cgi-bin/xlogin?' + xloginParams.toString());
+    const xloginRes = await requestOnce(
+      'https://xui.ptlogin2.qq.com/cgi-bin/xlogin?' + xloginParams.toString(),
+    );
     if (xloginRes.status !== 200) {
       return res.json({ code: -1, msg: `xlogin 初始化失败，状态码 ${xloginRes.status}` });
     }
@@ -217,7 +230,14 @@ exports.getQrCode = async (req, res) => {
     latestSessionId = sessionId;
 
     const base64 = qrRes.rawBuffer.toString('base64');
-    res.json({ code: 0, data: { qrcode: `data:image/png;base64,${base64}`, sessionId, expiresIn: Math.floor(QR_SESSION_TTL_MS / 1000) } });
+    res.json({
+      code: 0,
+      data: {
+        qrcode: `data:image/png;base64,${base64}`,
+        sessionId,
+        expiresIn: Math.floor(QR_SESSION_TTL_MS / 1000),
+      },
+    });
   } catch (e) {
     res.json({ code: -1, msg: e.message });
   }
@@ -256,9 +276,12 @@ exports.pollQrCode = async (req, res) => {
       pt_3rd_aid: PT_3RD_AID,
       has_onekey: '1',
     });
-    const pollRes = await requestOnce('https://ssl.ptlogin2.qq.com/ptqrlogin?' + pollParams.toString(), {
-      headers: { Cookie: cookieStr },
-    });
+    const pollRes = await requestOnce(
+      'https://ssl.ptlogin2.qq.com/ptqrlogin?' + pollParams.toString(),
+      {
+        headers: { Cookie: cookieStr },
+      },
+    );
 
     const body = pollRes.data;
     const match = body.match(/ptuiCB\('(\d+)'/);
@@ -283,7 +306,11 @@ exports.pollQrCode = async (req, res) => {
     let stepRes = await followRequest(urlRefresh, {}, cookies);
     let stepCookies = stepRes.cookies || cookies;
 
-    const jumpRes = await followRequest('https://graph.qq.com/oauth2.0/login_jump', {}, stepCookies);
+    const jumpRes = await followRequest(
+      'https://graph.qq.com/oauth2.0/login_jump',
+      {},
+      stepCookies,
+    );
     stepCookies = jumpRes.cookies || stepCookies;
 
     // 调用 authorize 获取 code（禁止自动重定向，以便从 Location 读取 code）
@@ -309,7 +336,7 @@ exports.pollQrCode = async (req, res) => {
       headers: {
         Cookie: cookieObjToStr(stepCookies),
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Origin': 'https://graph.qq.com',
+        Origin: 'https://graph.qq.com',
       },
       body: authData.toString(),
     });
@@ -333,7 +360,8 @@ exports.pollQrCode = async (req, res) => {
         param: { code },
       },
     };
-    const exchangeUrl = 'https://u.y.qq.com/cgi-bin/musicu.fcg?g_tk=5381&format=json&inCharset=utf8&outCharset=utf-8&data=' +
+    const exchangeUrl =
+      'https://u.y.qq.com/cgi-bin/musicu.fcg?g_tk=5381&format=json&inCharset=utf8&outCharset=utf-8&data=' +
       encodeURIComponent(JSON.stringify(exchangeData));
     const exchangeRes = await requestOnce(exchangeUrl, {
       headers: {
@@ -346,7 +374,11 @@ exports.pollQrCode = async (req, res) => {
     try {
       exchangeJson = JSON.parse(exchangeRes.data);
     } catch {
-      return res.json({ code: -1, msg: 'code 换 token 接口返回非 JSON', data: exchangeRes.data.slice(0, 500) });
+      return res.json({
+        code: -1,
+        msg: 'code 换 token 接口返回非 JSON',
+        data: exchangeRes.data.slice(0, 500),
+      });
     }
 
     const exchangeBody = exchangeJson.req || exchangeJson['QQConnectLogin.LoginServer'] || {};
@@ -377,7 +409,9 @@ exports.pollQrCode = async (req, res) => {
       openid: loginInfo.openid || '',
       unionid: loginInfo.unionid || '',
       refreshKey: loginInfo.refresh_key || '',
-      expiredAt: loginInfo.expired_at ? new Date(Number(loginInfo.expired_at) * 1000).toISOString() : '',
+      expiredAt: loginInfo.expired_at
+        ? new Date(Number(loginInfo.expired_at) * 1000).toISOString()
+        : '',
       updatedAt: new Date().toISOString(),
     };
     saveCookie(cookieData);
@@ -453,7 +487,9 @@ const refreshMusicCookieData = async (cookie) => {
     accessToken: refreshBody.data.access_token || cookie.accessToken,
     unionid: refreshBody.data.unionid || cookie.unionid,
     refreshKey: refreshBody.data.refresh_key || cookie.refreshKey,
-    expiredAt: refreshBody.data.expired_at ? new Date(Number(refreshBody.data.expired_at) * 1000).toISOString() : cookie.expiredAt,
+    expiredAt: refreshBody.data.expired_at
+      ? new Date(Number(refreshBody.data.expired_at) * 1000).toISOString()
+      : cookie.expiredAt,
     updatedAt: new Date().toISOString(),
   };
 };
@@ -493,19 +529,22 @@ exports.importCookie = async (req, res) => {
     openid: '',
     unionid: '',
     refreshKey: '',
+    rawCookie: cookieText,
     expiredAt: '',
     updatedAt: new Date().toISOString(),
   };
 
+  const skipValidation = req.body.skipValidation === true;
+
   try {
-    const validated = await refreshMusicCookieData(cookieData);
+    const validated = skipValidation ? cookieData : await refreshMusicCookieData(cookieData);
     saveCookie(validated);
     pollSessions.clear();
     latestSessionId = null;
 
     return res.json({
       code: 0,
-      msg: '导入成功',
+      msg: skipValidation ? '已保存 Cookie（未验证）' : '导入成功',
       data: { uin },
     });
   } catch (e) {

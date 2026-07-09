@@ -41,6 +41,9 @@
     <a-modal v-model:open="importModalOpen" title="导入 QQ 音乐 Cookie" :confirm-loading="importing" @ok="importCookie" width="560px">
       <a-alert class="mb-4" type="info" show-icon message="从 y.qq.com 登录后复制 Cookie，需包含 uin 和 qm_keyst 或 qqmusic_key。" />
       <a-textarea v-model:value="cookieText" :rows="8" placeholder="uin=...; qm_keyst=...; qqmusic_key=..." />
+      <a-checkbox v-model:checked="skipValidation" class="mt-4">
+        跳过验证直接保存（兼容 CSDN / qq-music-api 直接复制 Cookie 的方式）
+      </a-checkbox>
     </a-modal>
   </div>
 </template>
@@ -58,6 +61,7 @@ const scanModalOpen = ref(false)
 const importModalOpen = ref(false)
 const cookieText = ref('')
 const importing = ref(false)
+const skipValidation = ref(false)
 const pollMsg = ref('等待扫码...')
 const pollStatus = ref(66)
 const refreshing = ref(false)
@@ -272,11 +276,12 @@ const importCookie = async () => {
   }
   importing.value = true
   try {
-    const res = await http.post('/music/cookie/import', { cookie: cookieText.value })
+    const res = await http.post('/music/cookie/import', { cookie: cookieText.value, skipValidation: skipValidation.value })
     if (res.data.code === 0) {
-      notification.success({ message: '导入成功' })
+      notification.success({ message: res.data.msg || '导入成功' })
       importModalOpen.value = false
       cookieText.value = ''
+      skipValidation.value = false
       loadStatus()
     } else {
       notification.error({ message: res.data.msg || '导入失败' })
