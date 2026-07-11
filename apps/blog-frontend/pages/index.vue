@@ -9,26 +9,32 @@ const goTo = (url, $event) => { // 跳转到其他网站
   window.open(url, '_blank')
 }
 // 获取热门文章数据
-const { data: articleData, error: articleError } = await useAsyncData('getArticleData', async () =>
-  await api.getHottestArticleTen().then(res => {
-    const hottestArticle = res.rows.shift()
-    const hotArticleList = res.rows
-    return {
-      hottestArticle, hotArticleList
-    }
+const { data: articleData, error: articleError } = await useAsyncData('getArticleData', async () => {
+  const res = await api.getHottestArticleTen()
+  const rows = Array.isArray(res?.rows) ? [...res.rows] : []
+  const hottestArticle = rows.shift() ?? null
+  const hotArticleList = rows
+  return {
+    hottestArticle, hotArticleList
+  }
+}, {
+  default: () => ({
+    hottestArticle: null,
+    hotArticleList: []
   })
-)
+})
 // 获取热门留言数据
-const { data: hottestMessageList, error: hottestMessageError } = await useAsyncData('getMessageData', async () =>
-  await api.getComment({
+const { data: hottestMessageList, error: hottestMessageError } = await useAsyncData('getMessageData', async () => {
+  const res = await api.getComment({
     currentPage: 1,
     pageSize: 20,
     userId: -1,
     order: '[["createTime", "DESC"]]'
-  }).then(res => {
-    return res.rows
   })
-)
+  return Array.isArray(res?.rows) ? res.rows : []
+}, {
+  default: () => []
+})
 const likeMessage = (message) => { // 喜欢评论
   api.likeComment(message.id).then(res => {
     if (utils.analysisData(res)) {

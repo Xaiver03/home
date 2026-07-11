@@ -6,7 +6,7 @@ definePageMeta({
 })
 useHead({
   script: [
-    { type: "text/javascript", src: '/TagCanvas.js' }, // 引入TagCanvas
+    { type: "text/javascript", src: '/blog/TagCanvas.js' }, // 引入TagCanvas
   ],
 })
 
