@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Blog Clippings Import'
+  short_description: 'Publish Obsidian clippings to the production blog safely.'
+  default_prompt: 'Use $blog-clippings-import to publish and organize an Obsidian Clippings folder.'
