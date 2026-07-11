@@ -4,6 +4,7 @@ const router = useRouter();
 const store = useNuxtStore();
 const config = useRuntimeConfig();
 const route = useRoute();
+const articleAuthor = computed(() => store.$state.config['article-author']?.content || '邓湘雷');
 
 definePageMeta({
   layout: 'classics',
@@ -24,7 +25,7 @@ const { data: articleData, error: articleError } = await useAsyncData('getArticl
 },
 );
 useHead({
-  title: `${articleData.value?.topic} 【 Bokey Space 】`,
+  title: `${articleData.value?.topic} 【 邓湘雷的博客 】`,
   meta: [
     {
       name: 'description',
@@ -32,14 +33,17 @@ useHead({
     },
   ],
 });
-const getArticleType = (id) => { // 获取文章类别数据
-  api.getArticleTypeById(id).then(res => {
-    articleData.value.typeTheme = res?.theme;
+const getArticleType = (typeId) => { // 获取文章类别数据
+  if (!typeId || !articleData.value) return;
+  api.getArticleTypeById(typeId).then(res => {
+    if (articleData.value) {
+      articleData.value.typeTheme = res?.theme || '';
+    }
   });
 };
-watch(() => route.params.id, (newVal) => { // 监听路由中id参数的变化，变化就重新获取文章内容
-  getArticleType(newVal);
-  if (window) {
+watch(() => articleData.value?.typeId, (typeId) => { // 监听文章类目变化
+  getArticleType(typeId);
+  if (import.meta.client && window) {
     window.scrollTo(0, 0); // 滚动到页面顶部
   }
 }, {
@@ -397,7 +401,7 @@ onMounted(() => {
         </li>
         <li class="m-4">
           <p>作者</p>
-          <p>Bokey</p>
+          <p>{{ articleAuthor }}</p>
         </li>
         <li class="m-4">
           <p>版权协议</p>

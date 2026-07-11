@@ -101,6 +101,8 @@ pnpm --filter blog-api migration:generate --name <migration-name>
 
 ## 工作流程（极其重要）
 
+**硬性约束：任何代码/配置修改完成后，严禁停在本地或服务器未提交状态；必须 commit 并 push 到 origin/dev。除非用户明确说“不要提交/不要推送”，否则改完即提交、推送、监控 CI/CD，这是不可省略步骤。**
+
 **每次代码修改完成后的强制步骤：**
 
 1. **构建** — `cd apps/blog-admin && npm run build`（前端修改时）
