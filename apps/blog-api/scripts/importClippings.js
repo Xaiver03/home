@@ -63,6 +63,12 @@ function getFrontmatter(markdown) {
       fields[field[1]] = unquote(field[2]);
     }
   }
+  const author =
+    match[1].match(/^author:\s*\r?\n\s*-\s*["']?\[\[([^\]]+)\]\]["']?\s*$/m)?.[1] ||
+    match[1].match(/^author:\s*["']?\[\[([^\]]+)\]\]["']?\s*$/m)?.[1];
+  if (author) {
+    fields.author = author;
+  }
   return { fields, content: markdown.slice(match[0].length).trim() };
 }
 
@@ -111,6 +117,7 @@ function parseClipping(markdown, fileName) {
   return {
     title,
     source: fields.source || null,
+    author: fields.author || null,
     description: sanitizeDatabaseText(getDescription(fields.description, content)),
     content: `${content}${sourceNote}`,
     publishedAt: getPublishedAt(fields.published, content),
@@ -141,23 +148,25 @@ function findMarkdownFiles(directory) {
     .sort((left, right) => left.localeCompare(right, 'zh-CN'));
 }
 
-function getImportPlan(sourceDirectory) {
-  return findMarkdownFiles(sourceDirectory).map((filePath) => {
-    const parsed = parseClipping(fs.readFileSync(filePath, 'utf8'), path.basename(filePath));
-    return {
-      ...parsed,
-      ...classifyArticle(parsed.title),
-      filePath,
-    };
-  });
+function getImportPlan(sourceDirectory, { includeExternal = false } = {}) {
+  return findMarkdownFiles(sourceDirectory)
+    .map((filePath) => {
+      const parsed = parseClipping(fs.readFileSync(filePath, 'utf8'), path.basename(filePath));
+      return {
+        ...parsed,
+        ...classifyArticle(parsed.title),
+        filePath,
+      };
+    })
+    .filter((item) => includeExternal || item.author?.includes('灯下灯'));
 }
 
-async function importClippings(sourceDirectory, dependencies) {
+async function importClippings(sourceDirectory, dependencies, options) {
   const { Article, ArticleType, sequelize, storageService } = dependencies || {
     ...require('../models'),
     storageService: require('../services/qiniuService'),
   };
-  const plan = getImportPlan(sourceDirectory);
+  const plan = getImportPlan(sourceDirectory, options);
   let transaction;
   const result = { created: 0, updated: 0, categories: new Set() };
 
@@ -233,12 +242,16 @@ async function importClippings(sourceDirectory, dependencies) {
 async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
+  const includeExternal = args.includes('--include-external');
   const sourceDirectory = args.find((arg) => !arg.startsWith('--'));
   if (!sourceDirectory) {
-    throw new Error('用法: node scripts/importClippings.js <Clippings目录> [--dry-run]');
+    throw new Error(
+      '用法: node scripts/importClippings.js <Clippings目录> [--dry-run] [--include-external]',
+    );
   }
 
-  const plan = getImportPlan(sourceDirectory);
+  const options = { includeExternal };
+  const plan = getImportPlan(sourceDirectory, options);
   if (dryRun) {
     console.table(
       plan.map((item) => ({
@@ -253,7 +266,7 @@ async function main() {
     return;
   }
 
-  const result = await importClippings(sourceDirectory);
+  const result = await importClippings(sourceDirectory, undefined, options);
   console.log(
     `导入完成：${result.total} 篇，新增 ${result.created} 篇，更新 ${result.updated} 篇，分类 ${result.categories.join(
       '、',

@@ -26,6 +26,7 @@ description: "文章简介"
     expect(parseClipping(clipping, '测试文章.md')).toEqual({
       title: '测试文章',
       source: 'https://example.com/article',
+      author: null,
       description: '文章简介',
       content: `正文第一段。
 
@@ -87,12 +88,44 @@ describe('getImportPlan', () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'clippings-'));
     const article = `---
 title: "真实文章"
+author:
+  - "[[灯下灯]]"
 ---
 正文。`;
     fs.writeFileSync(path.join(directory, '真实文章.md'), article);
     fs.writeFileSync(path.join(directory, '._真实文章.md'), 'sidecar');
 
     expect(getImportPlan(directory).map((item) => item.title)).toEqual(['真实文章']);
+
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+
+  it('includes only clippings authored by 灯下灯 unless external content is explicitly requested', () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'clippings-'));
+    fs.writeFileSync(
+      path.join(directory, '自己的文章.md'),
+      `---
+title: "自己的文章"
+author:
+  - "[[灯下灯/Xaiver]]"
+---
+正文。`,
+    );
+    fs.writeFileSync(
+      path.join(directory, '外部文章.md'),
+      `---
+title: "外部文章"
+author:
+  - "[[其他作者]]"
+---
+正文。`,
+    );
+
+    expect(getImportPlan(directory).map((item) => item.title)).toEqual(['自己的文章']);
+    expect(getImportPlan(directory, { includeExternal: true }).map((item) => item.title)).toEqual([
+      '外部文章',
+      '自己的文章',
+    ]);
 
     fs.rmSync(directory, { recursive: true, force: true });
   });
@@ -105,6 +138,8 @@ describe('importClippings', () => {
       path.join(directory, '文章.md'),
       `---
 title: "文章"
+author:
+  - "[[灯下灯]]"
 ---
 正文。`,
     );
