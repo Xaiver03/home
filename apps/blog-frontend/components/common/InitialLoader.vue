@@ -13,7 +13,7 @@
 
 <script setup>
 const store = useNuxtStore()
-const avatarSrc = computed(() => store.$state.config['my-avatar']?.content || '/images/bokey.png')
+const avatarSrc = computed(() => store.$state.config['my-avatar']?.content || '')
 const visible = ref(true)
 
 // SSR 阶段（服务端）默认显示
