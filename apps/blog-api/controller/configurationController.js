@@ -5,7 +5,8 @@ module.exports = {
   // --获取--
   // 后台获取配置
   getAllConfiguration: async (req, res) => {
-    res.json(await configurationService.getAllConfiguration());
+    const result = await configurationService.getAllConfiguration();
+    res.json(utils.postMessage(1, "获取成功", { data: result.rows }));
   },
   // 客户端获取配置
   getConfig: async (req, res) => {

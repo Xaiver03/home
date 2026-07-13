@@ -660,7 +660,7 @@ const saveAllConfigurations = async () => {
     await saveConfig('about-basic-info', basicInfo.value)
 
     // 保存社交链接
-    await saveConfig('social-links', socialLinks.value)
+    await saveConfig('about-social-links', socialLinks.value)
 
     // 保存关于本站滑动展示
     await saveConfig('about-me-slide', websiteSlides.value)
@@ -714,7 +714,7 @@ const loadConfigurations = async () => {
             case 'about-basic-info':
               basicInfo.value = JSON.parse(config.content)
               break
-            case 'social-links':
+            case 'about-social-links':
               socialLinks.value = JSON.parse(config.content)
               break
             case 'about-me-slide':
