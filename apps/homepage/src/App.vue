@@ -214,6 +214,7 @@
     <footer class="site-footer">
       <span>{{ homeText.siteAuthor }}</span>
       <span>{{ homeText.siteUrl }}</span>
+      <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer">湘ICP备2026026942号-1</a>
       <a href="#top">回到顶部 ↑</a>
     </footer>
   </div>
@@ -240,6 +241,7 @@ const articles = ref([]);
 const filteredArticles = ref([]);
 const categories = ref([]);
 const selectedCategoryId = ref('all');
+const totalArticleCount = ref(0);
 const isLoading = ref(true);
 const isFilterLoading = ref(false);
 const isScrolled = ref(false);
@@ -264,8 +266,8 @@ const latestArticle = computed(() => visibleArticles.value[0] || articles.value[
 const articleListLoading = computed(() => isLoading.value || isFilterLoading.value);
 const articleCountLabel = computed(() => {
   if (articleListLoading.value) return '文章加载中';
-  if (!visibleArticles.value.length) return '文章列表';
-  return `${selectedCategoryName.value} ${visibleArticles.value.length} 篇`;
+  if (!totalArticleCount.value) return '文章列表';
+  return `全部文章 ${totalArticleCount.value} 篇`;
 });
 const selectedCategoryName = computed(() => {
   if (selectedCategoryId.value === 'all') return '全部文章';
@@ -318,6 +320,7 @@ const loadHome = async () => {
   ]);
   homeText.value = getHomeText(config);
   parseProfileData(config);
+  totalArticleCount.value = latest?.count || latest?.rows?.length || 0;
   articles.value = normalizeArticles(latest);
   categories.value = Array.isArray(categoryList)
     ? categoryList
