@@ -586,6 +586,15 @@ const previewAboutPage = () => {
   window.open('https://xiangleideng.site/blog/about', '_blank')
 }
 
+// 安全解析配置内容（数据库JSON列已自动反序列化）
+const safeParse = (val, fallback) => {
+  if (!val) return fallback;
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return fallback; }
+  }
+  return val;
+};
+
 // 保存配置的辅助函数
 const saveConfig = async (label, content, type = 'JSON') => {
   try {
@@ -678,19 +687,19 @@ const loadConfigurations = async () => {
               // 头像已经在configs中处理
               break
             case 'about-basic-info':
-              basicInfo.value = JSON.parse(config.content)
+              basicInfo.value = safeParse(config.content, basicInfo.value)
               break
             case 'about-social-links':
-              socialLinks.value = JSON.parse(config.content)
+              socialLinks.value = safeParse(config.content, socialLinks.value)
               break
             case 'about-me-slide':
-              websiteSlides.value = JSON.parse(config.content)
+              websiteSlides.value = safeParse(config.content, websiteSlides.value)
               break
             case 'skill-item':
-              skills.value = JSON.parse(config.content)
+              skills.value = safeParse(config.content, skills.value)
               break
             case 'career-line':
-              career.value = JSON.parse(config.content)
+              career.value = safeParse(config.content, career.value)
               break
             case 'about-me-cloud-tags':
               keywordTags.value = config.content
@@ -699,13 +708,13 @@ const loadConfigurations = async () => {
               keywordDescription.value = config.content
               break
             case 'final-thoughts':
-              finalThoughts.value = JSON.parse(config.content)
+              finalThoughts.value = safeParse(config.content, finalThoughts.value)
               break
             case 'final-thoughts-hint':
               finalThoughtsHint.value = config.content
               break
             case 'about-page-texts':
-              pageTexts.value = JSON.parse(config.content)
+              pageTexts.value = safeParse(config.content, pageTexts.value)
               break
           }
         } catch (e) {
@@ -725,13 +734,13 @@ const initializeDefaults = () => {
   // 基本信息默认值
   if (!basicInfo.value.name) {
     basicInfo.value = {
-      name: 'Xaiver',
-      tagline: '把生活和思考，留在能慢慢阅读的地方。',
-      profession: '全栈开发',
-      personality: 'INFJ',
-      personalityDesc: '提倡者',
-      welcomeText: '欢迎来到灯下灯',
-      introduction: '我是Xaiver，一个热爱技术和文学的全栈开发者'
+      name: '',
+      tagline: '',
+      profession: '',
+      personality: '',
+      personalityDesc: '',
+      welcomeText: '',
+      introduction: ''
     }
   }
 
