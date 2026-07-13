@@ -1,5 +1,5 @@
 // import axios from "axios";
-import fetchJsonp from "fetch-jsonp";
+import fetchJsonp from 'fetch-jsonp';
 
 /**
  * 全局配置API
@@ -12,7 +12,7 @@ export const getGlobalConfig = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const res = await fetch(`/api/configuration/reception/getConfig`, {
+    const res = await fetch('/api/configuration/reception/getConfig', {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
@@ -34,6 +34,42 @@ export const getGlobalConfig = async () => {
   }
 };
 
+export const getLatestArticles = async () => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch('/api/article/reception/searchArticle', {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: {
+          orderByTime: true,
+        },
+        currentPage: 1,
+        pageSize: 6,
+      }),
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.warn('最新文章加载失败:', error.message);
+    return {
+      count: 0,
+      rows: [],
+    };
+  }
+};
+
 /**
  * 音乐播放器
  */
@@ -47,7 +83,7 @@ export const getPlayerList = async (server, type, id) => {
 
     const res = await fetch(
       `${import.meta.env.VITE_SONG_API}?server=${server}&type=${type}&id=${id}`,
-      { signal: controller.signal }
+      { signal: controller.signal },
     );
 
     clearTimeout(timeoutId);
@@ -62,14 +98,14 @@ export const getPlayerList = async (server, type, id) => {
       throw new Error('音乐数据格式错误或为空');
     }
 
-    if (data[0].url.startsWith("@")) {
+    if (data[0].url.startsWith('@')) {
       // eslint-disable-next-line no-unused-vars
-      const [handle, jsonpCallback, jsonpCallbackFunction, url] = data[0].url.split("@").slice(1);
+      const [handle, jsonpCallback, jsonpCallbackFunction, url] = data[0].url.split('@').slice(1);
       const jsonpData = await fetchJsonp(url).then((res) => res.json());
       const domain = (
-        jsonpData.req_0.data.sip.find((i) => !i.startsWith("http://ws")) ||
+        jsonpData.req_0.data.sip.find((i) => !i.startsWith('http://ws')) ||
         jsonpData.req_0.data.sip[0]
-      ).replace("http://", "https://");
+      ).replace('http://', 'https://');
 
       return data.map((v, i) => ({
         name: v.name || v.title,
@@ -100,7 +136,7 @@ export const getPlayerList = async (server, type, id) => {
 
 // 获取一言数据
 export const getHitokoto = async () => {
-  const res = await fetch("https://v1.hitokoto.cn");
+  const res = await fetch('https://v1.hitokoto.cn');
   return await res.json();
 };
 
@@ -149,6 +185,6 @@ export const getWeather = async (key, city) => {
 // 获取教书先生天气 API
 // https://api.oioweb.cn/doc/weather/GetWeather
 export const getOtherWeather = async () => {
-  const res = await fetch("https://api.oioweb.cn/api/weather/GetWeather");
+  const res = await fetch('https://api.oioweb.cn/api/weather/GetWeather');
   return await res.json();
 };

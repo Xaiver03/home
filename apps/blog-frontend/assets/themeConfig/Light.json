@@ -1,9 +1,9 @@
 {
-  "--main-text-color": "#333333",
-  "--secondary-text-color": "#777777",
-  "--main-background-color": "#fafafa",
-  "--main-car-color": "#ffffff",
-  "--secondary-car-color": "#fcfcfc",
-  "--success-color": "#FF6600",
-  "--info-color": "#ff983f"
+  "--main-text-color": "#17201d",
+  "--secondary-text-color": "#65706a",
+  "--main-background-color": "#ebece5",
+  "--main-car-color": "#f6f7f1",
+  "--secondary-car-color": "#dfe4da",
+  "--success-color": "#1d4d40",
+  "--info-color": "#5b796a"
 }

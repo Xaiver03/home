@@ -10,7 +10,7 @@ let sequelize;
 
 if (isDev) {
   // 开发环境：使用 SQLite
-  const dbPath = path.join(__dirname, '../database.db');
+  const dbPath = path.join(__dirname, '../database.dev.db');
   sequelize = new Sequelize({
     dialect: "sqlite",
     storage: dbPath,

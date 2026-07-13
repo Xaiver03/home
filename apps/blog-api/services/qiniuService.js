@@ -5,7 +5,7 @@ const config = require('config');
 
 // 本地存储配置
 const storageConfig = config.has('storage') ? config.get('storage') : {
-  baseDir: '/opt/home/apps/blog-api/public/uploads',
+  baseDir: path.resolve(__dirname, '../public/uploads'),
   publicUrl: '/uploads',
 };
 

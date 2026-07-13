@@ -15,7 +15,11 @@ interface HttpOptions {
 // 简易的http工具函数
 export async function http(path: string, options: HttpOptions = {}) {
   try {
-    const baseUrl = process.env.NUXT_PUBLIC_API_URL || "http://localhost:3000";
+    const baseUrl =
+      process.env.NUXT_PUBLIC_API_URL ||
+      (process.env.NUXT_PUBLIC_ENV === "dev"
+        ? "http://localhost:8086/api"
+        : "https://xiangleideng.site/api");
     const {
       method = "GET",
       headers = {

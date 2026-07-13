@@ -8,13 +8,13 @@
   >
     <!-- 品牌区 —— 完全对齐 SSOS SidebarHeader -->
     <div class="sidebar-header">
-      <a-tooltip :title="collapsed ? 'Xaiver Space' : ''" placement="right">
+      <a-tooltip :title="collapsed ? '灯下灯' : ''" placement="right">
         <div class="brand-btn" @click="router.push('/')">
           <div class="brand-logo">
             <DashboardOutlined />
           </div>
           <div v-if="!collapsed" class="brand-info">
-            <span class="brand-name">Xaiver Space</span>
+            <span class="brand-name">灯下灯</span>
             <span class="brand-desc">博客管理</span>
           </div>
         </div>
@@ -167,23 +167,13 @@ const selectedKeys = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-// ============================================================
-// SSOS shadcn/ui Sidebar 1:1 对齐
-// Light mode colors (HSL values from SSOS index.css):
-//   --sidebar-bg:   0 0% 98%     → #fafafa
-//   --sidebar-fg:   240 5.3% 26.1% → #3f3f46
-//   --sidebar-accent: 240 4.8% 95.9% → #f1f1f5
-//   --sidebar-accent-fg: 240 5.9% 10% → #18181b
-//   --sidebar-border: 220 13% 91% → #e1e3e8
-// ============================================================
-
-$sb-bg:          var(--admin-sidebar-bg, #ffffff);
-$sb-fg:          var(--admin-sidebar-fg, #1f2937);
-$sb-fg-muted:    var(--admin-sidebar-muted, #667085);
-$sb-accent:      var(--admin-sidebar-accent, #eff6ff);
-$sb-accent-fg:   var(--admin-sidebar-accent-fg, #1d4ed8);
-$sb-border:      var(--admin-sidebar-border, #e5e7eb);
-$sb-primary:     var(--admin-sidebar-primary, #2563eb);
+$sb-bg:          var(--admin-sidebar-bg, #f6f7f1);
+$sb-fg:          var(--admin-sidebar-fg, #17201d);
+$sb-fg-muted:    var(--admin-sidebar-muted, #65706a);
+$sb-accent:      var(--admin-sidebar-accent, #dfe4da);
+$sb-accent-fg:   var(--admin-sidebar-accent-fg, #1d4d40);
+$sb-border:      var(--admin-sidebar-border, #ccd3c8);
+$sb-primary:     var(--admin-sidebar-primary, #1d4d40);
 $sb-primary-fg:  #ffffff;
 $sb-radius:      8px;
 $sb-transition:  150ms ease;
@@ -207,9 +197,6 @@ $sb-transition:  150ms ease;
   }
 }
 
-// ============================================================
-// Header — 对齐 SSOS SidebarHeader + SidebarMenuButton(size=lg)
-// ============================================================
 .sidebar-header {
   padding: 8px;
 
@@ -236,10 +223,10 @@ $sb-transition:  150ms ease;
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    background: linear-gradient(135deg, $sb-primary 0%, #0ea5e9 100%);
+    background: $sb-primary;
     color: $sb-primary-fg;
     font-size: 18px;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+    box-shadow: 0 8px 18px color-mix(in srgb, $sb-primary 24%, transparent);
   }
 
   .brand-info {

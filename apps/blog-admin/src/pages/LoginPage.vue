@@ -6,7 +6,7 @@
         <div class="brand-logo">
           <DashboardOutlined class="logo-icon" />
         </div>
-        <h1 class="brand-title">Xaiver Space</h1>
+        <h1 class="brand-title">灯下灯</h1>
         <p class="brand-subtitle">博客管理后台</p>
         <div class="feature-list">
           <div class="feature-item">
@@ -266,31 +266,9 @@ const getLoginCode = () => {
   display: none;
   width: 460px;
   flex-shrink: 0;
-  background: linear-gradient(160deg, #0f172a 0%, #1e293b 100%);
+  background: #102c27;
   position: relative;
   overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -30%;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: rgba(59, 130, 246, 0.06);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -20%;
-    left: -20%;
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    background: rgba(99, 102, 241, 0.04);
-  }
 
   @media (min-width: 1024px) {
     display: flex;
@@ -307,8 +285,8 @@ const getLoginCode = () => {
 .brand-logo {
   width: 56px;
   height: 56px;
-  border-radius: 14px;
-  background: rgba(59, 130, 246, 0.15);
+  border-radius: 8px;
+  background: rgba(154, 194, 173, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,20 +294,20 @@ const getLoginCode = () => {
 
   .logo-icon {
     font-size: 28px;
-    color: #60a5fa;
+    color: #c3d8c9;
   }
 }
 
 .brand-title {
-  color: #f1f5f9;
+  color: #edf1e9;
   font-size: 28px;
   font-weight: 700;
   margin: 0 0 8px 0;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
 }
 
 .brand-subtitle {
-  color: #94a3b8;
+  color: #abb6af;
   font-size: 15px;
   margin: 0 0 48px 0;
 }
@@ -344,19 +322,19 @@ const getLoginCode = () => {
   display: flex;
   align-items: center;
   gap: 14px;
-  color: #cbd5e1;
+  color: #cde2d3;
   font-size: 14px;
 
   .feature-icon {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
-    background: rgba(59, 130, 246, 0.12);
+    border-radius: 8px;
+    background: rgba(154, 194, 173, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    color: #93c5fd;
+    color: #c3d8c9;
     flex-shrink: 0;
   }
 }
@@ -368,16 +346,16 @@ const getLoginCode = () => {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: var(--main-background-color, #f8fafc);
+  background: var(--main-background-color, #ebece5);
 }
 
 .form-card {
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+  background: var(--main-car-color, #f6f7f1);
+  border-radius: 8px;
+  border: 1px solid #ccd3c8;
+  box-shadow: 0 1px 3px rgba(23, 32, 29, 0.05), 0 4px 12px rgba(23, 32, 29, 0.04);
   padding: 40px 36px;
 }
 
@@ -389,13 +367,13 @@ const getLoginCode = () => {
 .form-title {
   font-size: 22px;
   font-weight: 700;
-  color: #0f172a;
+  color: #17201d;
   margin: 0 0 6px 0;
 }
 
 .form-desc {
   font-size: 14px;
-  color: #64748b;
+  color: #65706a;
   margin: 0;
 }
 
@@ -412,7 +390,7 @@ const getLoginCode = () => {
   display: block;
   font-size: 13px;
   font-weight: 500;
-  color: #334155;
+  color: #17201d;
   margin-bottom: 6px;
 }
 
@@ -434,7 +412,7 @@ const getLoginCode = () => {
   height: 44px;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 8px;
   margin-top: 8px;
 }
 
@@ -455,29 +433,29 @@ const getLoginCode = () => {
 
   :deep(.ant-tabs-ink-bar) {
     height: 3px;
-    border-radius: 2px;
+  border-radius: 0;
   }
 }
 
 // ========== Input 覆盖 ==========
 :deep(.ant-input-affix-wrapper),
 :deep(.ant-input) {
-  border-radius: 10px;
-  border-color: #e2e8f0;
+  border-radius: 8px;
+  border-color: #ccd3c8;
 
   &:hover {
-    border-color: #93c5fd;
+    border-color: #5b796a;
   }
 
   &:focus,
   &.ant-input-affix-wrapper-focused {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #1d4d40;
+    box-shadow: 0 0 0 3px rgba(29, 77, 64, 0.12);
   }
 }
 
 :deep(.ant-input-prefix) {
-  color: #94a3b8;
+  color: #65706a;
   margin-right: 8px;
 }
 

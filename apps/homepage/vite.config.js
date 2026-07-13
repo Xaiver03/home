@@ -133,6 +133,7 @@ export default ({ mode }) =>
             ? `http://localhost:${process.env.VITE_BLOG_ADMIN_PORT}`
             : 'http://localhost:8083',
           changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/mgmt/, '/admin'),
         },
       },
       fs: {

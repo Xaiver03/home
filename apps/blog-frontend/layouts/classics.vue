@@ -20,7 +20,7 @@
     color: $main-text-color;
 
     #content {
-        min-height: 85vh;
+        min-height: calc(100dvh - 11rem);
     }
 
 }

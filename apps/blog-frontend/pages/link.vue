@@ -67,7 +67,7 @@ const submitFriendMsg = () => { // 提交朋友信息
         <a-alert class="my-4 w-full" message="友链申请说明" type="info" show-icon>
           <template #description>
             <p class="py-1">🔒 请确保全站使用https</p>
-            <p class="py-1">🍻 在友链中添加了Xaiver Space</p>
+            <p class="py-1">在友链中添加了灯下灯</p>
             <p class="py-1">🔖 原创的博客内容</p>
           </template>
           <template #icon>
@@ -135,7 +135,7 @@ const submitFriendMsg = () => { // 提交朋友信息
         </div>
         <a-alert class="my-4 w-full" message="我的网站信息" type="info" show-icon>
           <template #description>
-            <p class="py-1">📍名称：Xaiver Space</p>
+            <p class="py-1">名称：灯下灯</p>
             <p class="py-1">👀简介：留下自己的痕迹</p>
             <p class="py-1">🔗链接：https://bokey.space/</p>
             <p class="py-1">📌头像：{{ store.$state.config['my-avatar'].content }}</p>

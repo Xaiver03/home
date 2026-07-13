@@ -26,8 +26,8 @@ module.exports = {
   },
   // 分页 筛选搜索所有文章
   searchArticle: async (req, res) => {
+    req.body.data = req.body.data || {};
     req.body.data.status = 'publish';
-    console.log(req.body.data);
     res.json(
       await articleService.searchArticle(
         req.body.data,

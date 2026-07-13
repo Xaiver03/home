@@ -27,39 +27,39 @@ const getLocalTheme = () => { // 获取本地主题
 // --导航模块--
 const naviData = reactive([
     {
-        title: '📚档案',
-        label: '📚档案',
+        title: '写作',
+        label: '写作',
         key: 'root-document',
         children: [
             {
-                title: '📋列表',
-                label: '📋列表',
+                title: '文章',
+                label: '文章',
                 path: '/log/article',
                 key: "/log/article",
             },
             {
-                title: '🗂类目',
-                label: '🗂类目',
+                title: '类目',
+                label: '类目',
                 path: '/log/category',
                 key: '/log/category',
             }
         ],
     },
     {
-        title: "✏️痕迹留言",
-        label: "✏️痕迹留言",
+        title: "留言",
+        label: "留言",
         path: "/message",
         key: "/message",
     },
     {
-        title: "🔮朋友们",
-        label: "🔮朋友们",
+        title: "朋友们",
+        label: "朋友们",
         path: "/link",
         key: "/link",
     },
     {
-        title: '❓关于我',
-        label: '❓关于我',
+        title: '关于',
+        label: '关于',
         path: '/about',
         key: '/about',
     }
@@ -218,7 +218,7 @@ onMounted(() => {
         <div id="navi-header">
             <div id="navi-content" class="hidden xl:flex justify-between items-center h-28 my-0 mx-auto px-8">
                 <a-space :size="25">
-                    <h1 class="cursor-point" @click="router.push('/')">XAIVER'S SPACE</h1>
+                    <h1 class="cursor-point" @click="router.push('/')">灯下灯</h1>
                     <a-dropdown v-for="naviFirst in naviData" :key="naviFirst.label">
                         <div>
                             <a href="javascript:;" v-if="naviFirst.children">{{ naviFirst.label }}</a>
@@ -307,7 +307,7 @@ onMounted(() => {
                 </a-space>
             </div>
             <div id="navi-content-phone" class="flex xl:hidden justify-between items-center py-8 px-16">
-                <h1 class="cursor-point" @click="router.push('/')">XAIVER'S SPACE</h1>
+                <h1 class="cursor-point" @click="router.push('/')">灯下灯</h1>
                 <a-space :size="12">
                     <a-button class="button flex justify-center items-center h-full"
                         @click="router.push('/')" title="返回首页">
@@ -389,7 +389,7 @@ onMounted(() => {
                 </a-space>
             </div>
         </div>
-        <a-drawer v-model:open="naviDrawer" class="navi-top-drawer" title="XAIVER'S SPACE" placement="top" height="auto">
+        <a-drawer v-model:open="naviDrawer" class="navi-top-drawer" title="灯下灯" placement="top" height="auto">
             <a-tree @select="changePath" v-model:expandedKeys="expandedKeys" :tree-data="naviData">
             </a-tree>
         </a-drawer>
@@ -400,21 +400,26 @@ onMounted(() => {
 #affix {
 
     #navi-header {
-        background-color: $main-car-color;
+        background: color-mix(in srgb, $main-car-color 88%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, $main-text-color 14%, transparent);
+        backdrop-filter: blur(18px) saturate(120%);
 
         #navi-content {
+            max-width: 1248px;
+            min-height: 72px;
+            height: auto;
 
             h1 {
-                font-size: $small-font-size;
-                font-weight: $large-font-weight;
+                font-size: 1.4rem;
+                font-weight: 700;
             }
 
             a {
-                font-size: $x-small-font-size;
-                font-weight: $small-font-weight;
+                font-size: 0.95rem;
+                font-weight: 600;
 
                 &:hover {
-                    cursor: $hover-cursor;
+                    color: $main-color;
                 }
             }
 
@@ -427,16 +432,18 @@ onMounted(() => {
     }
 
     #navi-content-phone {
+        min-height: 60px;
+
         h1 {
-            font-size: $medium-font-size;
-            font-weight: $medium-font-weight;
+            font-size: 1.3rem;
+            font-weight: 700;
         }
 
         .button {
             font-size: $xx-small-font-size;
             height: 100%;
             padding: 1rem;
-            background-color: $main-background-color !important;
+            background-color: transparent !important;
             color: $main-text-color !important;
 
             * {

@@ -48,14 +48,15 @@ const setThemeMode = () => { // 获取缓存设置主题
   const theme = localStorage.getItem('theme')
   if (theme) store.setThemeMode(theme)
 }
-watch(() => store.themeMode, (newVal) => { // 监听store中主题变化，设置对应主题样式
+const applyTheme = (newVal) => {
   localStorage.setItem('theme', newVal) // 设置缓存
   const root = document.documentElement
   const config = newVal == 'Light' ? LightConfig : DarkConfig
   for (let attribute in config) {
     root.style.setProperty(attribute, config[attribute])
   }
-})
+}
+watch(() => store.themeMode, applyTheme)
 const getGlobalCOnfig = async () => { // 获取并设置全局配置
   await api.getGlobalConfig().then(res => {
     store.setConfig(res)
@@ -73,9 +74,8 @@ const getGlobalCOnfig = async () => { // 获取并设置全局配置
 const seo = [
   {
     path: '/',
-    title: 'Xaiver Space',
-    description: `Xaiver Space📍，希望在世界留下我的痕迹。我是Xaiver，一名深圳的前端程序员，
-          在这里我会分享我的日常☕️、编程💻、成长✍🏻，我们都会成为自己想要的样子`
+    title: '灯下灯',
+    description: '灯下灯的个人写作，记录生活、技术与思考。'
   },
   {
     path: '/about',
@@ -84,8 +84,8 @@ const seo = [
   },
   {
     path: '/log/article',
-    title: 'Xaiver的文章 【 Xaiver Space 】',
-    description: 'Xaiver的文章详情📒'
+    title: '灯下灯的文章',
+    description: '灯下灯的文章详情。'
   },
   {
     path: '/link',
@@ -104,8 +104,8 @@ const seo = [
   },
   {
     path: '/message',
-    title: '留言 【 Xaiver Space 】',
-    description: 'Xaiver Space的留言板🌐，我们在这里畅所欲言，只为在这个世界留下属于自己的痕迹🌏'
+    title: '留言',
+    description: '留下想说的话。'
   }
 ]
 watch(() => router.currentRoute.value.path, (newVal) => {
@@ -127,6 +127,7 @@ onMounted(async () => {
   window.addEventListener('resize', resizeEvent)
   resizeEvent()
   setThemeMode()
+  applyTheme(store.themeMode)
   await getGlobalCOnfig()
 })
 onBeforeUnmount(() => {

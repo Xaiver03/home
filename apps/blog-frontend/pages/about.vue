@@ -288,9 +288,8 @@ onBeforeUnmount(() => {
 
   }
 
-  // 渐变card
   #gradient-card {
-    background-image: linear-gradient(109.6deg, rgba(96, 221, 142, 1) 11.2%, rgba(24, 138, 141, 1) 60.1%);
+    background: $main-color;
     overflow: hidden;
     font-size: $x-small-font-size;
     color: $main-background-color;
@@ -370,7 +369,7 @@ onBeforeUnmount(() => {
           position: absolute;
           width: 0;
           height: 2px;
-          background: linear-gradient(90deg, $main-text-color, $secondary-text-color);
+          background: $main-color;
           bottom: 0;
           left: 0;
           border-radius: 20px;

@@ -41,6 +41,8 @@ apps/blog-api/config/local.json
 .env.dev
 .env.pro
 .env.beta
+apps/blog-api/database.dev.db
+apps/blog-api/public/uploads/
 
 # Credentials and sensitive information
 CREDENTIALS.md

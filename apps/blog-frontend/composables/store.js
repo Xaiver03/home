@@ -5,7 +5,7 @@ export const useNuxtStore = defineStore('nuxtStore', {
       height: 0,
     }, // 窗口大小数据
     rem: 0, // rem的值(px)
-    themeMode: 'light', // 主题模式
+    themeMode: 'Light', // 主题模式
     user: {
       token: '', // token信息
     }, // 用户信息
