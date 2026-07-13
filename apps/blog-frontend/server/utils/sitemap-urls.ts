@@ -42,7 +42,9 @@ export async function http(path: string, options: HttpOptions = {}) {
     });
     return await res.json();
   } catch (err) {
-    console.error(`HTTP request failed: ${path}`, err);
+    if (process.env.NUXT_PUBLIC_ENV === "dev") {
+      console.warn(`HTTP request failed: ${path}`, err);
+    }
     throw err;
   }
 }
@@ -67,7 +69,6 @@ export async function getSitemapUrls(): Promise<UrlItem[]> {
     );
     return result;
   } catch (err) {
-    console.error("Error fetching sitemap URLs:", err);
     return [];
   }
 }
