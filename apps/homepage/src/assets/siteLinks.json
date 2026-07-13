@@ -14,13 +14,11 @@
   {
     "icon": "Compass",
     "name": "GitHub",
-    "logo": "/images/icon/github.png",
     "link": "https://github.com/Xaiver03/"
   },
   {
     "icon": "LaptopCode",
     "name": "公众号",
-    "logo": "/images/social/wechat.png",
     "link": "#wechat-qr"
   }
 ]

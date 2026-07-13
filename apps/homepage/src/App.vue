@@ -59,7 +59,12 @@
                   :target="link.url.startsWith('http') ? '_blank' : undefined"
                   :rel="link.url.startsWith('http') ? 'noreferrer' : undefined"
                 >
-                  <i v-if="link.icon" :class="`iconfont ${link.icon}`"></i>
+                  <svg
+                    v-if="getSocialIcon(link.name)"
+                    class="social-svg"
+                    viewBox="0 0 24 24"
+                    v-html="getSocialIcon(link.name)"
+                  ></svg>
                   <span v-else>{{ link.name }}</span>
                 </a>
               </div>
@@ -109,8 +114,19 @@
             @click="handleRouteClick(link, $event)"
           >
             <span class="route-visual" :class="{ 'has-logo': link.logo }" aria-hidden="true">
-              <img v-if="link.logo" :src="link.logo" :alt="`${link.name} logo`" />
-              <span v-else>{{ getSiteIcon(link.icon) }}</span>
+              <img
+                v-if="link.logo"
+                :src="link.logo"
+                :alt="`${link.name} logo`"
+                @error="$event.target.style.display='none'"
+              />
+              <svg
+                v-if="getRouteSvg(link.name) && !link.logo"
+                class="route-svg"
+                viewBox="0 0 24 24"
+                v-html="getRouteSvg(link.name)"
+              ></svg>
+              <span v-if="!getRouteSvg(link.name) && !link.logo">{{ getSiteIcon(link.icon) }}</span>
             </span>
             <span class="route-copy">
               <span class="route-index">0{{ index + 1 }}</span>
@@ -335,6 +351,19 @@ const handleRouteClick = (link, event) => {
   event.preventDefault();
   qrImage.value = link.qrImage;
   qrDialogOpen.value = true;
+};
+
+const getSocialIcon = (name) => {
+  const icons = {
+    GitHub: '<path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z" fill="currentColor"/>',
+    微信: '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
+    公众号: '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
+  };
+  return icons[name] || null;
+};
+
+const getRouteSvg = (name) => {
+  return getSocialIcon(name);
 };
 
 const getSiteIcon = (icon) => {
@@ -592,6 +621,17 @@ onBeforeUnmount(() => {
     font-size: 0.88rem;
     font-weight: 700;
   }
+}
+
+.social-svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.route-svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  color: inherit;
 }
 
 .hero-actions {
