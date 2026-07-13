@@ -3,15 +3,17 @@
         <div v-if="visible" id="loading"
             class="loader-page fixed h-[100vh] w-[100vw] inset-0 z-[9999] flex flex-col items-center justify-center">
             <div class="rotate-box rounded-full overflow-hidden ">
-                <img class="h-[120px] w-[120px] " src="@/assets/images/bokey.png">
+                <img class="h-[120px] w-[120px] " :src="avatarSrc">
             </div>
-            <p class="my-[10px] text-[20px]">欢迎来到Xaiver的空间🌼</p>
+            <p class="my-[10px] text-[20px]">欢迎来到Xaiver的空间</p>
             <p class="text-[10px]">加载中...</p>
         </div>
     </Transition>
 </template>
 
 <script setup>
+const store = useNuxtStore()
+const avatarSrc = computed(() => store.$state.config['my-avatar']?.content || '/images/bokey.png')
 const visible = ref(true)
 
 // SSR 阶段（服务端）默认显示

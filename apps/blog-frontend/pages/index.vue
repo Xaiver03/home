@@ -13,6 +13,24 @@ const profileSocialLinks = computed(() => {
   }
 });
 
+// 从 config 读取名字和头像
+const profileName = computed(() => {
+  try {
+    const raw = store.$state.config['about-basic-info']?.content;
+    if (!raw) return '灯下灯';
+    const info = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return info.name || '灯下灯';
+  } catch { return '灯下灯'; }
+});
+const profileTagline = computed(() => {
+  try {
+    const raw = store.$state.config['about-basic-info']?.content;
+    if (!raw) return '';
+    const info = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return info.tagline || '';
+  } catch { return ''; }
+});
+
 definePageMeta({
   layout: 'classics',
 });
@@ -92,7 +110,7 @@ const likeMessage = (message) => {
           v-motion-pop-visible-once
         />
         <div>
-          <p class="profile-name">Xaiver / 灯下灯</p>
+          <p class="profile-name">{{ profileName }}</p>
           <div class="profile-links">
             <a
               v-for="link in profileSocialLinks"

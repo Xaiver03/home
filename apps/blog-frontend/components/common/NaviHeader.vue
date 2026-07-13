@@ -36,6 +36,13 @@ const getLocalTheme = () => {
 // --导航模块--
 const primaryLinks = [
   {
+    title: '首页',
+    label: '首页',
+    path: 'https://xiangleideng.site/',
+    key: 'homepage',
+    external: true,
+  },
+  {
     title: '博客',
     label: '博客',
     path: '/',
@@ -49,13 +56,6 @@ const primaryLinks = [
   },
 ];
 const secondaryLinks = [
-  {
-    title: '首页',
-    label: '首页',
-    path: 'https://xiangleideng.site/',
-    key: 'homepage',
-    external: true,
-  },
   {
     title: '类目',
     label: '类目',
@@ -327,10 +327,10 @@ onMounted(() => {
           v-for="item in primaryLinks"
           :key="item.key"
           class="nav-item primary"
-          :class="{ active: isActive(item.path) }"
+          :class="{ active: !item.external && isActive(item.path) }"
           type="button"
           role="listitem"
-          @click="goTo(item.path)"
+          @click="goTo(item.path, item.external)"
         >
           {{ item.label }}
         </button>
