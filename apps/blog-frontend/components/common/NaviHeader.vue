@@ -57,22 +57,16 @@ const primaryLinks = [
 ];
 const secondaryLinks = [
   {
-    title: '类目',
-    label: '类目',
-    path: '/log/category',
-    key: '/log/category',
+    title: '关于',
+    label: '关于',
+    path: '/about',
+    key: '/about',
   },
   {
     title: '留言',
     label: '留言',
     path: '/message',
     key: '/message',
-  },
-  {
-    title: '关于',
-    label: '关于',
-    path: '/about',
-    key: '/about',
   },
   {
     title: '朋友们',
@@ -105,12 +99,6 @@ const naviData = reactive([
         label: '文章列表',
         path: '/log/article',
         key: '/log/article',
-      },
-      {
-        title: '类目',
-        label: '类目',
-        path: '/log/category',
-        key: '/log/category',
       },
     ],
   },
