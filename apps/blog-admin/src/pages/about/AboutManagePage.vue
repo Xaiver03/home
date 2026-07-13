@@ -281,9 +281,8 @@
             </a-form>
           </a-card>
         </a-tab-pane>
-      </a-tabs>
 
-      <!-- 操作按钮 -->
+        <!-- 页面文案 -->
         <a-tab-pane key="pageText" tab="页面文案">
           <a-card title="页面标题和文案配置" size="small">
             <a-form layout="vertical">
