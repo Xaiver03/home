@@ -64,21 +64,33 @@
                     <a-input v-model:value="link.name" placeholder="如：GitHub" />
                   </a-form-item>
                 </a-col>
-                <a-col :span="10">
+                <a-col :span="8">
                   <a-form-item label="链接地址">
                     <a-input v-model:value="link.url" placeholder="完整的URL地址" />
                   </a-form-item>
                 </a-col>
                 <a-col :span="6">
-                  <a-form-item label="图标类名">
-                    <a-input v-model:value="link.icon" placeholder="如：icon-github" />
+                  <a-form-item label="图标上传">
+                    <div class="flex items-center gap-2">
+                      <img v-if="link.icon" :src="link.icon" alt="图标预览" class="w-8 h-8 object-contain rounded" />
+                      <span v-else class="text-gray-400 text-sm">未上传</span>
+                      <a-upload
+                        :before-upload="(file) => handleSocialIconUpload(file, index)"
+                        :show-upload-list="false"
+                        accept="image/*"
+                      >
+                        <a-button size="small" :loading="uploading">
+                          <UploadOutlined /> 上传
+                        </a-button>
+                      </a-upload>
+                    </div>
+                    <a-input v-model:value="link.icon" placeholder="或直接输入图片URL" size="small" class="mt-2" />
                   </a-form-item>
                 </a-col>
-                <a-col :span="2">
-                  <a-form-item label="预览">
-                    <div class="text-center">
-                      <i :class="`iconfont ${link.icon}`" style="font-size: 24px;"></i>
-                    </div>
+                <a-col :span="4">
+                  <a-form-item label="SVG图标名">
+                    <a-input v-model:value="link.iconClass" placeholder="如：GitHub" />
+                    <div class="text-xs text-gray-400 mt-1">GitHub / 公众号 等内置SVG</div>
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -465,11 +477,34 @@ const moveItemDown = (array, index) => {
 
 // 社交链接管理
 const addSocialLink = () => {
-  socialLinks.value.push({ name: '', url: '', icon: '' })
+  socialLinks.value.push({ name: '', url: '', icon: '', iconClass: '' })
 }
 
 const removeSocialLink = (index) => {
   socialLinks.value.splice(index, 1)
+}
+
+// 社交图标上传
+const handleSocialIconUpload = async (file, index) => {
+  uploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('path', '/image/social/')
+    formData.append('uuidOrNot', 'true')
+    const response = await proxy.$api.uploadImage(formData)
+    if (response.code === 1) {
+      socialLinks.value[index].icon = response.data.url
+      message.success('图标上传成功')
+    } else {
+      message.error('图标上传失败')
+    }
+  } catch (error) {
+    message.error('图标上传失败: ' + error.message)
+  } finally {
+    uploading.value = false
+  }
+  return false
 }
 
 // 网站展示管理

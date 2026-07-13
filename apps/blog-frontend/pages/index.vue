@@ -11,6 +11,16 @@ const safeParse = (val, fallback) => {
   return val;
 };
 
+// 内置 SVG 图标
+const getSocialSvg = (name) => {
+  const icons = {
+    GitHub: '<path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z" fill="currentColor"/>',
+    公众号: '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
+    微信: '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
+  };
+  return icons[name] || null;
+};
+
 const profileSocialLinks = computed(() => {
   return safeParse(store.$state.config['about-social-links']?.content, []);
 });
@@ -106,12 +116,25 @@ const likeMessage = (message) => {
               v-for="link in profileSocialLinks"
               :key="link.name"
               class="icon"
-              :class="link.icon ? `iconfont ${link.icon}` : ''"
               :href="link.url"
               :title="link.name"
               :target="link.url.startsWith('http') ? '_blank' : undefined"
               @click.stop="link.url.startsWith('http') ? goTo(link.url, $event) : undefined"
-            ></a>
+            >
+              <img
+                v-if="link.icon && link.icon.startsWith('http')"
+                :src="link.icon"
+                :alt="link.name"
+                class="social-img"
+              />
+              <svg
+                v-else-if="getSocialSvg(link.iconClass || link.name)"
+                class="social-svg"
+                viewBox="0 0 24 24"
+                v-html="getSocialSvg(link.iconClass || link.name)"
+              ></svg>
+              <span v-else>{{ link.name }}</span>
+            </a>
           </div>
         </div>
       </div>
@@ -309,9 +332,29 @@ const likeMessage = (message) => {
     color: $main-text-color;
     font-size: 2rem;
     backdrop-filter: blur(16px) saturate(150%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition:
       transform 180ms ease,
       background 180ms ease;
+
+    .social-svg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .social-img {
+      width: 2.4rem;
+      height: 2.4rem;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    span {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
 
     &:hover {
       transform: translateY(-2px);

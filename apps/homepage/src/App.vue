@@ -59,11 +59,17 @@
                   :target="link.url.startsWith('http') ? '_blank' : undefined"
                   :rel="link.url.startsWith('http') ? 'noreferrer' : undefined"
                 >
+                  <img
+                    v-if="link.icon && link.icon.startsWith('http')"
+                    class="social-img"
+                    :src="link.icon"
+                    :alt="link.name"
+                  />
                   <svg
-                    v-if="getSocialIcon(link.name)"
+                    v-else-if="getSocialIcon(link.iconClass || link.name)"
                     class="social-svg"
                     viewBox="0 0 24 24"
-                    v-html="getSocialIcon(link.name)"
+                    v-html="getSocialIcon(link.iconClass || link.name)"
                   ></svg>
                   <span v-else>{{ link.name }}</span>
                 </a>
@@ -629,6 +635,13 @@ onBeforeUnmount(() => {
 .social-svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+.social-img {
+  width: 1.8rem;
+  height: 1.8rem;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .route-svg {
