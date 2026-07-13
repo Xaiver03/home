@@ -28,9 +28,10 @@
 - Follow Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `perf:`, `chore:` (mirrors existing history).
 - PRs must include: clear description, linked issues, and screenshots for UI changes. Update docs when changing behavior or env vars (`.env.example`).
 - Keep scope tight: avoid mixing root app changes with `blog/` or `music/` in the same PR.
+- After each completed logical feature or fix, run the relevant verification, create a focused commit, push it, and let the deployment workflow run. Do not leave completed logical work only in the local working tree.
+- When pushing to `dev`, confirm the CD workflow result when GitHub Actions access is available; report clearly if deployment could not be verified.
 
 ## Security & Configuration Tips
 - Copy `.env.example` to `.env`; never commit secrets. Configure keys like `VITE_WEATHER_KEY` and music settings locally.
 - PWA: APIs are excluded from SW caching in `vite.config.js`; avoid re‑adding API caching.
 - Do not edit generated artifacts in `dist/`.
-
