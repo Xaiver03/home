@@ -6,6 +6,14 @@ $secondary-text-color: var(--secondary-text-color,#65706a);
 $main-background-color: var(--main-background-color,#ebece5);
 $main-car-color: var(--main-car-color,#f6f7f1);
 $secondary-car-color: var(--secondary-car-color,#dfe4da);
+// --语义色--
+$color-bg-page: var(--color-bg-page,#ebece5);
+$color-bg-surface: var(--color-bg-surface,#f6f7f1);
+$color-bg-muted: var(--color-bg-muted,#dfe4da);
+$color-border-soft: var(--color-border-soft,rgba(255,255,255,.74));
+$color-border-strong: var(--color-border-strong,#ccd3c8);
+$color-accent-primary: var(--color-accent-primary,#1d4d40);
+$color-accent-secondary: var(--color-accent-secondary,#5b796a);
 // --文本粗--
 $large-font-weight: var(--large-font-weight,900); // 主要文本粗细
 $medium-font-weight: var(--secondary-font-weight,400); // 次要文本粗细
@@ -20,5 +28,29 @@ $xx-small-font-size: var(--x-small-font-size,1.5rem); // 次要文本粗细
 // --交互--
 $main-color: var(--success-color,#1d4d40);
 $secondary-color: var(--info-color,#5b796a);
+// --排版 / 容器 / 材质--
+$font-body: var(--font-body,-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);
+$font-display: var(--font-display,-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);
+$content-max-width: var(--content-max-width,1248px);
+$content-wide-width: var(--content-wide-width,1400px);
+$page-gutter: var(--page-gutter,clamp(1.6rem,4vw,5.6rem));
+$nav-shell-width: var(--nav-shell-width,min(104rem,calc(100vw - 2.4rem)));
+$radius-control: var(--radius-control,8px);
+$radius-card: var(--radius-card,8px);
+$radius-panel: var(--radius-panel,10px);
+$radius-capsule: var(--radius-capsule,999px);
+$surface-glass: var(--surface-glass,rgba(246,247,241,.72));
+$surface-glass-strong: var(--surface-glass-strong,rgba(246,247,241,.9));
+$surface-control: var(--surface-control,rgba(255,255,255,.62));
+$surface-hover: var(--surface-hover,rgba(255,255,255,.82));
+$surface-border: var(--surface-border,rgba(255,255,255,.74));
+$surface-inner-highlight: var(--surface-inner-highlight,inset 0 1px 0 rgba(255,255,255,.9));
+$surface-shadow: var(--surface-shadow,0 24px 80px rgba(23,32,29,.1));
+$surface-shadow-soft: var(--surface-shadow-soft,0 14px 42px rgba(23,32,29,.1));
+$surface-blur: var(--surface-blur,22px);
+$focus-ring: var(--focus-ring,0 0 0 3px rgba(29,77,64,.28));
+$motion-fast: var(--motion-fast,180ms ease);
+$motion-base: var(--motion-base,240ms ease);
+$z-sticky: var(--z-sticky,30);
 // --鼠标--
 $hover-cursor: var(--hover-cursor,(url(../cursor/hoverCursor.cur),pointer));

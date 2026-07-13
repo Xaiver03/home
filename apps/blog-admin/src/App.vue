@@ -6,13 +6,13 @@
     </div>
 
     <!-- 管理后台侧边栏 + Tab 布局 -->
-    <a-layout v-else class="admin-layout">
+    <a-layout v-else class="admin-layout admin-app-shell">
       <AdminSidebar />
-      <a-layout>
-        <a-layout-header class="admin-header">
+      <a-layout class="admin-main">
+        <a-layout-header class="admin-header admin-chrome">
           <GlobalTabBar @close-dirty="onCloseDirty" />
         </a-layout-header>
-        <a-layout-content>
+        <a-layout-content class="admin-content">
           <TabContentPanel />
         </a-layout-content>
       </a-layout>
@@ -36,8 +36,12 @@ import AdminSidebar from "./components/layout/AdminSidebar.vue";
 import GlobalTabBar from "./components/layout/GlobalTabBar.vue";
 import TabContentPanel from "./components/layout/TabContentPanel.vue";
 import CloseTabDialog from "./components/layout/CloseTabDialog.vue";
-import LightConfig from "@/assets/themeConfig/Light.json";
-import DarkConfig from "@/assets/themeConfig/Dark.json";
+import {
+  applyThemeVars as applyDesignThemeVars,
+  getAntDesignTokens,
+  normalizeThemeMode,
+  persistTheme,
+} from "@xld/design-tokens";
 import { useStore } from "vuex";
 import { useAutoTab } from "./composables/useAutoTab";
 import { useTabStore } from "./composables/useTabStore";
@@ -72,19 +76,7 @@ watch(
 const isDark = computed(() => store.state.themeMode === "Dark");
 const antTheme = computed(() => ({
   algorithm: isDark.value ? darkAlgorithm : defaultAlgorithm,
-  token: {
-    colorPrimary: isDark.value ? '#9ac2ad' : '#1d4d40',
-    colorInfo: isDark.value ? '#c3d8c9' : '#5b796a',
-    colorSuccess: isDark.value ? '#a7cdb7' : '#2c6a57',
-    colorWarning: '#f59e0b',
-    colorError: '#ef4444',
-    colorText: isDark.value ? '#edf1e9' : '#17201d',
-    colorTextSecondary: isDark.value ? '#abb6af' : '#65706a',
-    colorBgLayout: isDark.value ? '#101b18' : '#ebece5',
-    colorBgContainer: isDark.value ? '#172721' : '#f6f7f1',
-    borderRadius: 8,
-    fontSize: 14,
-  },
+  token: getAntDesignTokens(store.state.themeMode),
 }));
 
 // --rem设置--
@@ -106,16 +98,11 @@ const reScreenSize = () => {
 // --主题设置--
 const setThemeMode = () => {
   const theme = localStorage.getItem("theme");
-  if (theme) store.commit("SET_THEME", theme);
+  if (theme) store.commit("SET_THEME", normalizeThemeMode(theme));
 };
 
 const applyThemeVars = (newVal) => {
-  localStorage.setItem("theme", newVal);
-  const root = document.documentElement;
-  const config = newVal === "Dark" ? DarkConfig : LightConfig;
-  for (let attribute in config) {
-    root.style.setProperty(attribute, config[attribute]);
-  }
+  applyDesignThemeVars(persistTheme(newVal));
 };
 
 watch(
@@ -182,23 +169,33 @@ onMounted(() => {
   position: relative;
   height: 100vh;
   width: 100vw;
-  background-color: $main-background-color;
+  background: var(--page-gradient, #ebece5);
 }
 
 .admin-layout {
   min-height: 100vh;
-  background: $main-background-color;
+  background: var(--page-gradient, #ebece5);
+  color: $main-text-color;
+  font-family: $font-body;
+}
+
+.admin-main {
+  min-width: 0;
+  background: transparent;
 }
 
 .admin-header {
   height: auto;
   padding: 0;
-  background: $main-car-color;
+  background: transparent;
   line-height: 1;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
 }
 
-:deep(.ant-layout-content) {
-  background: $main-background-color;
-  padding: 24px;
+.admin-content {
+  min-width: 0;
+  background: transparent;
 }
 </style>

@@ -4,15 +4,9 @@
 }
 body {
   min-height: 100dvh;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0) 18rem),
-    radial-gradient(circle at 12% 8%, rgba(112, 137, 112, 0.18), transparent 28rem),
-    radial-gradient(circle at 90% 12%, rgba(93, 121, 106, 0.14), transparent 26rem),
-    $main-background-color;
+  background: var(--page-gradient, #ebece5);
   color: $main-text-color;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', sans-serif;
+  font-family: $font-body;
   letter-spacing: 0;
 }
 
@@ -32,7 +26,7 @@ body {
 .content-box {
   padding: 4rem 0 6rem;
   margin: 0 auto;
-  width: min(92%, 1248px);
+  width: min(92%, $content-max-width);
 }
 
 .blog-page-shell {
@@ -55,8 +49,9 @@ body {
   font-size: clamp(2.7rem, 5vw, 5.6rem);
   line-height: 1.04;
   font-weight: 850;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   text-wrap: balance;
+  font-family: $font-display;
 }
 
 .blog-section-head p {
@@ -80,13 +75,11 @@ body {
 }
 
 .blog-glass-panel {
-  background: rgba(246, 247, 241, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.74);
-  border-radius: 8px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 24px 80px rgba(23, 32, 29, 0.1);
-  backdrop-filter: blur(22px) saturate(165%);
+  background: $surface-glass;
+  border: 1px solid $surface-border;
+  border-radius: $radius-card;
+  box-shadow: $surface-inner-highlight, $surface-shadow;
+  backdrop-filter: blur($surface-blur) saturate(165%);
 }
 
 .blog-list-stack {
@@ -119,25 +112,23 @@ body {
   gap: 0.7rem;
   min-height: 4.4rem;
   padding: 0 1.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 8px;
-  background: rgba(246, 247, 241, 0.7);
+  border: 1px solid $surface-border;
+  border-radius: $radius-control;
+  background: $surface-glass;
   color: $main-text-color;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    0 14px 42px rgba(23, 32, 29, 0.1);
+  box-shadow: $surface-inner-highlight, $surface-shadow-soft;
   backdrop-filter: blur(18px) saturate(160%);
   font-size: 1.45rem;
   font-weight: 750;
   transition:
-    transform 180ms ease,
-    background 180ms ease,
-    box-shadow 180ms ease;
+    transform $motion-fast,
+    background $motion-fast,
+    box-shadow $motion-fast;
 }
 
 .blog-action:hover {
   transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.82);
+  background: $surface-hover;
   color: $main-text-color;
 }
 
@@ -148,13 +139,13 @@ body {
 .blog-search .ant-input,
 .blog-search .ant-btn {
   height: 4.4rem;
-  border-radius: 8px;
+  border-radius: $radius-control;
   font-size: 1.45rem;
 }
 
 .blog-search .ant-input {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(255, 255, 255, 0.82);
+  background: $surface-control;
+  border-color: $surface-border;
 }
 
 .blog-search .ant-btn {

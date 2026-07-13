@@ -1,0 +1,22 @@
+{
+  "name": "@xld/design-tokens",
+  "version": "1.0.0",
+  "description": "Shared design tokens for Xaiver blog frontend and admin",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "build": "echo 'Design tokens do not require build'",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "design-tokens",
+    "theme",
+    "shared",
+    "monorepo"
+  ],
+  "author": "灯下灯/Xaiver",
+  "license": "MIT"
+}

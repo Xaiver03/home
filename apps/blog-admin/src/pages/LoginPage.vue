@@ -259,6 +259,8 @@ const getLoginCode = () => {
   display: flex;
   min-height: 100vh;
   width: 100%;
+  color: $main-text-color;
+  font-family: $font-body;
 }
 
 // ========== 左侧品牌面板 ==========
@@ -266,7 +268,9 @@ const getLoginCode = () => {
   display: none;
   width: 460px;
   flex-shrink: 0;
-  background: #102c27;
+  background:
+    radial-gradient(circle at 18% 10%, color-mix(in srgb, $main-color 28%, transparent), transparent 22rem),
+    linear-gradient(180deg, $main-background-color, $main-car-color);
   position: relative;
   overflow: hidden;
 
@@ -286,7 +290,7 @@ const getLoginCode = () => {
   width: 56px;
   height: 56px;
   border-radius: 8px;
-  background: rgba(154, 194, 173, 0.15);
+  background: $surface-control;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -294,12 +298,12 @@ const getLoginCode = () => {
 
   .logo-icon {
     font-size: 28px;
-    color: #c3d8c9;
+    color: $secondary-color;
   }
 }
 
 .brand-title {
-  color: #edf1e9;
+  color: $main-text-color;
   font-size: 28px;
   font-weight: 700;
   margin: 0 0 8px 0;
@@ -307,7 +311,7 @@ const getLoginCode = () => {
 }
 
 .brand-subtitle {
-  color: #abb6af;
+  color: $secondary-text-color;
   font-size: 15px;
   margin: 0 0 48px 0;
 }
@@ -322,19 +326,19 @@ const getLoginCode = () => {
   display: flex;
   align-items: center;
   gap: 14px;
-  color: #cde2d3;
+  color: $main-text-color;
   font-size: 14px;
 
   .feature-icon {
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    background: rgba(154, 194, 173, 0.12);
+    background: $surface-control;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    color: #c3d8c9;
+    color: $secondary-color;
     flex-shrink: 0;
   }
 }
@@ -346,16 +350,17 @@ const getLoginCode = () => {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: var(--main-background-color, #ebece5);
+  background: transparent;
 }
 
 .form-card {
   width: 100%;
   max-width: 420px;
-  background: var(--main-car-color, #f6f7f1);
-  border-radius: 8px;
-  border: 1px solid #ccd3c8;
-  box-shadow: 0 1px 3px rgba(23, 32, 29, 0.05), 0 4px 12px rgba(23, 32, 29, 0.04);
+  background: $surface-glass-strong;
+  border-radius: $radius-card;
+  border: 1px solid $surface-border;
+  box-shadow: $surface-inner-highlight, $surface-shadow;
+  backdrop-filter: blur($surface-blur) saturate(165%);
   padding: 40px 36px;
 }
 
@@ -367,13 +372,13 @@ const getLoginCode = () => {
 .form-title {
   font-size: 22px;
   font-weight: 700;
-  color: #17201d;
+  color: $main-text-color;
   margin: 0 0 6px 0;
 }
 
 .form-desc {
   font-size: 14px;
-  color: #65706a;
+  color: $secondary-text-color;
   margin: 0;
 }
 
@@ -390,7 +395,7 @@ const getLoginCode = () => {
   display: block;
   font-size: 13px;
   font-weight: 500;
-  color: #17201d;
+  color: $main-text-color;
   margin-bottom: 6px;
 }
 
@@ -412,7 +417,7 @@ const getLoginCode = () => {
   height: 44px;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: $radius-control;
   margin-top: 8px;
 }
 
@@ -433,7 +438,7 @@ const getLoginCode = () => {
 
   :deep(.ant-tabs-ink-bar) {
     height: 3px;
-  border-radius: 0;
+    border-radius: $radius-capsule;
   }
 }
 
@@ -441,21 +446,21 @@ const getLoginCode = () => {
 :deep(.ant-input-affix-wrapper),
 :deep(.ant-input) {
   border-radius: 8px;
-  border-color: #ccd3c8;
+  border-color: $surface-border;
 
   &:hover {
-    border-color: #5b796a;
+    border-color: $secondary-color;
   }
 
   &:focus,
   &.ant-input-affix-wrapper-focused {
-    border-color: #1d4d40;
-    box-shadow: 0 0 0 3px rgba(29, 77, 64, 0.12);
+    border-color: $main-color;
+    box-shadow: $focus-ring;
   }
 }
 
 :deep(.ant-input-prefix) {
-  color: #65706a;
+  color: $secondary-text-color;
   margin-right: 8px;
 }
 

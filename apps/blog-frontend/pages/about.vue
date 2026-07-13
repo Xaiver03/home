@@ -350,7 +350,7 @@ onBeforeUnmount(() => {
       height: clamp(12rem, 20vw, 18rem) !important;
       padding: 0.4rem !important;
       border-radius: 8px !important;
-      background: rgba(255, 255, 255, 0.7);
+      background: $surface-hover;
       object-fit: cover;
       box-shadow: 0 18px 44px rgba(48, 69, 56, 0.16);
     }
@@ -364,7 +364,7 @@ onBeforeUnmount(() => {
     }
 
     #description {
-      color: rgba(55, 72, 62, 0.72);
+      color: $secondary-text-color;
       font-size: clamp(1.5rem, 2vw, 1.9rem);
     }
 
@@ -374,16 +374,16 @@ onBeforeUnmount(() => {
       justify-content: center;
       width: 4.4rem;
       height: 4.4rem;
-      border: 1px solid rgba(56, 79, 64, 0.14);
-      border-radius: 8px;
-      color: #26332c;
+      border: 1px solid $surface-border;
+      border-radius: $radius-control;
+      color: $main-text-color;
       font-size: 2.2rem;
-      background: rgba(255, 255, 255, 0.52);
-      box-shadow: inset 0 1px rgba(255, 255, 255, 0.8);
+      background: $surface-control;
+      box-shadow: $surface-inner-highlight;
 
       &:hover {
         transform: translateY(-2px);
-        border-color: rgba(38, 51, 44, 0.32);
+        border-color: $color-border-strong;
       }
     }
   }
@@ -394,15 +394,15 @@ onBeforeUnmount(() => {
     justify-content: space-between;
     gap: 1.2rem;
     margin: clamp(3.2rem, 6vw, 6rem) 0 1.6rem;
-    color: #26332c;
-    font-family: ui-serif, Georgia, 'Times New Roman', serif;
+    color: $main-text-color;
+    font-family: $font-display;
     font-size: clamp(2.8rem, 4vw, 5rem);
     font-weight: 650;
     line-height: 1.04;
 
     span {
-      color: rgba(55, 72, 62, 0.58);
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      color: $secondary-text-color;
+      font-family: $font-display;
       font-size: 1.2rem;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -413,13 +413,11 @@ onBeforeUnmount(() => {
 
   #gradient-card {
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(241, 246, 239, 0.54)),
+      linear-gradient(135deg, $surface-hover, $surface-glass),
       radial-gradient(circle at 18% 18%, rgba(112, 142, 115, 0.22), transparent 30%);
     overflow: hidden;
-    color: #26332c;
-    box-shadow:
-      inset 0 1px rgba(255, 255, 255, 0.78),
-      0 24px 60px rgba(48, 69, 56, 0.14);
+    color: $main-text-color;
+    box-shadow: $surface-inner-highlight, $surface-shadow;
 
     & > * {
       opacity: 0.92;

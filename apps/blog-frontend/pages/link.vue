@@ -191,7 +191,7 @@ const submitFriendMsg = () => {
       font-size: clamp(2.2rem, 3vw, 3.4rem);
       line-height: 1.15;
       font-weight: 820;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
     }
   }
 
@@ -221,9 +221,9 @@ const submitFriendMsg = () => {
       min-height: 10rem;
       padding: 1.8rem;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.72);
+      border: 1px solid $surface-border;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.42);
+      background: $surface-control;
       cursor: $hover-cursor;
       transition:
         transform 180ms ease,
@@ -231,7 +231,7 @@ const submitFriendMsg = () => {
 
       &:hover {
         transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.7);
+        background: $surface-hover;
       }
 
       h3 {

@@ -27,7 +27,7 @@ const cachedNames = computed(() => {
 .tab-content-panel {
   flex: 1;
   overflow: auto;
-  padding: 16px;
-  background: $main-background-color;
+  padding: 24px;
+  background: transparent;
 }
 </style>

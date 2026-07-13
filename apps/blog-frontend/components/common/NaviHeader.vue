@@ -359,7 +359,7 @@ onMounted(() => {
 .site-nav-shell {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: $z-sticky;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -373,18 +373,14 @@ onMounted(() => {
   grid-template-columns: auto auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
-  width: min(104rem, calc(100vw - 2.4rem));
+  width: $nav-shell-width;
   min-height: 5.6rem;
   padding: 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.74);
-  border-radius: 999px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(243, 247, 239, 0.56)),
-    rgba(248, 250, 245, 0.62);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 20px 70px rgba(35, 48, 42, 0.16);
-  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid $surface-border;
+  border-radius: $radius-capsule;
+  background: $surface-glass-strong;
+  box-shadow: $surface-inner-highlight, $surface-shadow-soft;
+  backdrop-filter: blur($surface-blur) saturate(180%);
 }
 
 button {
@@ -396,18 +392,18 @@ button {
 .tool-button {
   min-height: 4.4rem;
   border: 0;
-  color: rgba(38, 51, 44, 0.78);
+  color: $secondary-text-color;
   background: transparent;
   cursor: $hover-cursor;
   transition:
-    transform 180ms ease,
-    background 180ms ease,
-    color 180ms ease,
-    box-shadow 180ms ease;
+    transform $motion-fast,
+    background $motion-fast,
+    color $motion-fast,
+    box-shadow $motion-fast;
 
   &:hover {
-    color: #26332c;
-    background: rgba(255, 255, 255, 0.5);
+    color: $main-text-color;
+    background: $surface-hover;
   }
 
   &:active {
@@ -415,8 +411,8 @@ button {
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(63, 89, 70, 0.45);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: $focus-ring;
   }
 }
 
@@ -426,16 +422,16 @@ button {
   justify-content: center;
   min-width: 9.8rem;
   padding: 0 1.8rem;
-  border-radius: 999px 10px 10px 999px;
-  color: #26332c;
-  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+  border-radius: $radius-capsule $radius-panel $radius-panel $radius-capsule;
+  color: $main-text-color;
+  font-family: $font-display;
   font-size: 1.72rem;
   font-weight: 680;
   white-space: nowrap;
 
   &[aria-current='page'] {
-    background: rgba(255, 255, 255, 0.64);
-    box-shadow: inset 0 1px rgba(255, 255, 255, 0.94);
+    background: $surface-hover;
+    box-shadow: $surface-inner-highlight;
   }
 }
 
@@ -449,9 +445,9 @@ button {
 .entry-switch {
   gap: 0.3rem;
   padding: 0.25rem;
-  border-radius: 999px;
-  background: rgba(38, 51, 44, 0.06);
-  box-shadow: inset 0 1px 4px rgba(23, 32, 29, 0.08);
+  border-radius: $radius-capsule;
+  background: $surface-control;
+  box-shadow: inset 0 1px 4px color-mix(in srgb, $main-text-color 8%, transparent);
 }
 
 .desktop-links {
@@ -464,22 +460,20 @@ button {
   align-items: center;
   justify-content: center;
   padding: 0 1.4rem;
-  border-radius: 999px;
+  border-radius: $radius-capsule;
   font-size: 1.42rem;
   font-weight: 680;
   white-space: nowrap;
 
   &.primary {
     min-width: 7.2rem;
-    color: rgba(38, 51, 44, 0.82);
+    color: $main-text-color;
   }
 
   &.active {
-    color: #1f2d25;
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      0 10px 28px rgba(52, 68, 58, 0.12);
+    color: $main-text-color;
+    background: $surface-hover;
+    box-shadow: $surface-inner-highlight, $surface-shadow-soft;
   }
 }
 
@@ -495,7 +489,7 @@ button {
   gap: 0.55rem;
   min-width: 4.4rem;
   padding: 0 1.3rem;
-  border-radius: 10px 999px 999px 10px;
+  border-radius: $radius-panel $radius-capsule $radius-capsule $radius-panel;
   font-size: 1.28rem;
   font-weight: 720;
 
@@ -507,7 +501,7 @@ button {
 .menu-button {
   display: none;
   padding: 0;
-  border-radius: 999px;
+  border-radius: $radius-capsule;
 }
 
 @media (max-width: 1024px) {

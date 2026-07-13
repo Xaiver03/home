@@ -44,6 +44,9 @@ importers:
       '@vavt/v3-extension':
         specifier: ^1.2.3
         version: 1.3.2
+      '@xld/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
       '@xld/shared-utils':
         specifier: workspace:*
         version: link:../../packages/shared-utils
@@ -93,6 +96,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.23(postcss@8.5.6)
+      cross-env:
+        specifier: ^10.1.0
+        version: 10.1.0
       eslint:
         specifier: ^7.32.0
         version: 7.32.0
@@ -229,6 +235,9 @@ importers:
       '@vueuse/motion':
         specifier: ^2.2.6
         version: 2.2.6(vue@3.5.26)
+      '@xld/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
       '@xld/shared-utils':
         specifier: workspace:*
         version: link:../../packages/shared-utils
@@ -247,6 +256,9 @@ importers:
       pinia-plugin-persist:
         specifier: ^1.0.0
         version: 1.0.0(pinia@2.3.1)(vue@3.5.26)
+      tslib:
+        specifier: ^2.8.1
+        version: 2.8.1
       vue:
         specifier: latest
         version: 3.5.26(typescript@5.9.3)
@@ -354,6 +366,8 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.30)(sass@1.97.2)(terser@5.46.0)
+
+  packages/design-tokens: {}
 
   packages/shared-config: {}
 

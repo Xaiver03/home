@@ -16,9 +16,8 @@
 
 <script setup>
 import { watch } from 'vue';
+import { applyThemeVars, normalizeThemeMode, persistTheme } from '@xld/design-tokens'
 const router = useRouter()
-import LightConfig from '@/assets/themeConfig/Light.json'
-import DarkConfig from '@/assets/themeConfig/Dark.json'
 const store = useNuxtStore()
 // --rem设置--
 // 重新设置根元素font-size
@@ -46,15 +45,10 @@ const resizeEvent = () => { // 窗口变化回调
 // --主题/配置设置--
 const setThemeMode = () => { // 获取缓存设置主题
   const theme = localStorage.getItem('theme')
-  if (theme) store.setThemeMode(theme)
+  if (theme) store.setThemeMode(normalizeThemeMode(theme))
 }
 const applyTheme = (newVal) => {
-  localStorage.setItem('theme', newVal) // 设置缓存
-  const root = document.documentElement
-  const config = newVal == 'Light' ? LightConfig : DarkConfig
-  for (let attribute in config) {
-    root.style.setProperty(attribute, config[attribute])
-  }
+  applyThemeVars(persistTheme(newVal))
 }
 watch(() => store.themeMode, applyTheme)
 const getGlobalCOnfig = async () => { // 获取并设置全局配置

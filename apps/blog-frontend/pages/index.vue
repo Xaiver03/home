@@ -227,7 +227,7 @@ const likeMessage = (message) => {
     font-size: clamp(4rem, 8vw, 8.4rem);
     line-height: 0.98;
     font-weight: 880;
-    letter-spacing: -0.025em;
+    letter-spacing: 0;
     text-wrap: balance;
   }
 
@@ -247,7 +247,7 @@ const likeMessage = (message) => {
   }
 
   .hero-actions .secondary {
-    background: rgba(255, 255, 255, 0.42);
+    background: $surface-control;
   }
 
   .hero-profile {
@@ -282,9 +282,9 @@ const likeMessage = (message) => {
   .icon {
     width: 4rem;
     height: 4rem;
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.48);
+    border: 1px solid $surface-border;
+    border-radius: $radius-control;
+    background: $surface-control;
     color: $main-text-color;
     font-size: 2rem;
     backdrop-filter: blur(16px) saturate(150%);
@@ -294,7 +294,7 @@ const likeMessage = (message) => {
 
     &:hover {
       transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.8);
+      background: $surface-hover;
     }
   }
 

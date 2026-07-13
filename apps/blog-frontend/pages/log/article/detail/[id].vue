@@ -683,7 +683,7 @@ onMounted(() => {
         font-size: clamp(3.6rem, 7vw, 7.8rem);
         line-height: 1.02;
         font-weight: 880;
-        letter-spacing: -0.025em;
+        letter-spacing: 0;
       }
 
       .introduction {

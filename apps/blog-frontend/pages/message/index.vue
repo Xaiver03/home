@@ -644,16 +644,14 @@ onBeforeUnmount(() => {
 
     .md-view-box {
       border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      background: rgba(246, 247, 241, 0.72);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.88),
-        0 16px 52px rgba(23, 32, 29, 0.08);
+      border: 1px solid $surface-border;
+      background: $surface-glass;
+      box-shadow: $surface-inner-highlight, $surface-shadow-soft;
       backdrop-filter: blur(18px) saturate(160%);
 
       .view-box-top-bar {
         border-bottom: 1px solid rgba(101, 112, 106, 0.18);
-        background: rgba(255, 255, 255, 0.34);
+        background: $surface-control;
 
         .message-text {
           h4 {

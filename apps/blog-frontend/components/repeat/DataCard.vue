@@ -113,25 +113,21 @@ watch(
   grid-template-columns: minmax(0, 1fr);
   min-height: 21rem;
   overflow: hidden;
-  background: rgba(246, 247, 241, 0.74);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 8px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    0 22px 64px rgba(23, 32, 29, 0.1);
-  backdrop-filter: blur(20px) saturate(165%);
+  background: $surface-glass;
+  border: 1px solid $surface-border;
+  border-radius: $radius-card;
+  box-shadow: $surface-inner-highlight, $surface-shadow-soft;
+  backdrop-filter: blur($surface-blur) saturate(165%);
   cursor: $hover-cursor;
   transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    background 220ms ease;
+    transform $motion-base,
+    box-shadow $motion-base,
+    background $motion-base;
 
   &:hover {
     transform: translateY(-4px) !important;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      0 28px 90px rgba(23, 32, 29, 0.14);
+    background: $surface-hover;
+    box-shadow: $surface-inner-highlight, $surface-shadow;
   }
 
   &:active {
@@ -168,8 +164,9 @@ watch(
       font-size: clamp(2.2rem, 3vw, 3.5rem);
       line-height: 1.12;
       font-weight: 820;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
       text-wrap: balance;
+      font-family: $font-display;
     }
 
     .card-desc {
@@ -190,7 +187,7 @@ watch(
       text-align: right;
 
       span {
-        color: rgba(38, 51, 44, 0.54);
+        color: $secondary-text-color;
         font-size: 1.15rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
