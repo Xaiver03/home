@@ -36,14 +36,14 @@ const getLocalTheme = () => {
 // --导航模块--
 const primaryLinks = [
   {
-    title: '首页',
-    label: '首页',
+    title: '博客',
+    label: '博客',
     path: '/',
     key: '/',
   },
   {
-    title: '写作',
-    label: '写作',
+    title: '文章',
+    label: '文章',
     path: '/log/article',
     key: '/log/article',
   },
@@ -82,13 +82,13 @@ const naviData = reactive([
     children: primaryLinks,
   },
   {
-    title: '写作',
-    label: '写作',
+    title: '博客',
+    label: '博客',
     key: 'root-document',
     children: [
       {
-        title: '文章',
-        label: '文章',
+        title: '文章列表',
+        label: '文章列表',
         path: '/log/article',
         key: '/log/article',
       },
@@ -291,7 +291,7 @@ onMounted(() => {
         <span>灯下灯</span>
       </button>
 
-      <div class="entry-switch" role="list" aria-label="入口切换">
+      <div class="entry-switch" role="list" aria-label="博客入口切换">
         <button
           v-for="item in primaryLinks"
           :key="item.key"

@@ -9,7 +9,7 @@
   "description": "邓湘雷的个人主页 - Personal Homepage",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "BROWSERSLIST_IGNORE_OLD_DATA=1 vite build",
     "preview": "vite preview",
     "format": "prettier --write src/",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",

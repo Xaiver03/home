@@ -1,9 +1,9 @@
 <template>
-  <a class="skip-link" href="#writing">跳到最近写作</a>
+  <a class="skip-link" href="#articles">跳到文章列表</a>
 
   <div class="site-shell">
     <header class="site-header" :class="{ 'is-scrolled': isScrolled }">
-      <a class="wordmark" href="#top" aria-label="回到首页">
+      <a class="wordmark" href="#top" aria-label="回到站点顶部">
         <span>灯下灯</span>
         <small>XAIVER</small>
       </a>
@@ -20,9 +20,10 @@
       </button>
 
       <nav id="site-navigation" class="site-navigation" :class="{ 'is-open': menuOpen }">
-        <a href="#writing" @click="menuOpen = false">写作</a>
+        <a href="#top" @click="menuOpen = false">站点</a>
         <a href="#routes" @click="menuOpen = false">入口</a>
-        <a href="/blog/about">关于</a>
+        <a href="#articles" @click="menuOpen = false">博客</a>
+        <a href="#categories" @click="menuOpen = false">分类</a>
         <a href="https://github.com/Xaiver03" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
     </header>
@@ -37,8 +38,8 @@
           <h1 id="hero-title">把生活和思考，<br />留在能慢慢阅读的地方。</h1>
           <p class="hero-description">{{ homeText.descText }}</p>
           <div class="hero-actions">
-            <a class="primary-action legacy-glass-action" href="#writing"
-              >阅读最新写作 <span aria-hidden="true">↓</span></a
+            <a class="primary-action legacy-glass-action" href="#articles"
+              >阅读文章列表 <span aria-hidden="true">↓</span></a
             >
             <a class="secondary-action legacy-glass-action" href="/blog/about"
               >认识作者 <span aria-hidden="true">→</span></a
@@ -47,57 +48,16 @@
         </div>
 
         <aside class="hero-status" aria-label="站点状态">
-          <span>PUBLIC ARCHIVE</span>
+          <span>BLOG ARCHIVE</span>
           <strong>{{ articleCountLabel }}</strong>
           <p>
             {{
               latestArticle
                 ? `最近更新：${formatArticleDate(latestArticle.updatedTime)}`
-                : '正在读取公开文章'
+                : '正在读取文章列表'
             }}
           </p>
         </aside>
-      </section>
-
-      <section id="writing" class="writing-section" aria-labelledby="writing-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">LATEST WRITING</p>
-            <h2 id="writing-title">最近写作</h2>
-          </div>
-          <a class="archive-link" href="/blog/log/article"
-            >浏览全部文章 <span aria-hidden="true">→</span></a
-          >
-        </div>
-
-        <div v-if="isLoading" class="article-grid" aria-label="文章加载中">
-          <div v-for="index in 3" :key="index" class="article-skeleton"></div>
-        </div>
-
-        <div v-else-if="articles.length" class="article-grid">
-          <a
-            v-for="(article, index) in articles"
-            :key="article.id"
-            class="article-entry"
-            :class="{ featured: index === 0 }"
-            :href="article.url"
-          >
-            <div class="article-meta">
-              <span>{{ index === 0 ? '置顶阅读' : '文章' }}</span>
-              <time :datetime="article.updatedTime || undefined">{{
-                formatArticleDate(article.updatedTime)
-              }}</time>
-            </div>
-            <h3>{{ article.topic }}</h3>
-            <p>{{ article.introduction }}</p>
-            <span class="article-read">阅读全文 <span aria-hidden="true">→</span></span>
-          </a>
-        </div>
-
-        <div v-else class="article-empty">
-          <p>公开文章正在同步。</p>
-          <a href="/blog/log/article">进入文章档案 <span aria-hidden="true">→</span></a>
-        </div>
       </section>
 
       <section class="quote-section" aria-label="格言">
@@ -118,7 +78,7 @@
             <p class="eyebrow">START HERE</p>
             <h2 id="routes-title">从这里进入</h2>
           </div>
-          <p class="routes-copy">首页保留近期内容，完整归档、留言和个人信息在这里继续展开。</p>
+          <p class="routes-copy">首页负责统一入口和页面内切换，完整归档、留言和个人信息在这里继续展开。</p>
         </div>
 
         <div class="route-list">
@@ -129,14 +89,94 @@
             :href="link.href"
             :target="link.external ? '_blank' : undefined"
             :rel="link.external ? 'noreferrer' : undefined"
+            @click="handleRouteClick(link, $event)"
           >
-            <span class="route-index">0{{ index + 1 }}</span>
-            <span>{{ link.name }}</span>
-            <span aria-hidden="true">↗</span>
+            <span class="route-visual" :class="{ 'has-logo': link.logo }" aria-hidden="true">
+              <img v-if="link.logo" :src="link.logo" :alt="`${link.name} logo`" />
+              <span v-else>{{ getSiteIcon(link.icon) }}</span>
+            </span>
+            <span class="route-copy">
+              <span class="route-index">0{{ index + 1 }}</span>
+              <strong>{{ link.name }}</strong>
+              <small>{{ getRouteHint(link) }}</small>
+            </span>
+            <span class="route-arrow" aria-hidden="true">↗</span>
           </a>
         </div>
       </section>
+
+      <section id="articles" class="writing-section" aria-labelledby="articles-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">BLOG</p>
+            <h2 id="articles-title">文章列表</h2>
+          </div>
+          <a class="archive-link" href="/blog/log/article"
+            >浏览全部文章 <span aria-hidden="true">→</span></a
+          >
+        </div>
+
+        <div id="categories" class="category-filter" aria-label="按分类筛选文章">
+          <button
+            class="category-chip"
+            :class="{ active: selectedCategoryId === 'all' }"
+            type="button"
+            @click="selectCategory('all')"
+          >
+            全部
+          </button>
+          <button
+            v-for="category in categories"
+            :key="category.id"
+            class="category-chip"
+            :class="{ active: selectedCategoryId === category.id }"
+            type="button"
+            @click="selectCategory(category.id)"
+          >
+            {{ category.theme }}
+          </button>
+        </div>
+
+        <div v-if="articleListLoading" class="article-grid" aria-label="文章加载中">
+          <div v-for="index in 3" :key="index" class="article-skeleton"></div>
+        </div>
+
+        <div v-else-if="visibleArticles.length" class="article-grid">
+          <a
+            v-for="(article, index) in visibleArticles"
+            :key="article.id"
+            class="article-entry"
+            :class="{ featured: index === 0 }"
+            :href="article.url"
+          >
+            <div class="article-meta">
+              <span>{{ selectedCategoryName }}</span>
+              <time :datetime="article.updatedTime || undefined">{{
+                formatArticleDate(article.updatedTime)
+              }}</time>
+            </div>
+            <h3>{{ article.topic }}</h3>
+            <p>{{ article.introduction }}</p>
+            <span class="article-read">阅读全文 <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+
+        <div v-else class="article-empty">
+          <p>{{ selectedCategoryId === 'all' ? '文章列表正在同步。' : '这个分类下暂时没有公开文章。' }}</p>
+          <a href="/blog/log/article">进入文章档案 <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
     </main>
+
+    <div v-if="qrDialogOpen" class="qr-dialog-backdrop" @click.self="qrDialogOpen = false">
+      <section class="qr-dialog" role="dialog" aria-modal="true" aria-label="公众号二维码">
+        <button class="qr-close" type="button" aria-label="关闭二维码" @click="qrDialogOpen = false">
+          ×
+        </button>
+        <img :src="qrImage" alt="公众号二维码" />
+        <p>扫码查看公众号</p>
+      </section>
+    </div>
 
     <footer class="site-footer">
       <span>{{ homeText.siteAuthor }}</span>
@@ -147,7 +187,13 @@
 </template>
 
 <script setup>
-import { getGlobalConfig, getHitokoto, getLatestArticles } from '@/api';
+import {
+  getArticleCategories,
+  getArticlesByCategory,
+  getGlobalConfig,
+  getHitokoto,
+  getLatestArticles,
+} from '@/api';
 import {
   formatArticleDate,
   getHomeText,
@@ -155,27 +201,35 @@ import {
   normalizeQuote,
   normalizeSiteLink,
 } from '@/lib/homeContent';
-
-const fallbackLinks = [
-  { name: '文章档案', link: '/log/article' },
-  { name: '关于作者', link: '/about' },
-  { name: '朋友们', link: '/link' },
-  { name: '留言', link: '/message' },
-];
+import defaultSiteLinks from '@/assets/siteLinks.json';
 
 const homeText = ref(getHomeText());
 const articles = ref([]);
+const filteredArticles = ref([]);
+const categories = ref([]);
+const selectedCategoryId = ref('all');
 const isLoading = ref(true);
+const isFilterLoading = ref(false);
 const isScrolled = ref(false);
 const menuOpen = ref(false);
-const siteLinks = ref(fallbackLinks.map(normalizeSiteLink));
+const siteLinks = ref(defaultSiteLinks.map(normalizeSiteLink));
 const quote = ref(normalizeQuote());
+const qrDialogOpen = ref(false);
+const qrImage = ref('/uploads/wechat-qr.jpg');
 
-const latestArticle = computed(() => articles.value[0] || null);
+const visibleArticles = computed(() =>
+  selectedCategoryId.value === 'all' ? articles.value : filteredArticles.value,
+);
+const latestArticle = computed(() => visibleArticles.value[0] || articles.value[0] || null);
+const articleListLoading = computed(() => isLoading.value || isFilterLoading.value);
 const articleCountLabel = computed(() => {
-  if (isLoading.value) return '文章加载中';
-  if (!articles.value.length) return '公开档案';
-  return `近期 ${articles.value.length} 篇`;
+  if (articleListLoading.value) return '文章加载中';
+  if (!visibleArticles.value.length) return '文章列表';
+  return `${selectedCategoryName.value} ${visibleArticles.value.length} 篇`;
+});
+const selectedCategoryName = computed(() => {
+  if (selectedCategoryId.value === 'all') return '全部文章';
+  return categories.value.find((item) => item.id === selectedCategoryId.value)?.theme || '分类文章';
 });
 
 const updateScrollState = () => {
@@ -183,19 +237,38 @@ const updateScrollState = () => {
 };
 
 const loadHome = async () => {
-  const [config, latest] = await Promise.all([getGlobalConfig(), getLatestArticles()]);
+  const [config, latest, categoryList] = await Promise.all([
+    getGlobalConfig(),
+    getLatestArticles(),
+    getArticleCategories(),
+  ]);
   homeText.value = getHomeText(config);
   articles.value = normalizeArticles(latest);
-
-  const configuredLinks = config?.['site-links']?.content;
-  if (Array.isArray(configuredLinks) && configuredLinks.length) {
-    siteLinks.value = configuredLinks
-      .filter((item) => item?.type !== 'qr')
-      .map(normalizeSiteLink)
-      .slice(0, 5);
-  }
+  categories.value = Array.isArray(categoryList)
+    ? categoryList
+        .filter((item) => Number.isInteger(Number(item?.id)) && item?.theme)
+        .map((item) => ({
+          id: String(item.id),
+          theme: String(item.theme).trim(),
+        }))
+    : [];
 
   isLoading.value = false;
+};
+
+const selectCategory = async (categoryId) => {
+  const normalizedId = String(categoryId);
+  if (selectedCategoryId.value === normalizedId && normalizedId !== 'all') return;
+
+  selectedCategoryId.value = normalizedId;
+  if (normalizedId === 'all') {
+    filteredArticles.value = [];
+    return;
+  }
+
+  isFilterLoading.value = true;
+  filteredArticles.value = normalizeArticles(await getArticlesByCategory(normalizedId));
+  isFilterLoading.value = false;
 };
 
 const loadQuote = async () => {
@@ -204,6 +277,33 @@ const loadQuote = async () => {
   } catch {
     quote.value = normalizeQuote();
   }
+};
+
+const handleRouteClick = (link, event) => {
+  if (!link.qr) return;
+  event.preventDefault();
+  qrImage.value = link.qrImage;
+  qrDialogOpen.value = true;
+};
+
+const getSiteIcon = (icon) => {
+  const icons = {
+    Blog: '文',
+    Cloud: '云',
+    Fire: '创',
+    CompactDisc: '乐',
+    Compass: '↗',
+    Book: '书',
+    LaptopCode: '微',
+  };
+  return icons[icon] || '站';
+};
+
+const getRouteHint = (link) => {
+  if (link.qr) return '扫码打开';
+  if (link.external) return '外部站点';
+  if (link.href.startsWith('/blog')) return '博客内容';
+  return '站内页面';
 };
 
 onMounted(() => {
@@ -486,14 +586,14 @@ onBeforeUnmount(() => {
 }
 
 .routes-section {
-  padding-top: 1rem;
+  padding-top: 0;
   padding-bottom: 7rem;
 }
 
 .quote-section {
   width: min(92%, 78rem);
   margin: 0 auto;
-  padding: 0 0 7.5rem;
+  padding: 7.5rem 0 3rem;
 }
 
 .quote-panel {
@@ -571,6 +671,53 @@ onBeforeUnmount(() => {
   &:focus-visible {
     text-decoration: underline;
     text-underline-offset: 0.3rem;
+  }
+}
+
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  margin: -0.7rem 0 1.6rem;
+  padding: 0.55rem;
+  background: rgb(246 247 241 / 72%);
+  border: 1px solid rgb(255 255 255 / 70%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 84%),
+    0 1rem 2.4rem rgb(23 32 29 / 8%);
+  backdrop-filter: blur(1rem) saturate(145%);
+}
+
+.category-chip {
+  min-height: 2.6rem;
+  padding: 0 1rem;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--ink);
+    background: rgb(255 255 255 / 70%);
+    outline: none;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.active {
+    color: #f6f9ed;
+    background: var(--forest);
   }
 }
 
@@ -690,31 +837,92 @@ onBeforeUnmount(() => {
 }
 
 .route-list {
-  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
 }
 
 .route-link {
+  position: relative;
   display: grid;
-  grid-template-columns: 4rem 1fr auto;
+  grid-template-columns: 3.8rem minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
-  padding: 1.2rem 0;
+  min-height: 8.8rem;
+  padding: 1.1rem;
+  overflow: hidden;
   color: var(--ink);
-  border-bottom: 1px solid var(--line);
+  background: rgb(246 247 241 / 72%);
+  border: 1px solid rgb(255 255 255 / 72%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 86%),
+    0 1.2rem 3rem rgb(23 32 29 / 8%);
+  backdrop-filter: blur(1rem) saturate(145%);
   transition:
     color 180ms ease,
-    padding 180ms ease;
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 
   &:hover,
   &:focus-visible {
-    padding-right: 0.4rem;
-    padding-left: 0.4rem;
+    transform: translateY(-0.12rem);
     color: var(--forest);
+    background: rgb(255 255 255 / 86%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 92%),
+      0 1.6rem 3.6rem rgb(23 32 29 / 12%);
     outline: none;
   }
 
-  span:nth-child(2) {
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.route-visual {
+  display: grid;
+  width: 3.8rem;
+  height: 3.8rem;
+  place-items: center;
+  color: #f6f9ed;
+  background: var(--forest);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
+  font-size: 1rem;
+  font-weight: 800;
+
+  &.has-logo {
+    background: rgb(255 255 255 / 74%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 88%),
+      0 0.7rem 1.6rem rgb(23 32 29 / 10%);
+  }
+
+  img {
+    width: 72%;
+    height: 72%;
+    object-fit: contain;
+  }
+}
+
+.route-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.24rem;
+
+  strong {
+    overflow: hidden;
+    color: inherit;
+    font-size: clamp(1.08rem, 1.6vw, 1.42rem);
+    font-weight: 800;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    color: var(--muted);
+    font-size: 0.78rem;
     font-weight: 700;
   }
 }
@@ -723,6 +931,12 @@ onBeforeUnmount(() => {
   color: var(--muted);
   font-size: 0.7rem;
   font-weight: 700;
+}
+
+.route-arrow {
+  align-self: start;
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .site-footer {
@@ -744,6 +958,60 @@ onBeforeUnmount(() => {
       color: var(--forest);
     }
   }
+}
+
+.qr-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgb(7 20 16 / 54%);
+  backdrop-filter: blur(0.8rem);
+}
+
+.qr-dialog {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  width: min(21rem, 100%);
+  padding: 1.2rem;
+  text-align: center;
+  background: rgb(246 247 241 / 94%);
+  border: 1px solid rgb(255 255 255 / 78%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 86%),
+    0 2rem 5rem rgb(7 20 16 / 24%);
+
+  img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: #fff;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+}
+
+.qr-close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 2rem;
+  height: 2rem;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  background: rgb(255 255 255 / 74%);
+  border: 0;
+  cursor: pointer;
 }
 
 .sr-only {
@@ -858,8 +1126,18 @@ onBeforeUnmount(() => {
     min-height: 15rem;
   }
 
+  .route-list {
+    grid-template-columns: 1fr;
+  }
+
   .route-link {
     grid-template-columns: 2.8rem 1fr auto;
+    min-height: 7.2rem;
+  }
+
+  .route-visual {
+    width: 2.8rem;
+    height: 2.8rem;
   }
 }
 

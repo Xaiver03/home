@@ -70,6 +70,59 @@ export const getLatestArticles = async () => {
   }
 };
 
+export const getArticleCategories = async () => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch('/api/article/reception/getAllArticleTypes', {
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.warn('文章分类加载失败:', error.message);
+    return [];
+  }
+};
+
+export const getArticlesByCategory = async (categoryId) => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch(`/api/article/reception/getArticleByTypeId/${categoryId}/1/6`, {
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.warn('分类文章加载失败:', error.message);
+    return {
+      count: 0,
+      rows: [],
+    };
+  }
+};
+
 /**
  * 音乐播放器
  */

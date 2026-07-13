@@ -2,36 +2,43 @@
   {
     "icon": "Blog",
     "name": "博客",
+    "logo": "/images/icon/candle.png",
     "link": "/blog"
   },
   {
     "icon": "Cloud",
     "name": "理想国文学网",
+    "logo": "/images/site/litopia-logo.png",
     "link": "https://litopia.space"
   },
   {
     "icon": "Fire",
     "name": "创业OS",
+    "logo": "/images/site/finlaw-logo.webp",
     "link": "https://finlaw.cloud"
   },
   {
     "icon": "CompactDisc",
     "name": "音乐",
+    "logo": "/images/icon/music.png",
     "link": "https://xiangleideng.site/"
   },
   {
     "icon": "Compass",
     "name": "GitHub",
+    "logo": "/images/icon/github.png",
     "link": "https://github.com/Xaiver03/"
   },
   {
     "icon": "Book",
     "name": "关于我",
+    "logo": "/images/icon/logo.png",
     "link": "/about"
   },
   {
     "icon": "LaptopCode",
     "name": "公众号",
+    "logo": "/images/social/wechat.png",
     "link": "#wechat-qr"
   }
 ]

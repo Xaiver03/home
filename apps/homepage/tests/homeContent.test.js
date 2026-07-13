@@ -61,6 +61,18 @@ describe('home content helpers', () => {
       href: 'https://github.com/Xaiver03',
       external: true,
     });
+    expect(normalizeSiteLink({ name: '公众号', link: '#wechat-qr' })).toMatchObject({
+      href: '#wechat-qr',
+      external: false,
+      qr: true,
+      qrImage: '/uploads/wechat-qr.jpg',
+    });
+    expect(
+      normalizeSiteLink({ name: '理想国文学网', link: 'https://litopia.space', logo: '/logo.png' }),
+    ).toMatchObject({
+      href: 'https://litopia.space',
+      logo: '/logo.png',
+    });
   });
 
   it('uses a readable fallback when the quote service has no usable result', () => {

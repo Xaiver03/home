@@ -9,18 +9,26 @@ const goTo = (url, $event) => {
   $event.stopPropagation();
   window.open(url, '_blank');
 };
-// 获取热门文章数据
+// 获取文章列表数据
 const { data: articleData, error: articleError } = await useAsyncData(
   'getArticleData',
   async () =>
-    await api.getHottestArticleTen().then((res) => {
-      const hottestArticle = res.rows.shift();
-      const hotArticleList = res.rows;
-      return {
-        hottestArticle,
-        hotArticleList,
-      };
-    }),
+    await api
+      .getArticleListOrderByTime({
+        currentPage: 1,
+        pageSize: 7,
+      })
+      .then((res) => {
+        for (let row of res.rows) {
+          row.createTime = utils.formatDate(row.createTime);
+        }
+        const leadArticle = res.rows.shift();
+        const articleList = res.rows;
+        return {
+          leadArticle,
+          articleList,
+        };
+      }),
 );
 // 获取热门留言数据
 const { data: hottestMessageList, error: hottestMessageError } = await useAsyncData(
@@ -52,9 +60,9 @@ const likeMessage = (message) => {
     <section id="xaiver" class="blog-glass-panel archive-hero" @click="router.push('/about')">
       <div class="hero-copy">
         <span class="blog-eyebrow">Public archive</span>
-        <h1>灯下灯的公开写作</h1>
+        <h1>灯下灯的博客</h1>
         <p>
-          这里继续展开首页的最近写作、留言和作者信息。阅读文章、查看主题、认识作者，都从同一个入口进入。
+          这里继续展开文章列表、留言和作者信息。阅读文章、查看主题、认识作者，都从同一个入口进入。
         </p>
         <div class="hero-actions">
           <button class="blog-action" type="button" @click.stop="router.push('/log/article')">
@@ -98,27 +106,27 @@ const likeMessage = (message) => {
 
     <header class="blog-section-head">
       <div>
-        <span class="blog-eyebrow">Featured writing</span>
-        <h2>热门文章</h2>
+        <span class="blog-eyebrow">Article list</span>
+        <h2>文章列表</h2>
       </div>
-      <p>按阅读热度选出几篇公开文章。完整归档仍按时间排序，方便连续阅读。</p>
+      <p>按发布时间整理公开文章。完整归档继续保留搜索和分页，方便连续阅读。</p>
     </header>
     <RepeatEmptyPlaceholder
       :dataReady="Boolean(articleData)"
-      :dataShow="!utils.isNullOrEmpty(articleData?.hottestArticle)"
+      :dataShow="!utils.isNullOrEmpty(articleData?.leadArticle)"
     >
       <RepeatDataCard
         id="topArticle"
-        :data="articleData?.hottestArticle"
+        :data="articleData?.leadArticle"
         :dataOption="{
           mainAttribute: 'topic',
           secondAttribute: 'introduction',
           additional: {
-            icon: '阅读',
-            attribute: 'popularity',
+            icon: '发布于',
+            attribute: 'createTime',
           },
         }"
-        @click="router.push(`/log/article/detail/${articleData?.hottestArticle.id}`)"
+        @click="router.push(`/log/article/detail/${articleData?.leadArticle.id}`)"
         v-motion
         :initial="{ opacity: 0, y: 18 }"
         :visibleOnce="{
@@ -131,7 +139,7 @@ const likeMessage = (message) => {
       />
       <div class="blog-grid" id="article-bar">
         <div
-          v-for="(item, index) in articleData?.hotArticleList"
+          v-for="(item, index) in articleData?.articleList"
           :key="index"
           v-motion
           :initial="{ opacity: 0, y: 18 }"
@@ -152,8 +160,8 @@ const likeMessage = (message) => {
               mainAttribute: 'topic',
               secondAttribute: 'introduction',
               additional: {
-                icon: '阅读',
-                attribute: 'popularity',
+                icon: '发布于',
+                attribute: 'createTime',
               },
             }"
           />

@@ -90,8 +90,8 @@ const getMore = () => {
   <main id="log-list" class="content-box blog-page-shell">
     <header class="blog-section-head">
       <div>
-        <span class="blog-eyebrow">Latest writing</span>
-        <h1>最近写作</h1>
+        <span class="blog-eyebrow">Article list</span>
+        <h1>文章列表</h1>
       </div>
       <p>第 {{ route.params.page }} 页。继续按时间浏览公开归档，也可以直接搜索标题。</p>
     </header>

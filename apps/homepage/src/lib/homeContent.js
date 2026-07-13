@@ -45,6 +45,7 @@ export const normalizeArticles = (response) => {
 export const normalizeSiteLink = (item = {}) => {
   const link = typeof item.link === 'string' ? item.link.trim() : '';
   let href = link || '/blog';
+  const isQr = item.type === 'qr' || href === '#wechat-qr';
 
   if (href === '/log') href = '/blog/log/article';
   if (href.startsWith('/log/')) href = `/blog${href}`;
@@ -53,7 +54,11 @@ export const normalizeSiteLink = (item = {}) => {
   return {
     name: getText(item.name, '更多内容'),
     href,
+    icon: getText(item.icon, 'Compass'),
+    logo: getText(item.logo, ''),
     external: /^https?:\/\//i.test(href),
+    qr: isQr,
+    qrImage: isQr && href !== '#wechat-qr' ? href : '/uploads/wechat-qr.jpg',
   };
 };
 
