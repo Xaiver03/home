@@ -51,6 +51,13 @@ const applyTheme = (newVal) => {
   applyThemeVars(persistTheme(newVal))
 }
 watch(() => store.themeMode, applyTheme)
+
+// 动态 favicon
+const faviconUrl = computed(() => store.$state.config['my-avatar']?.content || '/favicon.ico')
+useHead({
+  link: () => [{ rel: 'icon', href: faviconUrl.value }],
+})
+
 const getGlobalCOnfig = async () => { // 获取并设置全局配置
   await api.getGlobalConfig().then(res => {
     store.setConfig(res)

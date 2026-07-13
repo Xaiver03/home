@@ -290,6 +290,7 @@ const parseProfileData = (config) => {
   // 头像
   if (config['my-avatar']?.content) {
     profileAvatar.value = config['my-avatar'].content;
+    updateFavicon(config['my-avatar'].content);
   }
 
   // 基本信息
@@ -360,6 +361,17 @@ const handleRouteClick = (link, event) => {
   event.preventDefault();
   qrImage.value = link.qrImage;
   qrDialogOpen.value = true;
+};
+
+const updateFavicon = (url) => {
+  if (!url || typeof document === 'undefined') return;
+  let link = document.querySelector("link[rel*='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.href = url;
 };
 
 const getSocialIcon = (name) => {
