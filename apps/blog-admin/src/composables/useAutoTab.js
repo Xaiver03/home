@@ -12,8 +12,7 @@ const EXACTLY_EXCLUDED_PATHS = new Set([
 
 // 路径 → Tab 配置（最长前缀匹配）
 export const PATH_TO_TAB = {
-  '/': { title: '首页', type: 'dashboard' },
-  '/log': { title: '博客看板', type: 'log' },
+  '/log': { title: '首页', type: 'dashboard' },
   '/log/list': { title: '博客列表', type: 'log' },
   '/log/edit': { title: '博客编辑', type: 'log' },
   '/log/type': { title: '博客类目', type: 'log' },
@@ -66,8 +65,8 @@ export function useAutoTab() {
           fullPath: route.fullPath,
           title: config.title,
           type: config.type,
-          pinned: config.base === '/', // 首页默认固定
-          closable: config.base !== '/',
+          pinned: config.base === '/log', // 首页默认固定
+          closable: config.base !== '/log',
         });
       }
     },

@@ -8,9 +8,7 @@ const routes = [
     },
     {
         path: '/',
-        name: '首页',
-        component: () => import('../pages/HomePage.vue'),
-        meta: { requiresAuth: true },
+        redirect: '/log',
     },
     {
         path: '/log',

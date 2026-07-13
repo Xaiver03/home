@@ -20,10 +20,10 @@
       </button>
 
       <nav id="site-navigation" class="site-navigation" :class="{ 'is-open': menuOpen }">
-        <a href="#top" @click="menuOpen = false">站点</a>
-        <a href="#routes" @click="menuOpen = false">入口</a>
-        <a href="#articles" @click="menuOpen = false">博客</a>
-        <a href="#categories" @click="menuOpen = false">分类</a>
+        <a href="#top" @click="menuOpen = false">首页</a>
+        <a href="/blog/" @click="menuOpen = false">博客</a>
+        <a href="/blog/log/article" @click="menuOpen = false">文章</a>
+        <a href="/blog/about" @click="menuOpen = false">关于</a>
         <a href="https://github.com/Xaiver03" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
     </header>
@@ -78,7 +78,7 @@
             <p class="eyebrow">START HERE</p>
             <h2 id="routes-title">从这里进入</h2>
           </div>
-          <p class="routes-copy">首页负责统一入口和页面内切换，完整归档、留言和个人信息在这里继续展开。</p>
+          <p class="routes-copy">外部站点与社交媒体入口，从这里探索更多内容。</p>
         </div>
 
         <div class="route-list">
@@ -838,7 +838,7 @@ onBeforeUnmount(() => {
 
 .route-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.9rem;
 }
 

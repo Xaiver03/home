@@ -121,14 +121,13 @@ const menuGroups = [
     key: 'dashboard',
     label: '概览',
     items: [
-      { key: '/', label: '首页', icon: HomeOutlined },
+      { key: '/log', label: '首页', icon: HomeOutlined },
     ],
   },
   {
     key: 'content',
     label: '内容管理',
     items: [
-      { key: '/log', label: '博客看板', icon: BarChartOutlined },
       { key: '/log/list', label: '博客列表', icon: FileTextOutlined },
       { key: '/log/edit', label: '博客编辑', icon: EditOutlined },
       { key: '/log/type', label: '博客类目', icon: AppstoreOutlined },

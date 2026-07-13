@@ -50,6 +50,13 @@ const primaryLinks = [
 ];
 const secondaryLinks = [
   {
+    title: '首页',
+    label: '首页',
+    path: 'https://xiangleideng.site/',
+    key: 'homepage',
+    external: true,
+  },
+  {
     title: '类目',
     label: '类目',
     path: '/log/category',
@@ -75,6 +82,13 @@ const secondaryLinks = [
   },
 ];
 const naviData = reactive([
+  {
+    title: '首页',
+    label: '首页',
+    key: 'homepage',
+    path: 'https://xiangleideng.site/',
+    external: true,
+  },
   {
     title: '入口',
     label: '入口',
@@ -108,7 +122,11 @@ const isActive = (path) => {
   if (path === '/') return route.path === '/';
   return route.path === path || route.path.startsWith(`${path}/`);
 };
-const goTo = (path) => {
+const goTo = (path, external) => {
+  if (external || /^https?:\/\//i.test(path)) {
+    window.location.href = path;
+    return;
+  }
   router.push(path);
   naviDrawer.value = false;
 };
@@ -116,20 +134,33 @@ const toggleTheme = () => {
   currentThemeIndex.value = currentThemeIndex.value ? 0 : 1;
   themeChange(colorTheme.value[currentThemeIndex.value]);
 };
-const changePath = ([path]) => {
-  if (!path) {
+const findNavItem = (key, nodes) => {
+  for (const node of nodes) {
+    if (node.key === key) return node;
+    if (node.children) {
+      const found = findNavItem(key, node.children);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+const changePath = ([key]) => {
+  if (!key) {
     expandedKeys.value = [];
     return;
   }
   const regex = /^root-/;
-  if (regex.test(path)) {
-    // 根节点，展开
-    if (!expandedKeys.value.includes(path)) {
-      expandedKeys.value = [path];
+  if (regex.test(key)) {
+    if (!expandedKeys.value.includes(key)) {
+      expandedKeys.value = [key];
     }
   } else {
-    // 子节点
-    goTo(path);
+    const item = findNavItem(key, naviData);
+    if (item) {
+      goTo(item.path || key, item.external);
+    } else {
+      goTo(key);
+    }
   }
 };
 // #region --用户模块--
@@ -310,10 +341,10 @@ onMounted(() => {
           v-for="item in secondaryLinks"
           :key="item.key"
           class="nav-item"
-          :class="{ active: isActive(item.path) }"
+          :class="{ active: !item.external && isActive(item.path) }"
           type="button"
           role="listitem"
-          @click="goTo(item.path)"
+          @click="goTo(item.path, item.external)"
         >
           {{ item.label }}
         </button>

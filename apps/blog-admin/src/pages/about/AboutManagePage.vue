@@ -762,22 +762,21 @@ const initializeDefaults = () => {
   // 基本信息默认值
   if (!basicInfo.value.name) {
     basicInfo.value = {
-      name: 'Bokey',
-      tagline: '留下属于我的痕迹🐾',
-      profession: '前端开发',
+      name: 'Xaiver',
+      tagline: '把生活和思考，留在能慢慢阅读的地方。',
+      profession: '全栈开发',
       personality: 'INFJ',
       personalityDesc: '提倡者',
-      welcomeText: '🎉欢迎来到我的空间🎉',
-      introduction: '我是Bokey，一个绿老头前端开发'
+      welcomeText: '欢迎来到灯下灯',
+      introduction: '我是Xaiver，一个热爱技术和文学的全栈开发者'
     }
   }
 
   // 社交链接默认值
   if (socialLinks.value.length === 0) {
     socialLinks.value = [
-      { name: 'GitHub', url: 'https://github.com/Bokey76', icon: 'icon-github' },
-      { name: '小红书', url: 'https://www.xiaohongshu.com/user/profile/5c5858380000000018037278', icon: 'icon-xiaohongshu' },
-      { name: '微博', url: 'https://weibo.com/u/6209660620', icon: 'icon-xinlangweibo' }
+      { name: 'GitHub', url: 'https://github.com/Xaiver03', icon: 'icon-github' },
+      { name: '公众号', url: '#wechat-qr', icon: 'icon-wechat' },
     ]
   }
 
@@ -808,13 +807,10 @@ const initializeDefaults = () => {
   // 网站链接默认值
   if (siteLinks.value.length === 0) {
     siteLinks.value = [
-      { name: '博客', link: 'https://xiangleideng.site/blog', icon: 'Blog' },
-      { name: '网盘', link: 'https://xiangleideng.site/', icon: 'Cloud' },
-      { name: '音乐', link: 'https://xiangleideng.site/', icon: 'CompactDisc' },
-      { name: '起始页', link: 'https://xiangleideng.site/', icon: 'Compass' },
-      { name: '网址集', link: 'https://xiangleideng.site/', icon: 'Book' },
-      { name: '今日热榜', link: 'https://xiangleideng.site/', icon: 'Fire' },
-      { name: '站点监测', link: 'https://xiangleideng.site/', icon: 'LaptopCode' }
+      { name: '理想国文学网', link: 'https://litopia.space', icon: 'Cloud' },
+      { name: '创业OS', link: 'https://finlaw.cloud', icon: 'Fire' },
+      { name: 'GitHub', link: 'https://github.com/Xaiver03/', icon: 'Compass' },
+      { name: '公众号', link: '#wechat-qr', icon: 'LaptopCode' },
     ]
   }
 }
