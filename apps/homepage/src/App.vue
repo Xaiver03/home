@@ -30,20 +30,49 @@
 
     <main>
       <section id="top" class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="/images/background10.jpg" alt="远山与森林的插画风景" />
+        <Background class="hero-bg" />
         <div class="hero-shade"></div>
 
         <div class="hero-content">
-          <p class="eyebrow">{{ homeText.helloText }}</p>
-          <h1 id="hero-title">把生活和思考，<br />留在能慢慢阅读的地方。</h1>
-          <p class="hero-description">{{ homeText.descText }}</p>
-          <div class="hero-actions">
-            <a class="primary-action legacy-glass-action" href="#articles"
-              >阅读文章列表 <span aria-hidden="true">↓</span></a
-            >
-            <a class="secondary-action legacy-glass-action" href="/blog/about"
-              >认识作者 <span aria-hidden="true">→</span></a
-            >
+          <div class="profile-card">
+            <img
+              v-if="profileAvatar"
+              class="profile-avatar"
+              :src="profileAvatar"
+              alt="头像"
+            />
+            <div class="profile-identity">
+              <p class="eyebrow">{{ homeText.helloText }}</p>
+              <h1 id="hero-title">{{ profileName || '灯下灯' }}</h1>
+              <p v-if="profileTagline" class="profile-tagline">
+                {{ profileProfession }}<span v-if="profilePersonality"> · {{ profilePersonality }}</span>
+              </p>
+              <p v-if="profileIntro" class="profile-intro">{{ profileIntro }}</p>
+
+              <div v-if="socialLinks.length" class="profile-links">
+                <a
+                  v-for="link in socialLinks"
+                  :key="link.name"
+                  class="social-link"
+                  :href="link.url"
+                  :title="link.name"
+                  :target="link.url.startsWith('http') ? '_blank' : undefined"
+                  :rel="link.url.startsWith('http') ? 'noreferrer' : undefined"
+                >
+                  <i v-if="link.icon" :class="`iconfont ${link.icon}`"></i>
+                  <span v-else>{{ link.name }}</span>
+                </a>
+              </div>
+
+              <div class="hero-actions">
+                <a class="primary-action legacy-glass-action" href="#articles"
+                  >阅读文章列表 <span aria-hidden="true">↓</span></a
+                >
+                <a class="secondary-action legacy-glass-action" href="/blog/about"
+                  >认识作者 <span aria-hidden="true">→</span></a
+                >
+              </div>
+            </div>
           </div>
         </div>
 
@@ -58,18 +87,6 @@
             }}
           </p>
         </aside>
-      </section>
-
-      <section class="quote-section" aria-label="格言">
-        <div class="quote-panel">
-          <span class="quote-label">A MOMENT TO PAUSE</span>
-          <blockquote>{{ quote.text }}</blockquote>
-          <footer>「{{ quote.from }}」</footer>
-          <button class="quote-refresh legacy-glass-action" type="button" @click="loadQuote">
-            <span class="sr-only">换一句格言</span>
-            <span aria-hidden="true">↻</span>
-          </button>
-        </div>
       </section>
 
       <section id="routes" class="routes-section" aria-labelledby="routes-title">
@@ -191,17 +208,16 @@ import {
   getArticleCategories,
   getArticlesByCategory,
   getGlobalConfig,
-  getHitokoto,
   getLatestArticles,
 } from '@/api';
 import {
   formatArticleDate,
   getHomeText,
   normalizeArticles,
-  normalizeQuote,
   normalizeSiteLink,
 } from '@/lib/homeContent';
 import defaultSiteLinks from '@/assets/siteLinks.json';
+import Background from '@/components/Background.vue';
 
 const homeText = ref(getHomeText());
 const articles = ref([]);
@@ -213,9 +229,17 @@ const isFilterLoading = ref(false);
 const isScrolled = ref(false);
 const menuOpen = ref(false);
 const siteLinks = ref(defaultSiteLinks.map(normalizeSiteLink));
-const quote = ref(normalizeQuote());
 const qrDialogOpen = ref(false);
 const qrImage = ref('/uploads/wechat-qr.jpg');
+
+// Profile 数据
+const profileName = ref('');
+const profileTagline = ref('');
+const profileProfession = ref('');
+const profilePersonality = ref('');
+const profileIntro = ref('');
+const profileAvatar = ref('');
+const socialLinks = ref([]);
 
 const visibleArticles = computed(() =>
   selectedCategoryId.value === 'all' ? articles.value : filteredArticles.value,
@@ -236,6 +260,40 @@ const updateScrollState = () => {
   isScrolled.value = window.scrollY > 24;
 };
 
+const parseProfileData = (config) => {
+  if (!config || typeof config !== 'object') return;
+
+  // 头像
+  if (config['my-avatar']?.content) {
+    profileAvatar.value = config['my-avatar'].content;
+  }
+
+  // 基本信息
+  try {
+    const basicInfo = config['about-basic-info']?.content;
+    if (basicInfo) {
+      const info = typeof basicInfo === 'string' ? JSON.parse(basicInfo) : basicInfo;
+      profileName.value = info.name || '';
+      profileTagline.value = info.tagline || '';
+      profileProfession.value = info.profession || '';
+      profilePersonality.value = info.personality || '';
+      profileIntro.value = info.introduction || '';
+    }
+  } catch (e) {
+    console.warn('解析 about-basic-info 失败:', e);
+  }
+
+  // 社交链接
+  try {
+    const links = config['about-social-links']?.content;
+    if (links) {
+      socialLinks.value = typeof links === 'string' ? JSON.parse(links) : links;
+    }
+  } catch (e) {
+    console.warn('解析 about-social-links 失败:', e);
+  }
+};
+
 const loadHome = async () => {
   const [config, latest, categoryList] = await Promise.all([
     getGlobalConfig(),
@@ -243,6 +301,7 @@ const loadHome = async () => {
     getArticleCategories(),
   ]);
   homeText.value = getHomeText(config);
+  parseProfileData(config);
   articles.value = normalizeArticles(latest);
   categories.value = Array.isArray(categoryList)
     ? categoryList
@@ -269,14 +328,6 @@ const selectCategory = async (categoryId) => {
   isFilterLoading.value = true;
   filteredArticles.value = normalizeArticles(await getArticlesByCategory(normalizedId));
   isFilterLoading.value = false;
-};
-
-const loadQuote = async () => {
-  try {
-    quote.value = normalizeQuote(await getHitokoto());
-  } catch {
-    quote.value = normalizeQuote();
-  }
 };
 
 const handleRouteClick = (link, event) => {
@@ -310,7 +361,6 @@ onMounted(() => {
   updateScrollState();
   window.addEventListener('scroll', updateScrollState, { passive: true });
   loadHome();
-  loadQuote();
 });
 
 onBeforeUnmount(() => {
@@ -426,65 +476,122 @@ onBeforeUnmount(() => {
 
 .hero {
   position: relative;
-  display: grid;
-  align-items: end;
-  min-height: 48rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   overflow: hidden;
   color: #f7f9f0;
   isolation: isolate;
 }
 
-.hero-image,
-.hero-shade {
+.hero-bg {
   position: absolute;
   inset: 0;
   z-index: -2;
-  width: 100%;
-  height: 100%;
-}
-
-.hero-image {
-  object-fit: cover;
-  object-position: center;
 }
 
 .hero-shade {
+  position: absolute;
+  inset: 0;
   z-index: -1;
   background: rgb(9 24 20 / 48%);
 }
 
 .hero-content {
   width: min(92%, 78rem);
-  margin: 0 auto;
-  padding: 9rem 0 8.5rem;
+  padding: 7rem 0 5rem;
   animation: reveal 650ms ease both;
+}
 
-  h1 {
-    max-width: 15ch;
-    margin: 0.7rem 0 1.3rem;
-    font-size: clamp(3.15rem, 7vw, 6.9rem);
-    font-weight: 700;
-    line-height: 1.02;
-    letter-spacing: 0;
-    text-wrap: balance;
-  }
+.profile-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  justify-items: start;
+}
+
+.profile-avatar {
+  width: clamp(10rem, 16vw, 16rem);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid rgb(255 255 255 / 30%);
+  box-shadow: 0 1.4rem 4rem rgb(4 17 13 / 28%);
+}
+
+.profile-identity {
+  display: grid;
+  gap: 0.6rem;
 }
 
 .eyebrow {
   margin: 0;
   color: inherit;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.08em;
   opacity: 0.84;
 }
 
-.hero-description {
-  max-width: 34rem;
+.profile-identity h1 {
   margin: 0;
+  font-size: clamp(2.8rem, 6vw, 5.6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.profile-tagline {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.profile-intro {
+  max-width: 42rem;
+  margin: 0.5rem 0 0;
   font-size: 1.06rem;
   line-height: 1.75;
+  opacity: 0.82;
   text-wrap: pretty;
+}
+
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem;
+  min-height: 3rem;
+  padding: 0 1.1rem;
+  color: inherit;
+  font-size: 1.5rem;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 12%);
+  backdrop-filter: blur(0.5rem);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+
+  &:hover {
+    background: rgb(255 255 255 / 24%);
+    transform: translateY(-0.12rem);
+  }
+
+  span {
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
 }
 
 .hero-actions {
@@ -492,7 +599,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 1.25rem;
   align-items: center;
-  margin-top: 2.2rem;
+  margin-top: 1.6rem;
 }
 
 .primary-action,
@@ -586,62 +693,8 @@ onBeforeUnmount(() => {
 }
 
 .routes-section {
-  padding-top: 0;
+  padding-top: 7.5rem;
   padding-bottom: 7rem;
-}
-
-.quote-section {
-  width: min(92%, 78rem);
-  margin: 0 auto;
-  padding: 7.5rem 0 3rem;
-}
-
-.quote-panel {
-  position: relative;
-  min-height: 12rem;
-  padding: 1.5rem 4.5rem 1.5rem 1.5rem;
-  color: #f4f7ed;
-  background: rgb(29 77 64 / 82%);
-  border: 1px solid rgb(255 255 255 / 20%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 20%),
-    0 1.3rem 2.8rem rgb(10 35 28 / 16%);
-  backdrop-filter: blur(0.8rem) saturate(115%);
-
-  blockquote {
-    max-width: 44rem;
-    margin: 1.3rem 0 1rem;
-    font-size: clamp(1.35rem, 2.4vw, 2rem);
-    font-weight: 600;
-    line-height: 1.5;
-    text-wrap: balance;
-  }
-
-  footer {
-    color: rgb(244 247 237 / 74%);
-    font-size: 0.84rem;
-    font-weight: 600;
-  }
-}
-
-.quote-label {
-  font-size: 0.66rem;
-  font-weight: 700;
-  opacity: 0.7;
-}
-
-.quote-refresh {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  display: grid;
-  width: 2.6rem;
-  height: 2.6rem;
-  place-items: center;
-  padding: 0;
-  color: inherit;
-  background: rgb(244 247 237 / 10%);
-  cursor: pointer;
 }
 
 .section-heading {
@@ -1078,12 +1131,27 @@ onBeforeUnmount(() => {
   }
 
   .hero {
-    min-height: 43rem;
+    min-height: 100vh;
   }
 
   .hero-content {
     padding-top: 7.8rem;
     padding-bottom: 7.4rem;
+  }
+
+  .profile-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .profile-intro {
+    text-align: center;
+  }
+
+  .profile-links,
+  .hero-actions {
+    justify-content: center;
   }
 
   .hero-status {
@@ -1095,14 +1163,6 @@ onBeforeUnmount(() => {
   .writing-section,
   .routes-section {
     padding-top: 5rem;
-    padding-bottom: 5rem;
-  }
-
-  .routes-section {
-    padding-top: 0;
-  }
-
-  .quote-section {
     padding-bottom: 5rem;
   }
 

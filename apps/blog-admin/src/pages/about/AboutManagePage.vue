@@ -281,59 +281,9 @@
             </a-form>
           </a-card>
         </a-tab-pane>
+      </a-tabs>
 
-        <!-- 网站链接 -->
-        <a-tab-pane key="siteLinks" tab="网站链接">
-          <a-card title="主页网站链接管理" size="small">
-            <a-alert message="提示" description="这些链接将显示在主页的网站列表中，每6个为一页。" type="info" show-icon class="mb-4" />
-
-            <div v-for="(link, index) in siteLinks" :key="index" class="border rounded p-4 mb-4">
-              <div class="flex justify-between items-center mb-2">
-                <h4>网站链接 {{ index + 1 }}: {{ link.name || '未命名' }}</h4>
-                <div>
-                  <a-button type="text" @click="moveSiteLinkUp(index)" :disabled="index === 0">上移</a-button>
-                  <a-button type="text" @click="moveSiteLinkDown(index)" :disabled="index === siteLinks.length - 1">下移</a-button>
-                  <a-button type="text" danger @click="removeSiteLink(index)">删除</a-button>
-                </div>
-              </div>
-              <a-row :gutter="16">
-                <a-col :span="6">
-                  <a-form-item label="网站名称">
-                    <a-input v-model:value="link.name" placeholder="如：博客" />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="10">
-                  <a-form-item label="链接地址">
-                    <a-input v-model:value="link.link" placeholder="完整的URL地址" />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="6">
-                  <a-form-item label="图标名称">
-                    <a-select v-model:value="link.icon" placeholder="选择图标">
-                      <a-select-option value="Blog">Blog (博客)</a-select-option>
-                      <a-select-option value="Cloud">Cloud (云盘)</a-select-option>
-                      <a-select-option value="CompactDisc">CompactDisc (音乐)</a-select-option>
-                      <a-select-option value="Compass">Compass (起始页)</a-select-option>
-                      <a-select-option value="Book">Book (书籍)</a-select-option>
-                      <a-select-option value="Fire">Fire (热榜)</a-select-option>
-                      <a-select-option value="LaptopCode">LaptopCode (编程)</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :span="2">
-                  <a-form-item label="预览">
-                    <div class="text-center text-lg">
-                      {{ getIconPreview(link.icon) }}
-                    </div>
-                  </a-form-item>
-                </a-col>
-              </a-row>
-            </div>
-            <a-button type="dashed" @click="addSiteLink" block>+ 添加网站链接</a-button>
-          </a-card>
-        </a-tab-pane>
-
-        <!-- 页面文案 -->
+      <!-- 操作按钮 -->
         <a-tab-pane key="pageText" tab="页面文案">
           <a-card title="页面标题和文案配置" size="small">
             <a-form layout="vertical">
@@ -437,9 +387,6 @@ const keywordDescription = ref('')
 // 最后的想法
 const finalThoughts = ref([])
 const finalThoughtsHint = ref('')
-
-// 网站链接
-const siteLinks = ref([])
 
 // 页面文案
 const pageTexts = ref({
@@ -586,18 +533,6 @@ const removeFinalThought = (index) => {
 const moveThoughtUp = (index) => moveItemUp(finalThoughts.value, index)
 const moveThoughtDown = (index) => moveItemDown(finalThoughts.value, index)
 
-// 网站链接管理
-const addSiteLink = () => {
-  siteLinks.value.push({ name: '', link: '', icon: 'Blog' })
-}
-
-const removeSiteLink = (index) => {
-  siteLinks.value.splice(index, 1)
-}
-
-const moveSiteLinkUp = (index) => moveItemUp(siteLinks.value, index)
-const moveSiteLinkDown = (index) => moveItemDown(siteLinks.value, index)
-
 // 图标预览
 const getIconPreview = (iconName) => {
   const iconMap = {
@@ -682,9 +617,6 @@ const saveAllConfigurations = async () => {
     // 保存页面文案
     await saveConfig('about-page-texts', pageTexts.value)
 
-    // 保存网站链接
-    await saveConfig('site-links', siteLinks.value)
-
     message.success('所有配置保存成功！')
   } catch (error) {
     message.error('保存失败: ' + error.message)
@@ -740,9 +672,6 @@ const loadConfigurations = async () => {
               break
             case 'about-page-texts':
               pageTexts.value = JSON.parse(config.content)
-              break
-            case 'site-links':
-              siteLinks.value = JSON.parse(config.content)
               break
           }
         } catch (e) {
@@ -802,16 +731,6 @@ const initializeDefaults = () => {
 
   if (!finalThoughtsHint.value) {
     finalThoughtsHint.value = '点一点有惊喜'
-  }
-
-  // 网站链接默认值
-  if (siteLinks.value.length === 0) {
-    siteLinks.value = [
-      { name: '理想国文学网', link: 'https://litopia.space', icon: 'Cloud' },
-      { name: '创业OS', link: 'https://finlaw.cloud', icon: 'Fire' },
-      { name: 'GitHub', link: 'https://github.com/Xaiver03/', icon: 'Compass' },
-      { name: '公众号', link: '#wechat-qr', icon: 'LaptopCode' },
-    ]
   }
 }
 

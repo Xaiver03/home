@@ -1,6 +1,18 @@
 <script setup>
 const router = useRouter();
 const store = useNuxtStore();
+
+// 从 config 读取社交链接
+const profileSocialLinks = computed(() => {
+  try {
+    const raw = store.$state.config['about-social-links']?.content;
+    if (!raw) return [];
+    return typeof raw === 'string' ? JSON.parse(raw) : raw;
+  } catch {
+    return [];
+  }
+});
+
 definePageMeta({
   layout: 'classics',
 });
@@ -82,23 +94,16 @@ const likeMessage = (message) => {
         <div>
           <p class="profile-name">Xaiver / 灯下灯</p>
           <div class="profile-links">
-            <button
-              class="icon iconfont icon-github"
-              @click.stop="goTo('https://github.com/Xaiver03', $event)"
-              title="GitHub"
-            ></button>
-            <button
-              class="icon iconfont icon-xiaohongshu"
-              @click.stop="
-                goTo('https://www.xiaohongshu.com/user/profile/5c5858380000000018037278', $event)
-              "
-              title="小红书"
-            ></button>
-            <button
-              class="icon iconfont icon-xinlangweibo"
-              @click.stop="goTo('https://weibo.com/u/6209660620', $event)"
-              title="微博"
-            ></button>
+            <a
+              v-for="link in profileSocialLinks"
+              :key="link.name"
+              class="icon"
+              :class="link.icon ? `iconfont ${link.icon}` : ''"
+              :href="link.url"
+              :title="link.name"
+              :target="link.url.startsWith('http') ? '_blank' : undefined"
+              @click.stop="link.url.startsWith('http') ? goTo(link.url, $event) : undefined"
+            ></a>
           </div>
         </div>
       </div>

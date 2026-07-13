@@ -203,72 +203,6 @@
             </a-form>
           </a-card>
         </a-tab-pane>
-
-        <!-- 音乐配置 -->
-        <a-tab-pane key="musicConfig" tab="音乐配置">
-          <a-card title="音乐播放器配置" size="small">
-            <a-alert message="音乐说明" description="配置主页的音乐播放器，支持网易云音乐和QQ音乐。" type="info" show-icon class="mb-4" />
-
-            <a-form layout="vertical">
-              <a-row :gutter="16">
-                <a-col :span="12">
-                  <a-form-item label="音乐API地址">
-                    <a-input v-model:value="musicConfig.apiUrl" placeholder="https://xiangleideng.site/music" />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="12">
-                  <a-form-item label="音乐平台">
-                    <a-select v-model:value="musicConfig.server" placeholder="选择音乐平台">
-                      <a-select-option value="netease">网易云音乐</a-select-option>
-                      <a-select-option value="tencent">QQ音乐</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-              </a-row>
-
-              <a-row :gutter="16">
-                <a-col :span="12">
-                  <a-form-item label="播放类型">
-                    <a-select v-model:value="musicConfig.type" placeholder="选择播放类型">
-                      <a-select-option value="song">单曲</a-select-option>
-                      <a-select-option value="playlist">播放列表</a-select-option>
-                      <a-select-option value="album">专辑</a-select-option>
-                      <a-select-option value="artist">艺术家</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :span="12">
-                  <a-form-item label="歌曲/播放列表ID">
-                    <a-input v-model:value="musicConfig.songId" placeholder="音乐ID" />
-                  </a-form-item>
-                </a-col>
-              </a-row>
-
-              <a-form-item>
-                <a-checkbox v-model:checked="musicConfig.enabled">启用音乐播放器</a-checkbox>
-              </a-form-item>
-            </a-form>
-          </a-card>
-        </a-tab-pane>
-
-        <!-- 天气配置 -->
-        <a-tab-pane key="weatherConfig" tab="天气配置">
-          <a-card title="天气组件配置" size="small">
-            <a-form layout="vertical">
-              <a-form-item label="高德地图API Key" extra="用于获取天气信息，免费额度每天5000次请求">
-                <a-input v-model:value="weatherConfig.amapKey" placeholder="从高德开放平台获取" />
-              </a-form-item>
-
-              <a-form-item>
-                <a-checkbox v-model:checked="weatherConfig.enabled">启用天气显示</a-checkbox>
-              </a-form-item>
-
-              <a-form-item label="获取API Key" extra="如果没有高德地图API Key，可以点击下面的链接获取">
-                <a-button type="link" @click="openAmapConsole">前往高德开放平台</a-button>
-              </a-form-item>
-            </a-form>
-          </a-card>
-        </a-tab-pane>
       </a-tabs>
 
       <!-- 操作按钮 -->
@@ -323,21 +257,6 @@ const homeTexts = ref({
   descTextOther: '',
   siteStart: null,
   siteIcp: ''
-})
-
-// 音乐配置
-const musicConfig = ref({
-  apiUrl: '',
-  server: 'tencent',
-  type: 'playlist',
-  songId: '',
-  enabled: true
-})
-
-// 天气配置
-const weatherConfig = ref({
-  amapKey: '',
-  enabled: true
 })
 
 // 数组移动方法
@@ -444,11 +363,6 @@ const previewHomePage = () => {
   window.open('https://xiangleideng.site/', '_blank')
 }
 
-// 打开高德控制台
-const openAmapConsole = () => {
-  window.open('https://console.amap.com/dev/index', '_blank')
-}
-
 // 保存配置的辅助函数
 const saveConfig = async (label, content, type = 'JSON') => {
   try {
@@ -496,12 +410,6 @@ const saveAllConfigurations = async () => {
     }
     await saveConfig('home-texts', homeTextsToSave)
 
-    // 保存音乐配置
-    await saveConfig('music-config', musicConfig.value)
-
-    // 保存天气配置
-    await saveConfig('weather-config', weatherConfig.value)
-
     message.success('所有配置保存成功！')
   } catch (error) {
     message.error('保存失败: ' + error.message)
@@ -534,12 +442,6 @@ const loadConfigurations = async () => {
               }
               break
             }
-            case 'music-config':
-              musicConfig.value = JSON.parse(config.content)
-              break
-            case 'weather-config':
-              weatherConfig.value = JSON.parse(config.content)
-              break
           }
         } catch (e) {
           console.warn(`解析配置 ${config.label} 失败:`, e)
@@ -558,55 +460,31 @@ const initializeDefaults = () => {
   // 网站链接默认值
   if (siteLinks.value.length === 0) {
     siteLinks.value = [
-      { name: '博客', link: 'https://xiangleideng.site/blog', icon: 'Blog' },
-      { name: '网盘', link: 'https://xiangleideng.site/', icon: 'Cloud' },
-      { name: '音乐', link: 'https://xiangleideng.site/', icon: 'CompactDisc' },
-      { name: '起始页', link: 'https://xiangleideng.site/', icon: 'Compass' },
-      { name: '网址集', link: 'https://xiangleideng.site/', icon: 'Book' },
-      { name: '今日热榜', link: 'https://xiangleideng.site/', icon: 'Fire' },
-      { name: '站点监测', link: 'https://xiangleideng.site/', icon: 'LaptopCode' }
+      { name: '理想国文学网', link: 'https://litopia.space', icon: 'Cloud' },
+      { name: '创业OS', link: 'https://finlaw.cloud', icon: 'Fire' },
+      { name: 'GitHub', link: 'https://github.com/Xaiver03/', icon: 'Compass' },
+      { name: '公众号', link: '#wechat-qr', type: 'qr', icon: 'LaptopCode' },
     ]
   }
 
   // 社交链接默认值
   if (socialLinks.value.length === 0) {
     socialLinks.value = [
-      { name: 'GitHub', url: 'https://github.com/', icon: '/images/social/github.png', tip: '我的 GitHub' },
-      { name: '微信', url: '#', icon: '/images/social/wechat.png', tip: '微信联系我' },
-      { name: 'QQ', url: '#', icon: '/images/social/qq.png', tip: 'QQ联系我' }
+      { name: 'GitHub', url: 'https://github.com/Xaiver03', icon: '/images/social/github.png', tip: '我的 GitHub' },
     ]
   }
 
   // 主页文案默认值
   if (!homeTexts.value.siteName) {
     homeTexts.value = {
-      siteName: '邓湘雷の主页',
+      siteName: '灯下灯',
       siteAuthor: 'Xaiver/灯下灯',
       helloText: 'Hello World !',
       helloOther: 'Oops !',
-      descText: '一点浩然气，千里快哉风',
+      descText: '把生活和思考，留在能慢慢阅读的地方。',
       descTextOther: '哎呀，这都被你发现了（ 再点击一次可关闭 ）',
-      siteStart: dayjs('2025-10-18'),
+      siteStart: dayjs('2024-07-06'),
       siteIcp: '湘ICP备2026026942号-1'
-    }
-  }
-
-  // 音乐配置默认值
-  if (!musicConfig.value.apiUrl) {
-    musicConfig.value = {
-      apiUrl: 'https://xiangleideng.site/music',
-      server: 'tencent',
-      type: 'playlist',
-      songId: '9597130897',
-      enabled: true
-    }
-  }
-
-  // 天气配置默认值
-  if (!weatherConfig.value.amapKey) {
-    weatherConfig.value = {
-      amapKey: 'cd5b9380bb4544201fb884a67418a7b8',
-      enabled: true
     }
   }
 }

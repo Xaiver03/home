@@ -34,11 +34,39 @@ const search = () => {
     });
 };
 
+// --分类筛选模块--
+const selectedCategoryId = ref('all');
+const categories = ref([]);
+const selectCategory = (categoryId) => {
+  if (selectedCategoryId.value === categoryId) return;
+  selectedCategoryId.value = categoryId;
+  searchOrNot.value = false;
+  searchContent.value = '';
+  currentPage.value = 1;
+  articleList.value = [];
+  if (categoryId === 'all') {
+    getArticleList();
+  } else {
+    getArticlesByCategory();
+  }
+};
+const getArticlesByCategory = () => {
+  api
+    .getArticleByTypeId(selectedCategoryId.value, currentPage.value, pageSize.value)
+    .then((res) => {
+      total.value = res.count;
+      for (let row of res.rows) {
+        row.createTime = utils.formatDate(row.createTime);
+      }
+      articleList.value.push(...res.rows);
+    });
+};
+
 // --列表模块--
 const total = useState('total', () => 0);
 const currentPage = useState('currentPage', () => route.params.page);
 const pageSize = useState('pageSize', () => 10);
-// 服务端 - 获取文章列表
+// 服务端 - 获取文章列表和分类
 const { data: articleList, error: articleListError } = await useAsyncData(
   'getArticleList',
   async () => {
@@ -59,6 +87,16 @@ const { data: articleList, error: articleListError } = await useAsyncData(
       });
   },
 );
+const { data: categoryData } = await useAsyncData(
+  'getCategories',
+  async () => {
+    const list = await api.getAllArticleTypes();
+    return (list || []).filter((item) => Number.isInteger(Number(item?.id)) && item?.theme);
+  },
+);
+if (categoryData.value) {
+  categories.value = categoryData.value;
+}
 const getArticleList = () => {
   // 获取文章列表
   api
@@ -78,10 +116,11 @@ const getMore = () => {
   // 获取更多文章
   currentPage.value++;
   if (searchOrNot.value) {
-    // 判断是否搜索
-    search(); // 继续搜索更多文章
+    search();
+  } else if (selectedCategoryId.value !== 'all') {
+    getArticlesByCategory();
   } else {
-    getArticleList(); // 查看更多默认文章
+    getArticleList();
   }
 };
 </script>
@@ -108,6 +147,29 @@ const getMore = () => {
         </template>
       </a-input-search>
     </div>
+
+    <!-- 分类筛选 -->
+    <div v-if="categories.length" class="category-filter">
+      <button
+        class="category-chip"
+        :class="{ active: selectedCategoryId === 'all' }"
+        type="button"
+        @click="selectCategory('all')"
+      >
+        全部
+      </button>
+      <button
+        v-for="cat in categories"
+        :key="cat.id"
+        class="category-chip"
+        :class="{ active: selectedCategoryId === String(cat.id) }"
+        type="button"
+        @click="selectCategory(String(cat.id))"
+      >
+        {{ cat.theme }}
+      </button>
+    </div>
+
     <RepeatEmptyPlaceholder :dataReady="Boolean(articleList)" :dataShow="articleList?.length > 0">
       <div id="list" class="blog-list-stack">
         <nuxt-link
@@ -144,6 +206,51 @@ const getMore = () => {
   .search-panel {
     padding: 1rem;
     max-width: 52rem;
+  }
+
+  .category-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+    margin: 1.2rem 0 2rem;
+    padding: 0.55rem;
+    background: $surface-glass-strong;
+    border: 1px solid $surface-border;
+    border-radius: $radius-control;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 84%);
+    backdrop-filter: blur(1rem) saturate(145%);
+  }
+
+  .category-chip {
+    min-height: 2.6rem;
+    padding: 0 1rem;
+    color: $secondary-text-color;
+    font: inherit;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: transparent;
+    border: 0;
+    border-radius: $radius-control;
+    cursor: pointer;
+    transition:
+      color 180ms ease,
+      background 180ms ease,
+      transform 180ms ease;
+
+    &:hover {
+      color: $main-text-color;
+      background: $surface-hover;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &.active {
+      color: $surface-glass-strong;
+      background: $main-text-color;
+    }
   }
 }
 </style>
