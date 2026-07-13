@@ -1,47 +1,60 @@
 <script setup>
 definePageMeta({
-  layout: 'classics'
-})
+  layout: 'classics',
+});
 const config = useRuntimeConfig();
 // 获取所有文章类别
-const { data: dataList, error: getCategoriesError } = await useAsyncData('getCategories', async () =>
-  await api.getAllArticleTypes().then(res => {
-    return res
-  })
-)
+const { data: dataList, error: getCategoriesError } = await useAsyncData(
+  'getCategories',
+  async () =>
+    await api.getAllArticleTypes().then((res) => {
+      return res;
+    }),
+);
 </script>
 
 <template>
-  <div id="log-category" class="content-box">
-    <div class="flex my-8 justify-between items-center">
-      <h2 id="title" class="mx-8">{{ '📁文章类目' }}</h2>
-    </div>
+  <main id="log-category" class="content-box blog-page-shell">
+    <header class="blog-section-head">
+      <div>
+        <span class="blog-eyebrow">Archive map</span>
+        <h1>文章类目</h1>
+      </div>
+      <p>按主题进入不同写作脉络。类目封面缺失时会使用站点默认图，不影响阅读入口。</p>
+    </header>
     <RepeatEmptyPlaceholder :dataReady="Boolean(dataList)" :dataShow="dataList?.length > 0">
-      <nuxt-link class="w-full" :to="`/log/category/${item.id}`" v-for="item in dataList" :key="item.id">
-        <RepeatDataCard class="m-6 w-full h-96 overflow-hidden"
-          :imagePath="`${config.public.ossUrl}/image/articleTypeCover/${item.id}.png`" :data="item" :dataOption="{
-            mainAttribute: 'theme',
-            secondAttribute: 'introduction',
-            additional: {
-              icon: '🕘',
-              attribute: 'createTime'
-            }
-          }" v-motion :initial="{ opacity: 0, x: 100 }" :visibleOnce="{
-          opacity: 1, x: 0, transition: {
-            duration: 300,
-          },
-        }" />
-      </nuxt-link>
+      <div class="blog-list-stack">
+        <nuxt-link
+          class="blog-card-link"
+          :to="`/log/category/${item.id}`"
+          v-for="item in dataList"
+          :key="item.id"
+        >
+          <RepeatDataCard
+            :imagePath="`${config.public.ossUrl}/image/articleTypeCover/${item.id}.png`"
+            :data="item"
+            :dataOption="{
+              mainAttribute: 'theme',
+              secondAttribute: 'introduction',
+              additional: {
+                icon: '整理于',
+                attribute: 'createTime',
+              },
+            }"
+            v-motion
+            :initial="{ opacity: 0, y: 18 }"
+            :visibleOnce="{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 280,
+              },
+            }"
+          />
+        </nuxt-link>
+      </div>
     </RepeatEmptyPlaceholder>
-  </div>
+  </main>
 </template>
 
-<style lang="scss" scoped>
-#log-category {
-
-  #title {
-    font-size: $x-large-font-size;
-    font-weight: $large-font-weight;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

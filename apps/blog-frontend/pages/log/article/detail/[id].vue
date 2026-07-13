@@ -11,18 +11,20 @@ definePageMeta({
 });
 
 // 获取文章数据以及文章内容
-const { data: articleData, error: articleError } = await useAsyncData('getArticleDetail', async () => {
-  const id = route.params.id;
-  return await api.getArticleContentById(id).then(res => {
-    if (res && res.code === 200) {
-      return {
-        mdContent: res.data.content,
-        ...res.data.article,
-      };
-    }
-    return null;
-  });
-},
+const { data: articleData, error: articleError } = await useAsyncData(
+  'getArticleDetail',
+  async () => {
+    const id = route.params.id;
+    return await api.getArticleContentById(id).then((res) => {
+      if (res && res.code === 200) {
+        return {
+          mdContent: res.data.content,
+          ...res.data.article,
+        };
+      }
+      return null;
+    });
+  },
 );
 useHead({
   title: `${articleData.value?.topic} 【 邓湘雷的博客 】`,
@@ -33,25 +35,32 @@ useHead({
     },
   ],
 });
-const getArticleType = (typeId) => { // 获取文章类别数据
+const getArticleType = (typeId) => {
+  // 获取文章类别数据
   if (!typeId || !articleData.value) return;
-  api.getArticleTypeById(typeId).then(res => {
+  api.getArticleTypeById(typeId).then((res) => {
     if (articleData.value) {
       articleData.value.typeTheme = res?.theme || '';
     }
   });
 };
-watch(() => articleData.value?.typeId, (typeId) => { // 监听文章类目变化
-  getArticleType(typeId);
-  if (import.meta.client && window) {
-    window.scrollTo(0, 0); // 滚动到页面顶部
-  }
-}, {
-  immediate: true,
-});
+watch(
+  () => articleData.value?.typeId,
+  (typeId) => {
+    // 监听文章类目变化
+    getArticleType(typeId);
+    if (import.meta.client && window) {
+      window.scrollTo(0, 0); // 滚动到页面顶部
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 const headerTopicRef = ref(null);
 const headerIntroductionRef = ref(null);
-const showIntroductionOrNot = (showOrNot) => { // 控制文章标题和简介的显示/隐藏
+const showIntroductionOrNot = (showOrNot) => {
+  // 控制文章标题和简介的显示/隐藏
   if (showOrNot) {
     headerTopicRef.value.style.opacity = '0';
     headerTopicRef.value.style.height = '0';
@@ -87,7 +96,8 @@ const statementData = ref([
     attribute: 'typeTheme',
   },
 ]);
-const goTo = (url, $event) => { // 跳转到其他网站
+const goTo = (url, $event) => {
+  // 跳转到其他网站
   $event.stopPropagation();
   window.open(url, '_blank');
 };
@@ -95,30 +105,36 @@ const goTo = (url, $event) => { // 跳转到其他网站
 
 // #region 操作模块
 const like = ref(false); // 标记是否喜欢
-const likeEvent = () => { // 喜欢文章事件
-  api.likeArticleById(articleData.value.id).then(res => {
+const likeEvent = () => {
+  // 喜欢文章事件
+  api.likeArticleById(articleData.value.id).then((res) => {
     if (utils.analysisData(res)) {
       like.value = true;
       articleData.value.like += 1;
     }
   });
 };
-const shareEvent = () => { // 分享文章url事件
+const shareEvent = () => {
+  // 分享文章url事件
   const url = window.location.href;
-  const prompt = () => { // 提示成功函数
+  const prompt = () => {
+    // 提示成功函数
     notification.open({
       message: '🔗复制连接成功',
-      description: '分享给小伙伴叭，但请务必尊重本文的版权协议📍',
+      description: '分享给小伙伴，但请务必尊重本文的版权协议。',
       placement: 'top',
       duration: 3,
     });
   };
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(() => {
-      prompt();
-    }).catch(err => {
-      console.error('复制失败:', err);
-    });
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        prompt();
+      })
+      .catch((err) => {
+        console.error('复制失败:', err);
+      });
   } else {
     // 处理不支持 clipboard API 的情况
     const textarea = document.createElement('textarea');
@@ -139,7 +155,8 @@ const shareEvent = () => { // 分享文章url事件
     document.body.removeChild(textarea);
   }
 };
-const showReward = () => { // 显示打赏事件
+const showReward = () => {
+  // 显示打赏事件
   notification.open({
     message: '📌提示',
     description: '打赏功能还在开发中，感谢支持😘',
@@ -165,58 +182,71 @@ const commentListReady = ref(false); // 拿到评论列表状态量
  * @param  { Boolean } init 是否是评论区初始化(pageSize=10,currentPage=1)，默认false
  */
 const getCommentData = (init = false) => {
-  api.getComment({
-    entityType: 'Article',
-    entityId: router.currentRoute.value.query.id,
-    currentPage: init ? 1 : currentCommentPage.value++,
-    pageSize: init ? 10 : pageSize.value,
-  }).then(res => {
-    if (init) {
-      commentList.value = res.rows;
-    } else {
-      commentList.value.push(...res.rows);
-    }
-    commentTotal.value = res.count;
-    commentListReady.value = true; // 已获取内容
-  });
+  api
+    .getComment({
+      entityType: 'Article',
+      entityId: router.currentRoute.value.query.id,
+      currentPage: init ? 1 : currentCommentPage.value++,
+      pageSize: init ? 10 : pageSize.value,
+    })
+    .then((res) => {
+      if (init) {
+        commentList.value = res.rows;
+      } else {
+        commentList.value.push(...res.rows);
+      }
+      commentTotal.value = res.count;
+      commentListReady.value = true; // 已获取内容
+    });
 };
 const commentBar = ref(null);
-const commentBarScroll = () => { // 评论区滚动的事件监听
-  if (commentBar.value.scrollTop + commentBar.value.clientHeight >= commentBar.value.scrollHeight - 200 && commentList.value.length < commentTotal.value) {
+const commentBarScroll = () => {
+  // 评论区滚动的事件监听
+  if (
+    commentBar.value.scrollTop + commentBar.value.clientHeight >=
+      commentBar.value.scrollHeight - 200 &&
+    commentList.value.length < commentTotal.value
+  ) {
     getCommentData();
   }
 };
 const submittingCommentLoading = ref(false); // 正在提交评论状态量
-const submitComment = () => { // 提交评论
+const submitComment = () => {
+  // 提交评论
   submittingCommentLoading.value = true;
-  api.addComment({
-    entityId: router.currentRoute.value.query.id,
-    ...currentComment,
-  }).then(res => {
-    if (utils.analysisData(res)) {
-      currentComment.content = null;
-      currentComment.parentId = null;
-      pushNewDataInCommentList(res.data);
-    }
-    submittingCommentLoading.value = false;
-  });
+  api
+    .addComment({
+      entityId: router.currentRoute.value.query.id,
+      ...currentComment,
+    })
+    .then((res) => {
+      if (utils.analysisData(res)) {
+        currentComment.content = null;
+        currentComment.parentId = null;
+        pushNewDataInCommentList(res.data);
+      }
+      submittingCommentLoading.value = false;
+    });
   // TODO 评论上传图片相关逻辑
 };
-const pushNewDataInCommentList = async (newData) => { // 将新数据添加到list
+const pushNewDataInCommentList = async (newData) => {
+  // 将新数据添加到list
   newData.childrenCount = 0;
   newData.userId = userData.id;
   newData.user = {
     id: userData.id,
     name: userData.name,
   };
-  if (!utils.isNullOrEmpty(newData.parentId)) { // 若是子级评论
-    const parentComment = commentList.value.find(comment => comment.id == newData.parentId);
+  if (!utils.isNullOrEmpty(newData.parentId)) {
+    // 若是子级评论
+    const parentComment = commentList.value.find((comment) => comment.id == newData.parentId);
     await switchChildComment(parentComment, true); // 获取所有子评论
     if (parentComment.childrenCount <= 0) {
       parentComment.childrenCount = 1;
     }
     parentComment.childCommentShowStatus = true;
-  } else { // 若是顶级评论
+  } else {
+    // 若是顶级评论
     commentList.value.unshift(newData);
   }
 };
@@ -226,41 +256,49 @@ const pushNewDataInCommentList = async (newData) => { // 将新数据添加到li
  * @param {Boolean} refresh 是否刷新数据，默认false
  */
 const switchChildComment = async (comment, refresh = false) => {
-  if (utils.isNullOrEmpty(comment.childCommentList) || refresh) { // 第一次获取
-    await api.getSubComment({ id: comment.id }).then(res => {
+  if (utils.isNullOrEmpty(comment.childCommentList) || refresh) {
+    // 第一次获取
+    await api.getSubComment({ id: comment.id }).then((res) => {
       comment.childCommentList = res.rows;
       comment.childCommentShowStatus = true;
     });
-  } else { // 显示
+  } else {
+    // 显示
     comment.childCommentShowStatus = !comment.childCommentShowStatus;
   }
 };
 // 在评论列表中查询评论的用户名
 const currentParentCommentContent = computed(() => {
-  if (utils.isNullOrEmpty(currentComment.parentId)) return {
-    userName: '未知用户',
-    commentContent: null,
-  };
+  if (utils.isNullOrEmpty(currentComment.parentId))
+    return {
+      userName: '未知用户',
+      commentContent: null,
+    };
   let comment = null;
-  commentFor:
-  for (const item of commentList.value) {
-    if (currentComment.subUserId) { // 若找的是二级评论
+  commentFor: for (const item of commentList.value) {
+    if (currentComment.subUserId) {
+      // 若找的是二级评论
       if (item.childCommentList && item.childCommentList.length > 0) {
         for (const childItem of item.childCommentList) {
-          if (childItem.parentId == currentComment.parentId && childItem.userId == currentComment.subUserId) {
+          if (
+            childItem.parentId == currentComment.parentId &&
+            childItem.userId == currentComment.subUserId
+          ) {
             comment = childItem;
             break commentFor; // 跳出整个循环
           }
         }
       }
-    } else { // 找的是一级评论
+    } else {
+      // 找的是一级评论
       if (item.id == currentComment.parentId) {
         comment = item;
         break;
       }
     }
   }
-  if (comment?.userId == -1) { // 管理员
+  if (comment?.userId == -1) {
+    // 管理员
     return {
       userName: store.$state.config['my-name']?.content,
       commentContent: comment.content,
@@ -279,14 +317,16 @@ const addEmoji = (emoji) => {
     currentComment.content = emoji;
   }
 };
-const likeComment = (comment) => { // 喜欢评论
-  api.likeComment(comment.id).then(res => {
+const likeComment = (comment) => {
+  // 喜欢评论
+  api.likeComment(comment.id).then((res) => {
     if (utils.analysisData(res)) {
       comment.like += 1;
     }
   });
 };
-const getImageFileUrl = (fileObj) => { // 生成并得到文件URL
+const getImageFileUrl = (fileObj) => {
+  // 生成并得到文件URL
   let url = null;
   if (fileObj?.originFileObj) {
     url = URL.createObjectURL(fileObj.originFileObj); // 创建临时 URL
@@ -296,13 +336,17 @@ const getImageFileUrl = (fileObj) => { // 生成并得到文件URL
 // #endregion
 
 let userData = reactive({}); // 登录用户数据
-const getUserData = () => { // 获取用户数据
+const getUserData = () => {
+  // 获取用户数据
   const token = utils.getCookie('token');
-  if (!utils.isNullOrEmpty(token)) { // 若登录了
-    api.getUserDataByToken().then(res => {
-      if (utils.analysisData(res, false)) { // 信息获取成功
+  if (!utils.isNullOrEmpty(token)) {
+    // 若登录了
+    api.getUserDataByToken().then((res) => {
+      if (utils.analysisData(res, false)) {
+        // 信息获取成功
         Object.assign(userData, res.data);
-      } else { // 信息获取失败
+      } else {
+        // 信息获取失败
         utils.removeCookie('token'); // 去除token
         userData = {};
       }
@@ -316,99 +360,67 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    id="log-page"
-    class="content-box"
-  >
+  <div id="log-page" class="content-box blog-page-shell">
     <!-- 顶部文章卡片 -->
-    <a-card
+    <article
       id="log-header"
-      class="my-8 rounded-2xl relative"
-      hoverable
+      class="blog-glass-panel"
       @mouseenter="showIntroductionOrNot(true)"
       @mouseleave="showIntroductionOrNot(false)"
     >
-      <div class="header h-full w-full bg-contain flex flex-col">
-        <div class="z1 text-right">
-          <span class="mx-4 text-lg">💓 {{ articleData?.like }}</span>
-          <span class="mx-4 text-lg">🔥 {{ articleData?.popularity }}</span>
+      <div class="header">
+        <div class="article-kicker">
+          <span>{{ articleData?.typeTheme || 'Writing' }}</span>
+          <span>{{ utils.formatDate(articleData?.createTime) }}</span>
         </div>
-        <h1
-          ref="headerTopicRef"
-          class="topic flex flex-auto justify-center z1 items-center text-center"
-        >
-          {{
-            articleData?.topic
-          }}
+        <h1 ref="headerTopicRef" class="topic">
+          {{ articleData?.topic }}
         </h1>
-        <h2
-          ref="headerIntroductionRef"
-          class="introduction z1 flex flex-auto justify-center items-center text-center"
-        >
-          {{
-            articleData?.introduction
-          }}
+        <h2 ref="headerIntroductionRef" class="introduction">
+          {{ articleData?.introduction }}
         </h2>
-        <div class="z1 text-lg">
-          🕘 {{ utils.formatDate(articleData?.createTime) }}
+        <div class="article-stats">
+          <span>喜欢 {{ articleData?.like }}</span>
+          <span>阅读 {{ articleData?.popularity }}</span>
         </div>
       </div>
-      <div
-        id="image-box"
-        class="absolute top-0 left-0 w-full h-full rounded-2xl overflow-hidden"
-      >
+      <div id="image-box">
         <img
           :src="`${config.public.ossUrl}/image/articleCover/${articleData?.id}.png`"
-          class="h-full w-full"
+          :alt="articleData?.topic"
           :preview="false"
         />
-        <div
-          id="inner"
-          class="absolute top-0 left-0 w-full h-full"
-        ></div>
       </div>
-    </a-card>
+    </article>
     <!-- 文章内容 -->
-    <div
-      id="log-content"
-      class="flex my-8"
-    >
-      <RepeatEmptyPlaceholder
-        :data-show="articleData?.mdContent.length > 0"
-        class="w-full"
-      >
+    <div id="log-content" class="blog-glass-panel">
+      <RepeatEmptyPlaceholder :data-show="articleData?.mdContent?.length > 0" class="w-full">
         <RepeatMdPreView :md-content="articleData?.mdContent" />
       </RepeatEmptyPlaceholder>
     </div>
     <!-- 版权 -->
-    <div
-      id="statement-bar"
-      class="my-8 mx-auto p-8 flex flex-col relative overflow-hidden"
-    >
-      <div class="my-4 mx-4">
+    <div id="statement-bar" class="blog-glass-panel">
+      <div class="statement-title">
         {{ articleData?.topic }}
       </div>
-      <ul class="flex flex-row flex-wrap">
-        <li
-          v-for="item in statementData"
-          :key="item.name"
-          class="m-4"
-        >
+      <ul>
+        <li v-for="item in statementData" :key="item.name">
           <p>{{ item.name }}</p>
           <p>
-            {{ item.time ? utils.formatDate(articleData?.[item.attribute]) : articleData?.[item.attribute] }}
+            {{
+              item.time
+                ? utils.formatDate(articleData?.[item.attribute])
+                : articleData?.[item.attribute]
+            }}
           </p>
         </li>
-        <li class="m-4">
+        <li>
           <p>作者</p>
           <p>{{ articleAuthor }}</p>
         </li>
-        <li class="m-4">
+        <li>
           <p>版权协议</p>
-          <div
-            id="copyright"
-            class="flex flex-row"
-          >
+          <div id="copyright">
             <p
               class="iconfont icon-creativecommonssharealike"
               title="Creative Commons"
@@ -432,48 +444,33 @@ onMounted(() => {
           </div>
         </li>
       </ul>
-      <div
-        id="statement-bgc"
-        class="rounded-full absolute flex justify-center items-center"
-      >
-        <span>cc</span>
-      </div>
     </div>
     <!-- 操作 -->
-    <div
-      id="action-bar"
-      class="flex justify-center items-center my-32"
-    >
-      <a-tooltip
-        placement="bottom"
-        title="🍬点个赞鼓励一下"
-      >
-        <p
+    <div id="action-bar">
+      <a-tooltip placement="bottom" title="喜欢这篇文章">
+        <button
           :id="like ? 'active' : ''"
-          class="icon iconfont icon-dianzan rounded-full mx-8 text-center"
+          class="icon iconfont icon-dianzan blog-action"
           title="点赞"
+          type="button"
           @click="likeEvent"
-        ></p>
+        ></button>
       </a-tooltip>
-      <a-tooltip
-        placement="bottom"
-        title="🍻给隔壁老铁看看"
-      >
-        <p
-          class="icon iconfont icon-fenxiang rounded-full mx-8 text-center"
+      <a-tooltip placement="bottom" title="复制文章链接">
+        <button
+          class="icon iconfont icon-fenxiang blog-action"
           title="分享"
+          type="button"
           @click="shareEvent"
-        ></p>
+        ></button>
       </a-tooltip>
-      <a-tooltip
-        placement="bottom"
-        title="🍭打赏功能开发中~感谢好意"
-      >
-        <p
-          class="icon iconfont icon-liwu rounded-full mx-8 text-center"
+      <a-tooltip placement="bottom" title="打赏功能开发中">
+        <button
+          class="icon iconfont icon-liwu blog-action"
           title="打赏"
+          type="button"
           @click="showReward"
-        ></p>
+        ></button>
       </a-tooltip>
       <!-- <a-popover :overlay-inner-style="{ padding: 0 }">
                 <template #content>
@@ -643,216 +640,251 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 #log-page {
+  // 文章头部
+  #log-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(26rem, 0.8fr);
+    gap: 3rem;
+    min-height: 34rem;
+    padding: clamp(2.4rem, 5vw, 5rem);
+    overflow: hidden;
+    color: $main-text-color;
 
-    // 文章头部
-    #log-header {
-        height: 30rem;
-        background-color: $main-car-color;
-        color: #fff;
+    .header {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      gap: 2rem;
 
-        .header {
-            .z1 {
-                z-index: 2;
-            }
+      .article-kicker,
+      .article-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 1.6rem;
+        color: $secondary-text-color;
+        font-size: 1.25rem;
+        font-weight: 760;
+      }
 
-            .topic,
-            .introduction {
-                font-size: $medium-font-size;
-                transition: all .5s;
-                overflow: hidden;
-            }
+      .topic,
+      .introduction {
+        margin: 0;
+        transition:
+          opacity 0.28s ease,
+          height 0.28s ease;
+        overflow: hidden;
+        text-wrap: balance;
+      }
 
-            .topic {
-                opacity: 1;
-                height: auto;
-            }
+      .topic {
+        opacity: 1;
+        height: auto;
+        font-size: clamp(3.6rem, 7vw, 7.8rem);
+        line-height: 1.02;
+        font-weight: 880;
+        letter-spacing: -0.025em;
+      }
 
-            .introduction {
-                opacity: 0;
-                height: 0;
-            }
-        }
-
-        #image-box {
-            z-index: 1;
-            background-color: $main-background-color;
-
-            img {
-                object-fit: cover;
-            }
-
-            #inner {
-                background: rgba(0, 0, 0, 0.5);
-                backdrop-filter: blur(5px);
-            }
-        }
+      .introduction {
+        opacity: 0;
+        height: 0;
+        color: $secondary-text-color;
+        font-size: clamp(2.2rem, 4vw, 4rem);
+        line-height: 1.35;
+        font-weight: 720;
+      }
     }
 
-    // 文章内容
-    #log-content,
-    #comment-bar {
-        background-color: $main-car-color;
-        border-radius: 10px;
+    #image-box {
+      align-self: stretch;
+      min-height: 26rem;
+      overflow: hidden;
+      border-radius: 8px;
+      background-color: $main-background-color;
+      box-shadow: 0 22px 70px rgba(23, 32, 29, 0.14);
 
-        .comment-time {
-            font-size: $xx-small-font-size;
-            color: $secondary-text-color;
-        }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
 
-        .reply-user-span {
-            color: $secondary-text-color;
-        }
+  // 文章内容
+  #log-content,
+  #comment-bar {
+    padding: clamp(2rem, 4vw, 5rem);
 
+    .comment-time {
+      font-size: $xx-small-font-size;
+      color: $secondary-text-color;
     }
 
-    // 版权声明
-    #statement-bar {
-        border-radius: 10px;
-        border: 1px solid $secondary-text-color;
-        background-color: $main-car-color;
+    .reply-user-span {
+      color: $secondary-text-color;
+    }
+  }
 
-        div {
-            font-size: $small-font-size;
-        }
+  // 版权声明
+  #statement-bar {
+    padding: 2.2rem;
+    overflow: hidden;
 
-        ul {
-            font-size: $xx-small-font-size;
-        }
-
-        #copyright p {
-            cursor: $hover-cursor;
-            margin: 5px;
-        }
-
-        #statement-bgc {
-            height: 30rem;
-            width: 30rem;
-            border: 3rem solid $secondary-text-color;
-            right: -5rem;
-            top: -7rem;
-            opacity: .4;
-            animation: gradientAnimation 5s linear infinite;
-
-            span {
-                font-size: 15rem;
-                font-weight: $large-font-weight;
-            }
-
-        }
+    .statement-title {
+      margin-bottom: 1.6rem;
+      font-size: 1.8rem;
+      font-weight: 800;
     }
 
-    // 操作
-    #action-bar {
-        .icon {
-            font-size: $medium-font-size;
-            color: $main-text-color;
-            border: 1px solid $main-text-color;
-            height: 5rem;
-            width: 5rem;
-            line-height: 5rem;
-            cursor: $hover-cursor;
-            transition: all .3s;
-
-            &:hover {
-                color: $main-color;
-                border-color: $main-color;
-            }
-        }
-
-        #active {
-            color: $main-color;
-            border-color: $main-color;
-        }
+    ul {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.2rem;
+      margin: 0;
+      color: $secondary-text-color;
+      font-size: 1.25rem;
+      list-style: none;
     }
 
-    // # 评论区
-    #comment-bar {
+    li p:first-child {
+      margin-bottom: 0.4rem;
+      color: $main-text-color;
+      font-weight: 800;
+    }
+
+    #copyright {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    #copyright p {
+      cursor: $hover-cursor;
+      margin: 0;
+      font-size: 1.8rem;
+    }
+  }
+
+  // 操作
+  #action-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 3rem 0 5rem;
+
+    .icon {
+      min-width: 5rem;
+      width: 5rem;
+      padding: 0;
+      font-size: 2rem;
+      color: $main-text-color;
+      cursor: $hover-cursor;
+
+      &:hover {
+        color: $main-color;
+      }
+    }
+
+    #active {
+      color: $main-color;
+      border-color: $main-color;
+    }
+  }
+
+  // # 评论区
+  #comment-bar {
+    font-size: $medium-font-size;
+
+    .comment-list {
+      max-height: 70vh;
+
+      /* 定义滚动条整体样式 */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .comment-content {
+      font-size: $small-font-size;
+    }
+  }
+
+  #replyObj {
+    font-size: $x-small-font-size;
+
+    p {
+      color: $secondary-text-color;
+      /* 禁止换行 */
+      white-space: nowrap;
+      /* 隐藏超出部分 */
+      overflow: hidden;
+      /* 使用省略号表示超出部分 */
+      text-overflow: ellipsis;
+    }
+
+    // 回复相关评论的关闭按钮
+    .anticon-close {
+      background-color: $main-background-color;
+      color: $main-text-color;
+      border-radius: 50%;
+      cursor: $hover-cursor;
+    }
+  }
+
+  .submit-comment-bar {
+    border-radius: 20px;
+    border: 1px solid $secondary-text-color;
+
+    #submit-bar {
+      font-size: $medium-font-size;
+
+      * {
+        cursor: $hover-cursor;
+      }
+
+      .font-size-medium {
         font-size: $medium-font-size;
-
-        .comment-list {
-            max-height: 70vh;
-
-            /* 定义滚动条整体样式 */
-            &::-webkit-scrollbar {
-                display: none;
-            }
-
-        }
-
-        .comment-content {
-            font-size: $small-font-size;
-        }
+        color: $main-text-color;
+      }
     }
-
-    #replyObj {
-        font-size: $x-small-font-size;
-
-        p {
-            color: $secondary-text-color;
-            /* 禁止换行 */
-            white-space: nowrap;
-            /* 隐藏超出部分 */
-            overflow: hidden;
-            /* 使用省略号表示超出部分 */
-            text-overflow: ellipsis;
-        }
-
-        // 回复相关评论的关闭按钮
-        .anticon-close {
-            background-color: $main-background-color;
-            color: $main-text-color;
-            border-radius: 50%;
-            cursor: $hover-cursor;
-        }
-
-    }
-
-    .submit-comment-bar {
-        border-radius: 20px;
-        border: 1px solid $secondary-text-color;
-
-        #submit-bar {
-            font-size: $medium-font-size;
-
-            * {
-                cursor: $hover-cursor;
-            }
-
-            .font-size-medium {
-                font-size: $medium-font-size;
-                color: $main-text-color;
-            }
-
-        }
-
-    }
-
+  }
 }
 
 .emoji-bar {
-    border-color: $secondary-text-color;
-    background-color: $secondary-car-color;
-    border-radius: 20px;
-    max-height: 30rem;
-    max-width: 60rem;
-    overflow-y: scroll;
+  border-color: $secondary-text-color;
+  background-color: $secondary-car-color;
+  border-radius: 20px;
+  max-height: 30rem;
+  max-width: 60rem;
+  overflow-y: scroll;
 
-    /* 定义滚动条整体样式 */
-    &::-webkit-scrollbar {
-        display: none;
-    }
+  /* 定义滚动条整体样式 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
-    .emoji {
-        font-size: $medium-font-size;
-        cursor: $hover-cursor;
-    }
+  .emoji {
+    font-size: $medium-font-size;
+    cursor: $hover-cursor;
+  }
 }
 
 :deep(#preview) {
-    border-radius: 20px;
+  border-radius: 8px;
 }
 
-:deep(.ant-card-body) {
-    height: 100%;
+@media (max-width: 900px) {
+  #log-page {
+    #log-header {
+      grid-template-columns: 1fr;
+    }
+
+    #statement-bar ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 }
 </style>

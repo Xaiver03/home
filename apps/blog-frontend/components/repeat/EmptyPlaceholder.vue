@@ -1,26 +1,26 @@
 <script setup>
-import { computed, useSlots } from "vue";
+import { computed, useSlots } from 'vue';
 const slots = useSlots();
 const hasEmptyIcon = computed(() => !!slots.emptyIcon);
 const hasLoadingIcon = computed(() => !!slots.loadingIcon);
 const props = defineProps({
   dataReady: {
     type: Boolean,
-    default: false
+    default: false,
   },
   dataShow: {
     type: Boolean,
-    default: true
+    default: true,
   },
   emptyText: {
     type: String,
-    default: "暂时没有内容🙌"
+    default: '暂时没有内容🙌',
   },
   loadingText: {
     type: String,
-    default: "内容正在加载中，请稍后"
+    default: '内容正在加载中，请稍后',
   },
-})
+});
 </script>
 
 <template>
@@ -28,32 +28,56 @@ const props = defineProps({
     <div v-if="dataShow">
       <slot></slot>
     </div>
-    <div v-else-if="dataReady" class="py-16">
-      <div class="flex flex-col my-24">
+    <div v-else-if="dataReady" class="empty-panel blog-glass-panel">
+      <div class="flex flex-col">
         <template v-if="!hasEmptyIcon">
-          <InboxOutlined class="text-9xl flex justify-center" />
+          <InboxOutlined class="state-icon flex justify-center" />
         </template>
         <slot v-else name="emptyIcon"></slot>
-        <p class="mt-4 text-4xl text-center">{{ props.emptyText }}</p>
+        <p>{{ props.emptyText }}</p>
       </div>
     </div>
-    <div id="loading" class="flex flex-col justify-center items-center w-full p-36" v-else>
-      <template  v-if="!hasLoadingIcon">
+    <div id="loading" class="blog-glass-panel" v-else>
+      <template v-if="!hasLoadingIcon">
         <span class="iconfont icon-diqiu"></span>
       </template>
       <slot v-else name="loadingIcon"></slot>
-      <p class="text-8xl m-16">{{ props.loadingText }}</p>
+      <p>{{ props.loadingText }}</p>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 #empty-state-box {
+  .empty-panel,
+  #loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24rem;
+    padding: 5rem 2rem;
+    color: $secondary-text-color;
+    text-align: center;
+  }
+
   .iconfont {
-    font-size: 10rem;
+    font-size: 5rem;
+  }
+
+  .state-icon {
+    font-size: 5rem;
+    margin-bottom: 1.4rem;
+  }
+
+  p {
+    margin: 1.4rem 0 0;
+    font-size: 1.6rem;
+    line-height: 1.7;
   }
 
   #loading {
+    flex-direction: column;
+
     span {
       animation: rotateAnimation 2s linear infinite;
     }
@@ -68,7 +92,7 @@ const props = defineProps({
 @keyframes rotateAnimation {
   0% {
     transform: rotate(0deg);
-    opacity: .3;
+    opacity: 0.3;
   }
 
   50% {
@@ -78,14 +102,14 @@ const props = defineProps({
 
   100% {
     transform: rotate(360deg);
-    opacity: .3;
+    opacity: 0.3;
   }
 }
 
 // loading渐变动画
 @keyframes gradientAnimation {
   0% {
-    opacity: .3;
+    opacity: 0.3;
   }
 
   50% {
@@ -93,7 +117,7 @@ const props = defineProps({
   }
 
   100% {
-    opacity: .3;
+    opacity: 0.3;
   }
 }
 </style>

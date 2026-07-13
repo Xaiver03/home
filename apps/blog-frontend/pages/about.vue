@@ -1,128 +1,144 @@
 <script setup>
 import { onMounted, computed } from 'vue';
-const store = useNuxtStore()
+const store = useNuxtStore();
 definePageMeta({
-  layout: 'classics'
-})
+  layout: 'classics',
+});
 useHead({
   script: [
-    { type: "text/javascript", src: '/TagCanvas.js' }, // 引入TagCanvas
+    { type: 'text/javascript', src: '/TagCanvas.js' }, // 引入TagCanvas
   ],
-})
+});
 
 // 从配置中获取数据的计算属性
 const basicInfo = computed(() => {
   try {
-    return store.$state.config['about-basic-info']?.content ?
-           JSON.parse(store.$state.config['about-basic-info'].content) : {}
+    return store.$state.config['about-basic-info']?.content
+      ? JSON.parse(store.$state.config['about-basic-info'].content)
+      : {};
   } catch (e) {
-    return {}
+    return {};
   }
-})
+});
 
 const socialLinks = computed(() => {
   try {
-    return store.$state.config['about-social-links']?.content ?
-           JSON.parse(store.$state.config['about-social-links'].content) : []
+    return store.$state.config['about-social-links']?.content
+      ? JSON.parse(store.$state.config['about-social-links'].content)
+      : [];
   } catch (e) {
-    return []
+    return [];
   }
-})
+});
 
 const pageTexts = computed(() => {
   try {
-    return store.$state.config['about-page-texts']?.content ?
-           JSON.parse(store.$state.config['about-page-texts'].content) : {}
+    return store.$state.config['about-page-texts']?.content
+      ? JSON.parse(store.$state.config['about-page-texts'].content)
+      : {};
   } catch (e) {
-    return {}
+    return {};
   }
-})
+});
 
 const keywordDescription = computed(() => {
-  return store.$state.config['about-keyword-description']?.content ||
-         '我的构成元素，对自己的探索希望能越来越多'
-})
+  return (
+    store.$state.config['about-keyword-description']?.content ||
+    '我的构成元素，对自己的探索希望能越来越多'
+  );
+});
 
 const finalThoughtsHint = computed(() => {
-  return store.$state.config['final-thoughts-hint']?.content ||
-         '点一点有惊喜'
-})
+  return store.$state.config['final-thoughts-hint']?.content || '点一点有惊喜';
+});
 
 // #region 词云
-const cloud = ref(null)
-const cloudInit = () => { // 生成词云
+const cloud = ref(null);
+const cloudInit = () => {
+  // 生成词云
   setTimeout(() => {
     try {
       TagCanvas.Start('cloud', 'cloud-tags', {
         textColour: '#777777',
         outlineColour: '#777777',
         dragControl: false, // 设置禁用鼠标拖动，跟着鼠标转动
-        pinchZoom: true,// 设置为true通过捏合触摸屏设备来启用放大和缩小云
+        pinchZoom: true, // 设置为true通过捏合触摸屏设备来启用放大和缩小云
         reverse: true, // 设置为true以反转相对于鼠标位置的移动方向
         textHeight: 20, // 字体大小，单位px
-        shape: "Sphere", //目前支持的是Sphere hcylinder vcylinder 分别是圆形，立着的卷发棒，躺着的卷发棒
+        shape: 'Sphere', //目前支持的是Sphere hcylinder vcylinder 分别是圆形，立着的卷发棒，躺着的卷发棒
         depth: 0.8, // 控制透视图(0.0-1.0)
         decel: 1, // 鼠标离开画布时的减速率，设置0，鼠标离开就停止，设置1，鼠标离开还一直转
         padding: 5, // 文本框的padding
         wheelZoom: true, // 使用鼠标滚轮或滚动手势可以放大和缩小云
         fadeIn: 3, // 标签淡入的时间
         freezeActive: false, // 设置为true以在突出显示标记时暂停移动，这个必须是在dragControl:false才有效
-        outlineMethod: "outline",  // 鼠标指到的元素变化类型，outline:显示边框线(有深度)，classic:显示边框线，block:改变背景颜色为边框线颜色，colour:改变颜色，颜色属性为outlineColour:'#fff'，size:改变文本大小，大小属性为outlineIncrease:20，none:不突出显示
-        outlineOffset: "5", // 轮廓与文本的距离，单位px
-        outlineRadius: "10", // 轮廓框上的圆角半径，单位px
-        outlineThickness: "3", // 轮廓的粗细，单位px
-        txtOpt: true,// 文本优化,将文本标签转换为图像以获得更好的性能
+        outlineMethod: 'outline', // 鼠标指到的元素变化类型，outline:显示边框线(有深度)，classic:显示边框线，block:改变背景颜色为边框线颜色，colour:改变颜色，颜色属性为outlineColour:'#fff'，size:改变文本大小，大小属性为outlineIncrease:20，none:不突出显示
+        outlineOffset: '5', // 轮廓与文本的距离，单位px
+        outlineRadius: '10', // 轮廓框上的圆角半径，单位px
+        outlineThickness: '3', // 轮廓的粗细，单位px
+        txtOpt: true, // 文本优化,将文本标签转换为图像以获得更好的性能
         maxSpeed: 0.05, // 最大旋转速度，设置小一点，转的慢一点
         initial: [0.1, -0.2], // 初始旋转，水平和垂直为数组，这个是鼠标未进行操控时的旋转
         hideTags: true, // 隐藏基础标签
-      })
+      });
     } catch (e) {
-      cloud.value.style.display = "none";
+      cloud.value.style.display = 'none';
     }
-  }, 1000)
-}
+  }, 1000);
+};
 // #endregion
 
-let thoughtsIndex = ref(0)
-let thoughtsInterval = null
-const getRandomIndex = (arr, excludeIndex, clearIntervalOrNot = false) => { // 取数组的随机索引，除了excludeIndex
+let thoughtsIndex = ref(0);
+let thoughtsInterval = null;
+const getRandomIndex = (arr, excludeIndex, clearIntervalOrNot = false) => {
+  // 取数组的随机索引，除了excludeIndex
   // 创建一个包含所有可能索引的数组（排除 excludeIndex）
-  const indices = arr.map((_, i) => i).filter(i => i !== excludeIndex);
+  const indices = arr.map((_, i) => i).filter((i) => i !== excludeIndex);
   // 如果没有可选索引，返回 null
   if (indices.length === 0) return null;
   // 从剩余索引中随机选择一个
   const randomIndex = Math.floor(Math.random() * indices.length);
   if (clearIntervalOrNot) {
-    clearInterval(thoughtsInterval)
+    clearInterval(thoughtsInterval);
   }
   return indices[randomIndex];
-}
+};
 
-const goTo = (url, event) => { // 跳转到新页面函数
-  event.preventDefault()
-  window.open(url, '_blank')
-}
+const goTo = (url, event) => {
+  // 跳转到新页面函数
+  event.preventDefault();
+  window.open(url, '_blank');
+};
 
 onMounted(() => {
-  cloudInit()
+  cloudInit();
   thoughtsInterval = setInterval(() => {
-    thoughtsIndex.value = getRandomIndex(store.$state.config['final-thoughts']?.content, thoughtsIndex.value)
-  }, 5000)
-})
+    thoughtsIndex.value = getRandomIndex(
+      store.$state.config['final-thoughts']?.content,
+      thoughtsIndex.value,
+    );
+  }, 5000);
+});
 
 onBeforeUnmount(() => {
-  clearInterval(thoughtsInterval)
-})
+  clearInterval(thoughtsInterval);
+});
 </script>
 
 <template>
-  <div id="about-page" class="content-box overflow-hidden">
+  <div id="about-page" class="content-box blog-page-shell overflow-hidden">
     <!-- xaiver bar -->
-    <a-card hoverable id="xaiver" class="relative">
-      <img class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2" :src="store.$state.config['my-avatar']?.content"
-        :alt="basicInfo.name || 'Avatar'" v-motion-pop-visible-once>
+    <a-card hoverable id="xaiver" class="relative blog-glass-panel">
+      <img
+        class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2"
+        :src="store.$state.config['my-avatar']?.content"
+        :alt="basicInfo.name || 'Avatar'"
+        v-motion-pop-visible-once
+      />
       <h1 class="text-center text-6xl font-bold">{{ basicInfo.name || 'Name' }}</h1>
-      <p id="description" class="text-center text-2xl font-normal my-4">{{ basicInfo.tagline || 'Tagline' }}</p>
+      <p id="description" class="text-center text-2xl font-normal my-4">
+        {{ basicInfo.tagline || 'Tagline' }}
+      </p>
       <div class="mx-auto my-8 flex justify-center items-center gap-12">
         <div
           v-for="link in socialLinks"
@@ -135,42 +151,78 @@ onBeforeUnmount(() => {
     </a-card>
 
     <!-- 关于本站 -->
-    <h1>{{ pageTexts.aboutWebTitle || '关于本站' }}<span>{{ pageTexts.aboutWebSubtitle || 'About Web📍' }}</span></h1>
-    <a-card class="card about-web-card overflow-hidden relative my-8" v-motion-fade-visible-once>
+    <h1>
+      {{ pageTexts.aboutWebTitle || '关于本站'
+      }}<span>{{ pageTexts.aboutWebSubtitle || 'About Web' }}</span>
+    </h1>
+    <a-card
+      class="card about-web-card overflow-hidden relative my-8 blog-glass-panel"
+      v-motion-fade-visible-once
+    >
       <RepeatParallaxSlide :containerClass="'describe-card'">
         <div v-for="item in store.$state.config['about-me-slide']?.content" :key="item.title">
           <div class="describe-card relative card flex flex-col justify-center items-center">
-            <img class="md:w-full absolute top-0" :src="item.image">
+            <img class="md:w-full absolute top-0" :src="item.image" />
             <h3 class="card-title text-center mb-8">{{ item.title }}</h3>
-            <p class="w-4/5 text-center my-8" v-for="text in item.text" :key="text" v-html="text">
-            </p>
+            <p
+              class="w-4/5 text-center my-8"
+              v-for="text in item.text"
+              :key="text"
+              v-html="text"
+            ></p>
           </div>
         </div>
       </RepeatParallaxSlide>
     </a-card>
 
     <!-- about me -->
-    <h1>{{ pageTexts.aboutMeTitle || '关于我' }}<span>{{ pageTexts.aboutMeSubtitle || 'About Me❓' }}</span></h1>
+    <h1>
+      {{ pageTexts.aboutMeTitle || '关于我'
+      }}<span>{{ pageTexts.aboutMeSubtitle || 'About Me' }}</span>
+    </h1>
     <!-- 渐变bar -->
-    <a-card id="gradient-card" class="card my-8 p-8 relative" v-motion-slide-visible-top>
+    <a-card
+      id="gradient-card"
+      class="card my-8 p-8 relative blog-glass-panel"
+      v-motion-slide-visible-top
+    >
       <span class="card-title absolute top-8">Hi👏🏻</span>
       <div class="card-text">{{ basicInfo.welcomeText || '🎉欢迎来到我的空间🎉' }}</div>
-      <div class="card-text">{{ basicInfo.introduction || '我是一个开发者' }}<span class="iconfont icon-infj mx-4"></span>{{ basicInfo.profession || '' }}</div>
-      <div id="INFJ-bg" class="absolute text-9xl top-8 right-8">{{ basicInfo.personality || 'INFJ' }}</div>
-      <div id="INFJ-attach" class="absolute text-9xl left-8">{{ basicInfo.personalityDesc || '提倡者' }}</div>
+      <div class="card-text">
+        {{ basicInfo.introduction || '我是一个开发者' }}<span class="iconfont icon-infj mx-4"></span
+        >{{ basicInfo.profession || '' }}
+      </div>
+      <div id="INFJ-bg" class="absolute text-9xl top-8 right-8">
+        {{ basicInfo.personality || 'INFJ' }}
+      </div>
+      <div id="INFJ-attach" class="absolute text-9xl left-8">
+        {{ basicInfo.personalityDesc || '提倡者' }}
+      </div>
     </a-card>
 
     <!-- 技能 / 生涯 -->
     <div class="flex flex-wrap">
       <div class="w-full lg:w-1/2 pr-0 lg:pr-4 my-4">
-        <a-card class="w-full card overflow-hidden flex" style="height: 60rem;" v-motion-slide-visible-left>
+        <a-card
+          class="w-full card overflow-hidden flex blog-glass-panel"
+          style="height: 60rem"
+          v-motion-slide-visible-left
+        >
           <span class="card-title">{{ pageTexts.skillTitle || '技能' }}</span>
           <div
-            class="scroll-hidden h-full w-full pb-40 my-8 flex gap-8 flex-wrap justify-start content-start flex-1 overflow-y-scroll">
-            <div v-for="item in store.$state.config['skill-item']?.content" :key="item.name"
-              :class="item.type == 'parting' ? 'w-full' : ''">
-              <a-tag class="tag py-4 p-8 flex justify-center items-center" v-if="item.type == 'tag'"
-                @click="goTo(item.url, $event)" :color="item.color">
+            class="scroll-hidden h-full w-full pb-40 my-8 flex gap-8 flex-wrap justify-start content-start flex-1 overflow-y-scroll"
+          >
+            <div
+              v-for="item in store.$state.config['skill-item']?.content"
+              :key="item.name"
+              :class="item.type == 'parting' ? 'w-full' : ''"
+            >
+              <a-tag
+                class="tag py-4 p-8 flex justify-center items-center"
+                v-if="item.type == 'tag'"
+                @click="goTo(item.url, $event)"
+                :color="item.color"
+              >
                 <template #icon>
                   <i class="mr-4" :class="`iconfont ${item.iconClass}`"></i>
                 </template>
@@ -184,19 +236,32 @@ onBeforeUnmount(() => {
         </a-card>
       </div>
       <div class="w-full lg:w-1/2 pl-0 lg:pl-4 my-4">
-        <a-card class="w-full card overflow-hidden flex" style="height: 60rem;"
-          v-motion-slide-visible-right>
+        <a-card
+          class="w-full card overflow-hidden flex blog-glass-panel"
+          style="height: 60rem"
+          v-motion-slide-visible-right
+        >
           <span class="card-title">{{ pageTexts.careerTitle || '生涯' }}</span>
           <div
-            class="scroll-hidden h-full w-full my-8 flex gap-8 flex-wrap justify-start content-start flex-1 overflow-y-scroll">
+            class="scroll-hidden h-full w-full my-8 flex gap-8 flex-wrap justify-start content-start flex-1 overflow-y-scroll"
+          >
             <a-timeline pending="加载中..." mode="alternate" reverse class="py-8">
-              <a-timeline-item class="timeline-item"
-                v-for="(item, index) in store.$state.config['career-line']?.content" :key="index">
+              <a-timeline-item
+                class="timeline-item"
+                v-for="(item, index) in store.$state.config['career-line']?.content"
+                :key="index"
+              >
                 <template #dot>
                   <div class="dot">{{ item.icon }}</div>
                 </template>
-                <div class="line-info mx-4 flex flex-col items-center"
-                  :class="(store.$state.config['career-line']?.content?.length - index - 1) % 2 == 0 ? 'text-right' : 'text-left'">
+                <div
+                  class="line-info mx-4 flex flex-col items-center"
+                  :class="
+                    (store.$state.config['career-line']?.content?.length - index - 1) % 2 == 0
+                      ? 'text-right'
+                      : 'text-left'
+                  "
+                >
                   <div class="time mx-4 flex-1 w-full">{{ item.time }}</div>
                   <div class="w-full">{{ item.label }}</div>
                 </div>
@@ -208,29 +273,53 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- 词云cloud -->
-    <a-card class="card relative my-8" v-motion-slide-visible-top>
-      <span class="card-title">{{ pageTexts.keywordTitle || '关键词🔑' }}</span>
+    <a-card class="card relative my-8 blog-glass-panel" v-motion-slide-visible-top>
+      <span class="card-title">{{ pageTexts.keywordTitle || '关键词' }}</span>
       <div id="word-cloud">
         <div class="flex justify-center items-center">
           <canvas width="600" height="350" id="cloud" ref="cloud"></canvas>
         </div>
-        <div id="cloud-tags" class="hidden" v-html="store.$state.config['about-me-cloud-tags']?.content">
-        </div>
+        <div
+          id="cloud-tags"
+          class="hidden"
+          v-html="store.$state.config['about-me-cloud-tags']?.content"
+        ></div>
         <div class="small-tips text-end">{{ keywordDescription }}</div>
       </div>
     </a-card>
 
     <!-- 写在最后 -->
-    <h1>{{ pageTexts.finalThoughtsTitle || '写在最后' }}<span>{{ pageTexts.finalThoughtsSubtitle || 'Final Thoughts💐' }}</span></h1>
-    <a-card class="card my-8 cursor-point"
-      @click="thoughtsIndex = getRandomIndex(store.$state.config['final-thoughts']?.content, thoughtsIndex, true)"
-      v-motion-slide-visible-top>
-      <p class="card-title mt-4" v-for="(item, index) in store.$state.config['final-thoughts']?.content"
-        :key="index + 'thoughts'" v-motion :initial="{ opacity: 0, y: 10 }" :visible="{
-          opacity: 1, y: 0, transition: {
+    <h1>
+      {{ pageTexts.finalThoughtsTitle || '写在最后'
+      }}<span>{{ pageTexts.finalThoughtsSubtitle || 'Final Thoughts' }}</span>
+    </h1>
+    <a-card
+      class="card my-8 cursor-point blog-glass-panel"
+      @click="
+        thoughtsIndex = getRandomIndex(
+          store.$state.config['final-thoughts']?.content,
+          thoughtsIndex,
+          true,
+        )
+      "
+      v-motion-slide-visible-top
+    >
+      <p
+        class="card-title mt-4"
+        v-for="(item, index) in store.$state.config['final-thoughts']?.content"
+        :key="index + 'thoughts'"
+        v-motion
+        :initial="{ opacity: 0, y: 10 }"
+        :visible="{
+          opacity: 1,
+          y: 0,
+          transition: {
             duration: 300,
           },
-        }" v-show="index == thoughtsIndex" v-html="item"></p>
+        }"
+        v-show="index == thoughtsIndex"
+        v-html="item"
+      ></p>
       <div class="small-tips text-end">{{ finalThoughtsHint }}</div>
     </a-card>
   </div>
@@ -238,67 +327,102 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 #about-page {
+  max-width: min(112rem, calc(100vw - 3.2rem));
+  padding-top: clamp(2.4rem, 5vw, 6.4rem);
+  color: #26332c;
 
   // xaiver bar
   #xaiver {
+    overflow: hidden;
+    border-radius: 8px;
+    text-align: center;
+
+    :deep(.ant-card-body) {
+      padding: clamp(2.4rem, 5vw, 5.6rem);
+    }
 
     &:hover img {
-      width: 25rem;
-      height: 25rem;
-      padding: .2rem;
+      transform: translateY(-2px);
     }
 
     img {
-      background-color: $main-text-color;
+      width: clamp(12rem, 20vw, 18rem) !important;
+      height: clamp(12rem, 20vw, 18rem) !important;
+      padding: 0.4rem !important;
+      border-radius: 8px !important;
+      background: rgba(255, 255, 255, 0.7);
+      object-fit: cover;
+      box-shadow: 0 18px 44px rgba(48, 69, 56, 0.16);
     }
 
     img,
     .icon {
-      transition: all .3s;
+      transition:
+        transform 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease;
     }
 
     #description {
-      color: $secondary-text-color;
+      color: rgba(55, 72, 62, 0.72);
+      font-size: clamp(1.5rem, 2vw, 1.9rem);
     }
 
     .icon {
-      font-size: $large-font-size;
-      color: $main-text-color;
-      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4.4rem;
+      height: 4.4rem;
+      border: 1px solid rgba(56, 79, 64, 0.14);
+      border-radius: 8px;
+      color: #26332c;
+      font-size: 2.2rem;
+      background: rgba(255, 255, 255, 0.52);
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.8);
 
       &:hover {
-        font-size: $x-large-font-size;
+        transform: translateY(-2px);
+        border-color: rgba(38, 51, 44, 0.32);
       }
-
     }
   }
 
   h1 {
-    font-size: $large-font-size;
-    font-weight: $large-font-weight;
-    color: $main-text-color;
-    margin: 2rem 5rem;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.2rem;
+    margin: clamp(3.2rem, 6vw, 6rem) 0 1.6rem;
+    color: #26332c;
+    font-family: ui-serif, Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.8rem, 4vw, 5rem);
+    font-weight: 650;
+    line-height: 1.04;
 
     span {
-      font-size: $x-small-font-size;
-      font-weight: $small-font-weight;
-      color: $secondary-text-color;
+      color: rgba(55, 72, 62, 0.58);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       margin-left: 1rem;
+      text-transform: uppercase;
     }
-
   }
 
   #gradient-card {
-    background: $main-color;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(241, 246, 239, 0.54)),
+      radial-gradient(circle at 18% 18%, rgba(112, 142, 115, 0.22), transparent 30%);
     overflow: hidden;
-    font-size: $x-small-font-size;
-    color: $main-background-color;
-    -webkit-box-shadow: inset 0px 0px 20px 1px $main-background-color;
-    -moz-box-shadow: inset 0px 0px 20px 1px $main-background-color;
-    box-shadow: inset 0px 0px 20px 1px $main-background-color;
+    color: #26332c;
+    box-shadow:
+      inset 0 1px rgba(255, 255, 255, 0.78),
+      0 24px 60px rgba(48, 69, 56, 0.14);
 
-    &>* {
-      opacity: .7;
+    & > * {
+      opacity: 0.92;
     }
 
     // 字体反向
@@ -309,9 +433,11 @@ onBeforeUnmount(() => {
     }
 
     .card-text {
-      text-align: center;
+      text-align: left;
       opacity: 1;
-      color: $main-text-color;
+      color: rgba(38, 51, 44, 0.84);
+      font-size: clamp(1.6rem, 2vw, 2rem);
+      line-height: 1.8;
     }
 
     &:hover #INFJ-bg {
@@ -326,9 +452,9 @@ onBeforeUnmount(() => {
     #INFJ-bg,
     #INFJ-attach {
       z-index: -1;
-      transition: all .5s;
+      transition: all 0.5s;
       font-size: 20rem;
-      opacity: .1;
+      opacity: 0.07;
     }
 
     #INFJ-attach {
@@ -336,7 +462,7 @@ onBeforeUnmount(() => {
       font-size: 15rem;
     }
 
-    @media (max-width:1020px) {
+    @media (max-width: 1020px) {
       #INFJ-bg {
         font-size: 10rem;
       }
@@ -346,11 +472,10 @@ onBeforeUnmount(() => {
         opacity: 0;
       }
     }
-
   }
 
   .about-web-card {
-    font-weight: $large-font-weight;
+    font-weight: 650;
 
     .describe-card {
       height: 40rem;
@@ -361,11 +486,11 @@ onBeforeUnmount(() => {
 
       .card-title {
         color: $main-text-color;
-        font-size: $small-font-size;
+        font-size: clamp(2rem, 3vw, 3.6rem);
         position: relative;
 
         &::after {
-          content: "";
+          content: '';
           position: absolute;
           width: 0;
           height: 2px;
@@ -384,41 +509,48 @@ onBeforeUnmount(() => {
       }
 
       p {
-        font-size: $small-font-size;
+        color: rgba(38, 51, 44, 0.76);
+        font-size: clamp(1.5rem, 2vw, 1.8rem);
         margin: 1rem auto;
       }
 
       * {
         z-index: 1;
-        opacity: .8;
+        opacity: 0.8;
       }
     }
   }
 
   .card-title {
-    font-size: $small-font-size;
-    transition: all .3s;
+    color: #26332c;
+    font-size: clamp(1.8rem, 2vw, 2.4rem);
+    font-weight: 720;
+    transition: color 0.25s ease;
   }
 
   .card {
-    color: $main-text-color;
+    color: #26332c;
+    border-radius: 8px;
 
     :deep(.ant-card-body) {
       width: 100%;
     }
 
     .tag {
-      font-size: $small-font-size;
+      border-radius: 8px;
+      font-size: 1.4rem;
       cursor: $hover-cursor;
-
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
 
       &:hover {
-        font-size: $medium-font-size;
+        transform: translateY(-1px);
       }
     }
 
     &:hover .card-title {
-      font-size: $medium-font-size;
+      color: #3f5946;
     }
 
     // 生涯item
@@ -427,33 +559,30 @@ onBeforeUnmount(() => {
 
       &:hover .dot,
       &:hover .line-info .time {
-        font-size: $large-font-size;
         font-weight: $large-font-weight;
       }
 
       .dot {
         font-size: $medium-font-size;
-        transition: all .5s;
+        transition: all 0.5s;
       }
 
       .line-info {
-        font-size: $xx-small-font-size;
+        color: rgba(38, 51, 44, 0.74);
+        font-size: 1.3rem;
         width: 90%;
 
         .time {
-          font-size: $x-small-font-size;
-          transition: all .5s;
+          color: #26332c;
+          font-size: 1.35rem;
+          transition: font-weight 0.3s;
         }
-
       }
-
-
     }
 
     .small-tips {
-      color: $secondary-text-color;
+      color: rgba(55, 72, 62, 0.58);
     }
-
   }
 
   // 隐藏滚动条
@@ -468,7 +597,22 @@ onBeforeUnmount(() => {
       /* Chrome, Safari, Opera */
     }
   }
+}
 
+@media (max-width: 768px) {
+  #about-page {
+    max-width: calc(100vw - 2.4rem);
+
+    h1 {
+      align-items: flex-start;
+      flex-direction: column;
+      margin-top: 3.2rem;
+    }
+
+    #xaiver :deep(.ant-card-body) {
+      padding: 2.4rem;
+    }
+  }
 }
 </style>
 <style lang="scss">
