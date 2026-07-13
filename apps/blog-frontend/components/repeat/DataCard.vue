@@ -17,7 +17,7 @@ const props = defineProps({
         mainAttribute: 'topic',
         secondAttribute: 'introduction',
         additional: {
-          icon: '🕘',
+          icon: '时间',
           attribute: 'createTime',
         },
       };
@@ -28,8 +28,40 @@ const props = defineProps({
     default: null,
   }, // 图片路径，默认是 ${config.public.ossUrl}/image/articleCover/${props.articleData.id}.png
 });
+const candidateImageSrc = computed(() => {
+  if (props.imagePath) return props.imagePath;
+  if (!props.data?.id) return null;
+  return `${config.public.ossUrl}/image/articleCover/${props.data.id}.png`;
+});
+const imageStatus = ref('missing');
+let imageProbeId = 0;
+const probeImage = () => {
+  const src = candidateImageSrc.value;
+  imageProbeId += 1;
+  const currentProbeId = imageProbeId;
+  if (!src || import.meta.server) {
+    imageStatus.value = 'missing';
+    return;
+  }
+
+  imageStatus.value = 'loading';
+  const image = new Image();
+  image.onload = () => {
+    if (currentProbeId === imageProbeId) {
+      imageStatus.value = 'loaded';
+    }
+  };
+  image.onerror = () => {
+    if (currentProbeId === imageProbeId) {
+      imageStatus.value = 'missing';
+    }
+  };
+  image.src = src;
+};
+const showImage = computed(() => imageStatus.value === 'loaded');
 // 手机端自动横向展示
 let phoneOrNot = ref(false);
+watch(candidateImageSrc, probeImage, { immediate: true });
 watch(
   () => store.$state.windowSize.width,
   (newVal) => {
@@ -46,21 +78,16 @@ watch(
 </script>
 
 <template>
-  <article class="article-card" :class="{ column: props.column || phoneOrNot }">
-    <div id="pic-box">
-      <client-only>
-        <a-image
-          :src="
-            props.imagePath
-              ? props.imagePath
-              : `${config.public.ossUrl}/image/articleCover/${props.data.id}.png`
-          "
-          alt="文章封面"
-          :preview="false"
-          style="height: 100%; width: 100%; object-fit: cover"
-          :fallback="store.$state.config['not-found-image']?.content"
-        ></a-image>
-      </client-only>
+  <article
+    class="article-card"
+    :class="{
+      column: props.column || phoneOrNot,
+      'with-image': showImage,
+      'text-only': !showImage,
+    }"
+  >
+    <div v-if="showImage" id="pic-box">
+      <img :src="candidateImageSrc" alt="文章封面" loading="lazy" decoding="async" />
     </div>
     <div id="info">
       <div>
@@ -68,7 +95,7 @@ watch(
         <p class="limit-text-2 card-desc">{{ props.data[props.dataOption.secondAttribute] }}</p>
       </div>
       <div class="card-meta">
-        {{ props.dataOption.additional.icon }}
+        <span>{{ props.dataOption.additional.icon }}</span>
         {{
           String(props.dataOption.additional.attribute).toLowerCase().includes('time') ||
           String(props.dataOption.additional.attribute).toLowerCase().includes('date')
@@ -83,8 +110,8 @@ watch(
 <style lang="scss" scoped>
 .article-card {
   display: grid;
-  grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1.25fr);
-  min-height: 23rem;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 21rem;
   overflow: hidden;
   background: rgba(246, 247, 241, 0.74);
   border: 1px solid rgba(255, 255, 255, 0.72);
@@ -115,6 +142,15 @@ watch(
     overflow: hidden;
     min-height: 18rem;
     background: $secondary-car-color;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      transition: transform 300ms ease;
+    }
   }
 
   #info {
@@ -144,10 +180,21 @@ watch(
     }
 
     .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.8rem;
       color: $secondary-text-color;
       font-size: 1.3rem;
       font-weight: 700;
       text-align: right;
+
+      span {
+        color: rgba(38, 51, 44, 0.54);
+        font-size: 1.15rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
     }
 
     .limit-text-2 {
@@ -156,6 +203,33 @@ watch(
       -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+  }
+
+  &.with-image {
+    grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1.25fr);
+
+    &:hover #pic-box img {
+      transform: scale(1.035);
+    }
+  }
+
+  &.text-only {
+    min-height: 20rem;
+
+    #info {
+      min-height: 20rem;
+      padding: clamp(2.4rem, 4vw, 4.8rem);
+    }
+
+    .card-title {
+      max-width: 17ch;
+      font-size: clamp(2.5rem, 4vw, 4.4rem);
+    }
+
+    .card-desc {
+      max-width: 62ch;
+      -webkit-line-clamp: 3;
     }
   }
 
@@ -174,11 +248,6 @@ watch(
   }
 }
 
-:deep(.ant-image) {
-  height: 100%;
-  width: 100%;
-}
-
 @media (max-width: 768px) {
   .article-card {
     grid-template-columns: 1fr;
@@ -190,6 +259,19 @@ watch(
 
     #info {
       padding: 2.2rem;
+    }
+
+    &.text-only {
+      min-height: 18rem;
+
+      #info {
+        min-height: 18rem;
+      }
+
+      .card-title {
+        max-width: none;
+        font-size: clamp(2.2rem, 8vw, 3.4rem);
+      }
     }
   }
 }

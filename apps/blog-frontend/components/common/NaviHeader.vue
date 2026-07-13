@@ -1,492 +1,599 @@
 <script setup>
-import { notification, Modal, Upload } from 'ant-design-vue'
-import { ExclamationCircleOutlined, UploadOutlined, MenuOutlined, BulbOutlined, HomeOutlined } from '@ant-design/icons-vue';
+import { notification, Modal, Upload } from 'ant-design-vue';
+import {
+  ExclamationCircleOutlined,
+  UploadOutlined,
+  MenuOutlined,
+  BulbOutlined,
+  HomeOutlined,
+} from '@ant-design/icons-vue';
 import { createVNode } from 'vue';
-const router = useRouter()
-const store = useNuxtStore()
+const router = useRouter();
+const route = useRoute();
+const store = useNuxtStore();
 const config = useRuntimeConfig();
 // --主题切换模块--
-const colorTheme = ref(['Light', 'Dark'])
-let currentThemeIndex = ref(0)
-let currentTheme = ref(colorTheme.value[0])
-const themeChange = (newVal) => { // 改变主题事件
-    currentTheme.value = newVal
-    currentThemeIndex.value = colorTheme.value.findIndex(item => item == newVal)
-    store.setThemeMode(newVal)
-}
-const getLocalTheme = () => { // 获取本地主题
-    const theme = localStorage.getItem('theme')
-    if (theme) {
-        currentTheme.value = theme
-        currentThemeIndex.value = colorTheme.value.findIndex(item => item == theme)
-    } else {
-        currentTheme.value = 'Dark'
-        currentThemeIndex.value = 1
-    }
-}
+const colorTheme = ref(['Light', 'Dark']);
+let currentThemeIndex = ref(0);
+let currentTheme = ref(colorTheme.value[0]);
+const themeChange = (newVal) => {
+  // 改变主题事件
+  currentTheme.value = newVal;
+  currentThemeIndex.value = colorTheme.value.findIndex((item) => item == newVal);
+  store.setThemeMode(newVal);
+};
+const getLocalTheme = () => {
+  // 获取本地主题
+  const theme = localStorage.getItem('theme');
+  if (theme) {
+    currentTheme.value = theme;
+    currentThemeIndex.value = colorTheme.value.findIndex((item) => item == theme);
+  } else {
+    currentTheme.value = 'Dark';
+    currentThemeIndex.value = 1;
+  }
+};
 // --导航模块--
+const primaryLinks = [
+  {
+    title: '首页',
+    label: '首页',
+    path: '/',
+    key: '/',
+  },
+  {
+    title: '写作',
+    label: '写作',
+    path: '/log/article',
+    key: '/log/article',
+  },
+];
+const secondaryLinks = [
+  {
+    title: '类目',
+    label: '类目',
+    path: '/log/category',
+    key: '/log/category',
+  },
+  {
+    title: '留言',
+    label: '留言',
+    path: '/message',
+    key: '/message',
+  },
+  {
+    title: '关于',
+    label: '关于',
+    path: '/about',
+    key: '/about',
+  },
+  {
+    title: '朋友们',
+    label: '朋友们',
+    path: '/link',
+    key: '/link',
+  },
+];
 const naviData = reactive([
-    {
-        title: '写作',
-        label: '写作',
-        key: 'root-document',
-        children: [
-            {
-                title: '文章',
-                label: '文章',
-                path: '/log/article',
-                key: "/log/article",
-            },
-            {
-                title: '类目',
-                label: '类目',
-                path: '/log/category',
-                key: '/log/category',
-            }
-        ],
-    },
-    {
-        title: "留言",
-        label: "留言",
-        path: "/message",
-        key: "/message",
-    },
-    {
-        title: "朋友们",
-        label: "朋友们",
-        path: "/link",
-        key: "/link",
-    },
-    {
-        title: '关于',
-        label: '关于',
-        path: '/about',
-        key: '/about',
-    }
-]) // 导航数据
-let naviDrawer = ref(false)
+  {
+    title: '入口',
+    label: '入口',
+    key: 'root-entry',
+    children: primaryLinks,
+  },
+  {
+    title: '写作',
+    label: '写作',
+    key: 'root-document',
+    children: [
+      {
+        title: '文章',
+        label: '文章',
+        path: '/log/article',
+        key: '/log/article',
+      },
+      {
+        title: '类目',
+        label: '类目',
+        path: '/log/category',
+        key: '/log/category',
+      },
+    ],
+  },
+  ...secondaryLinks,
+]); // 导航数据
+let naviDrawer = ref(false);
 const expandedKeys = ref([]);
+const isActive = (path) => {
+  if (path === '/') return route.path === '/';
+  return route.path === path || route.path.startsWith(`${path}/`);
+};
+const goTo = (path) => {
+  router.push(path);
+  naviDrawer.value = false;
+};
+const toggleTheme = () => {
+  currentThemeIndex.value = currentThemeIndex.value ? 0 : 1;
+  themeChange(colorTheme.value[currentThemeIndex.value]);
+};
 const changePath = ([path]) => {
-    if (!path) {
-        expandedKeys.value = []
-        return
+  if (!path) {
+    expandedKeys.value = [];
+    return;
+  }
+  const regex = /^root-/;
+  if (regex.test(path)) {
+    // 根节点，展开
+    if (!expandedKeys.value.includes(path)) {
+      expandedKeys.value = [path];
     }
-    const regex = /^root-/
-    if (regex.test(path)) { // 根节点，展开
-        if (!expandedKeys.value.includes(path)) {
-            expandedKeys.value = [path]
-        }
-    } else { // 子节点
-        router.push(path)
-        naviDrawer.value = false
-    }
-}
+  } else {
+    // 子节点
+    goTo(path);
+  }
+};
 // #region --用户模块--
-let userImageStatus = ref(true) // 用户头像加载状态
-let loginStatus = ref(false) // 用户登录状态
-let userData = reactive({}) // 用户数据
-let editUserMsgShow = ref(false) // 用户信息编辑框的显示/隐藏
-let userUpdateData = reactive({}) // 编辑用户信息数据
-let userUpdateLoading = ref(false) // 用户编辑加载
-let imageFileList = ref([]) // 图片上传数组
-const handleImageError = () => { // 头像加载失败回调
-    userImageStatus.value = false
-}
-const getUserData = () => { // 获取用户数据
-    const token = utils.getCookie('token')
-    if (!utils.isNullOrEmpty(token)) { // 若登录了
-        api.getUserDataByToken().then(res => {
-            if (utils.analysisData(res, false)) { // 信息获取成功
-                loginStatus.value = true
-                Object.assign(userData, res.data)
-            } else { // 信息获取失败
-                utils.removeCookie('token') // 去除token
-                loginStatus.value = false
-                userData = {}
-            }
-        })
+let userImageStatus = ref(true); // 用户头像加载状态
+let loginStatus = ref(false); // 用户登录状态
+let userData = reactive({}); // 用户数据
+let editUserMsgShow = ref(false); // 用户信息编辑框的显示/隐藏
+let userUpdateData = reactive({}); // 编辑用户信息数据
+let userUpdateLoading = ref(false); // 用户编辑加载
+let imageFileList = ref([]); // 图片上传数组
+const handleImageError = () => {
+  // 头像加载失败回调
+  userImageStatus.value = false;
+};
+const getUserData = () => {
+  // 获取用户数据
+  const token = utils.getCookie('token');
+  if (!utils.isNullOrEmpty(token)) {
+    // 若登录了
+    api.getUserDataByToken().then((res) => {
+      if (utils.analysisData(res, false)) {
+        // 信息获取成功
+        loginStatus.value = true;
+        Object.assign(userData, res.data);
+      } else {
+        // 信息获取失败
+        utils.removeCookie('token'); // 去除token
+        loginStatus.value = false;
+        userData = {};
+      }
+    });
+  }
+};
+let sendCodeRest = ref(0); // 发送验证码按钮的休息时长
+const sendMailCode = () => {
+  // 发送验证码
+  if (utils.isNullOrEmpty(userData.mail) || !utils.isValidEmail(userData.mail)) {
+    // 若为空或者不是邮箱格式
+    notification.open({
+      message: '⏰提示',
+      description: '请输入有效的邮箱📨',
+      placement: 'top',
+      duration: 3,
+    });
+    return;
+  }
+  sendCodeRest.value = 60; // 60秒的休息时间
+  const sendCodeInterval = setInterval(() => {
+    if (--sendCodeRest.value <= 0) {
+      clearInterval(sendCodeInterval);
     }
-}
-let sendCodeRest = ref(0) // 发送验证码按钮的休息时长
-const sendMailCode = () => { // 发送验证码
-    if (utils.isNullOrEmpty(userData.mail) || !utils.isValidEmail(userData.mail)) { // 若为空或者不是邮箱格式
-        notification.open({
-            message: '⏰提示',
-            description: '请输入有效的邮箱📨',
-            placement: 'top',
-            duration: 3,
-        })
-        return
+  }, 1000);
+  api.getLoginCode({ mail: userData.mail }).then((res) => {
+    utils.analysisData(res);
+  });
+};
+const login = () => {
+  // 登录
+  api
+    .login({
+      mail: userData.mail,
+      code: userData.code,
+    })
+    .then((res) => {
+      if (utils.analysisData(res)) {
+        loginStatus.value = true;
+        Object.assign(userData, res.data);
+        utils.setCookie('token', userData.token);
+        fileHeaders.authorization = `Bearer ${userData.token}`;
+      }
+    });
+};
+const quit = () => {
+  // 退出登录
+  Modal.confirm({
+    title: '确认退出吗',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '退出将清除您的个人数据在此电脑',
+    okText: '退出',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk() {
+      utils.removeCookie('token'); // 去除token
+      utils.removeCookie('id'); // 去除token
+      utils.removeCookie('mail'); // 去除token
+      loginStatus.value = false;
+      userData = {};
+      notification.open({
+        message: '提示📢',
+        description: '退出成功♻️等待你的再次到来',
+        placement: 'top',
+        duration: 3,
+      });
+      fileHeaders.authorization = `Bearer ${utils.getCookie('token')}`;
+    },
+  });
+};
+const updateUserData = () => {
+  // 更新用户信息
+  if (utils.isNullOrEmpty(userUpdateData.mail) || !utils.isValidEmail(userUpdateData.mail)) {
+    // 若为空或者不是邮箱格式
+    notification.open({
+      message: '⏰提示',
+      description: '请输入有效的邮箱📨',
+      placement: 'top',
+      duration: 3,
+    });
+    return;
+  }
+  userUpdateLoading.value = true;
+  api.updateUserData(Object.assign({}, userUpdateData)).then((res) => {
+    userUpdateLoading.value = false;
+    if (utils.analysisData(res)) {
+      Object.assign(userData, userUpdateData);
     }
-    sendCodeRest.value = 60 // 60秒的休息时间
-    const sendCodeInterval = setInterval(() => {
-        if (--sendCodeRest.value <= 0) {
-            clearInterval(sendCodeInterval)
-        }
-    }, 1000);
-    api.getLoginCode({ mail: userData.mail }).then(res => {
-        utils.analysisData(res)
-    })
-}
-const login = () => { // 登录
-    api.login({
-        mail: userData.mail,
-        code: userData.code
-    }).then(res => {
-        if (utils.analysisData(res)) {
-            loginStatus.value = true
-            Object.assign(userData, res.data)
-            utils.setCookie('token', userData.token)
-            fileHeaders.authorization = `Bearer ${userData.token}`
-        }
-    })
-}
-const quit = () => { // 退出登录
-    Modal.confirm({
-        title: "确认退出吗",
-        icon: createVNode(ExclamationCircleOutlined),
-        content: '退出将清除您的个人数据在此电脑',
-        okText: '退出',
-        okType: 'danger',
-        cancelText: '取消',
-        onOk() {
-            utils.removeCookie('token') // 去除token
-            utils.removeCookie('id') // 去除token
-            utils.removeCookie('mail') // 去除token
-            loginStatus.value = false
-            userData = {}
-            notification.open({
-                message: '提示📢',
-                description: '退出成功♻️等待你的再次到来',
-                placement: 'top',
-                duration: 3,
-            })
-            fileHeaders.authorization = `Bearer ${utils.getCookie("token")}`
-        }
-    })
-}
-const updateUserData = () => { // 更新用户信息
-    if (utils.isNullOrEmpty(userUpdateData.mail) || !utils.isValidEmail(userUpdateData.mail)) { // 若为空或者不是邮箱格式
-        notification.open({
-            message: '⏰提示',
-            description: '请输入有效的邮箱📨',
-            placement: 'top',
-            duration: 3,
-        })
-        return
-    }
-    userUpdateLoading.value = true
-    api.updateUserData(Object.assign({}, userUpdateData)).then(res => {
-        userUpdateLoading.value = false
-        if (utils.analysisData(res)) {
-            Object.assign(userData, userUpdateData)
-        }
-    })
-}
+  });
+};
 let fileHeaders = reactive({
-    authorization: `Bearer ${utils.getCookie("token")}`,
+  authorization: `Bearer ${utils.getCookie('token')}`,
 }); // 封面图片上传header
-let avatarTimestamp = ref(null)
+let avatarTimestamp = ref(null);
 const beforeFileUpload = (file) => {
-    if (file.size > 30 * 1024 * 1024) { // 若文件大小大于30MB 
-        notification.open({
-            message: '⚠️提示',
-            description: '文件大小需小于30MB💾',
-            placement: 'top',
-            duration: 3,
-        })
-        return false || Upload.LIST_IGNORE;
+  if (file.size > 30 * 1024 * 1024) {
+    // 若文件大小大于30MB
+    notification.open({
+      message: '⚠️提示',
+      description: '文件大小需小于30MB💾',
+      placement: 'top',
+      duration: 3,
+    });
+    return false || Upload.LIST_IGNORE;
+  }
+};
+const handleUploadImageChange = (info) => {
+  // 上传图片状态改变回调
+  if (['done', 'error'].includes(info.file.status) && info.file.response) {
+    if (utils.analysisData(info.file.response)) {
+      avatarTimestamp.value = new Date();
     }
-}
-const handleUploadImageChange = (info) => { // 上传图片状态改变回调
-    if (['done', 'error'].includes(info.file.status) && info.file.response) {
-        if (utils.analysisData(info.file.response)) {
-            avatarTimestamp.value = new Date()
-        }
-    }
-}
+  }
+};
 // #endregion
 
 onMounted(() => {
-    getLocalTheme()
-    getUserData()
-})
+  getLocalTheme();
+  getUserData();
+});
 </script>
 
 <template>
-    <a-affix :offset-top="0" id="affix" class="border-b-2">
-        <div id="navi-header">
-            <div id="navi-content" class="hidden xl:flex justify-between items-center h-28 my-0 mx-auto px-8">
-                <a-space :size="25">
-                    <h1 class="cursor-point" @click="router.push('/')">灯下灯</h1>
-                    <a-dropdown v-for="naviFirst in naviData" :key="naviFirst.label">
-                        <div>
-                            <a href="javascript:;" v-if="naviFirst.children">{{ naviFirst.label }}</a>
-                            <nuxt-link :to="naviFirst.path" v-else >{{ naviFirst.label }}</nuxt-link>
-                        </div>
-                        <template v-if="naviFirst.children" #overlay>
-                            <a-menu>
-                                <a-menu-item v-for="naviSecond in naviFirst.children" :key="naviSecond.path">
-                                    <nuxt-link :to="naviSecond.path" class="text-3xl p-8">{{
-                                        naviSecond.label }}</nuxt-link>
-                                </a-menu-item>
-                            </a-menu>
-                        </template>
-                    </a-dropdown>
-                </a-space>
-                <a-space :size="25">
-                    <a-segmented v-model:value="currentTheme" @change="themeChange" :options="colorTheme" />
-                    <!-- TODO 公安备案注释TEMP -->
-                    <!-- <ClientOnly>
-                        <!== 用户 ==>
-                        <a-popover :title="loginStatus ? userData.name : '登录'" trigger="click" placement="bottomRight">
-                            <!== 已登录页面 ==>
-                            <template v-if="loginStatus" #content>
-                                <a-space size="middle" direction="vertical" class="items-center w-full">
-                                    <a-button class="w-96"
-                                        @click="editUserMsgShow = true; Object.assign(userUpdateData, userData)">编辑信息</a-button>
-                                    <a-modal v-model:open="editUserMsgShow" title="信息编辑" @ok="updateUserData">
-                                        <a-space size="small" direction="vertical" class="px-16 py-8 w-full">
-                                            <div class="flex flex-col items-center">
-                                                <a-avatar class="avatar mb-4" :size="200"
-                                                    :src="`${config.public.ossUrl}/image/userAvatar/${userData.id}.png?timestamp=${avatarTimestamp}`"
-                                                    :loadError="handleImageError">
-                                                    <template v-if="!userImageStatus">
-                                                        <span>
-                                                            {{ loginStatus ? userData.name : 'User' }}
-                                                        </span>
-                                                    </template>
-                                                </a-avatar>
-                                                <a-upload v-model:file-list="imageFileList" name="file"
-                                                    :action="config.public.apiUrl + '/user/uploadUserAvatar?id=' + userData.id"
-                                                    :max-count="1" accept="image/*" :headers="fileHeaders" :before-upload="beforeFileUpload"
-                                                    @change="handleUploadImageChange">
-                                                    <a-button>
-                                                        <upload-outlined></upload-outlined>
-                                                        上传头像
-                                                    </a-button>
-                                                </a-upload>
-                                            </div>
+  <header id="navi-header" class="site-nav-shell">
+    <nav class="site-nav-capsule" aria-label="主导航">
+      <button
+        class="brand-mark"
+        type="button"
+        @click="goTo('/')"
+        :aria-current="isActive('/') ? 'page' : undefined"
+      >
+        <span>灯下灯</span>
+      </button>
 
-                                            <span class="label px-4">用户名</span>
-                                            <a-input class="text-center" v-model:value="userUpdateData.name"
-                                                placeholder="请输入用户名" />
-                                        </a-space>
-                                        <template #footer>
-                                            <a-button @click="editUserMsgShow = false">取消</a-button>
-                                            <a-button :loading="userUpdateLoading" @click="updateUserData">提交</a-button>
-                                        </template>
-                                    </a-modal>
-                                    <a-button class="w-96" @click="quit">退出登录</a-button>
-                                </a-space>
-                            </template>
-                            <!== 未登录页面 ==>
-                            <template v-else #content>
-                                <a-space size="middle" direction="vertical" class="items-center w-full">
-                                    <a-input class="w-96 text-center" v-model:value="userData.mail"
-                                        placeholder="请输入邮箱" />
-                                    <a-button class="w-96" v-if="sendCodeRest <= 0"
-                                        @click="sendMailCode">发送验证码</a-button>
-                                    <a-button class="w-96" v-else :disabled="true">请 {{ sendCodeRest }} 秒后重试</a-button>
-                                    <a-input class="w-96 text-center" v-model:value="userData.code"
-                                        placeholder="请输入验证码" />
-                                    <a-button class="w-96" @click="login">登录</a-button>
-                                </a-space>
-                            </template>
-                            <a-avatar class="avatar" size="large"
-                                :src="`${config.public.ossUrl}/image/userAvatar/${userData.id}.png?timestamp=${avatarTimestamp}`"
-                                :loadError="handleImageError">
-                                <template v-if="!userImageStatus">
-                                    <span>
-                                        {{ loginStatus ? userData.name : '登录' }}
-                                    </span>
-                                </template>
-                            </a-avatar>
-                        </a-popover>
-                    </ClientOnly> -->
-                </a-space>
-            </div>
-            <div id="navi-content-phone" class="flex xl:hidden justify-between items-center py-8 px-16">
-                <h1 class="cursor-point" @click="router.push('/')">灯下灯</h1>
-                <a-space :size="12">
-                    <a-button class="button flex justify-center items-center h-full"
-                        @click="router.push('/')" title="返回首页">
-                        <HomeOutlined />
-                    </a-button>
-                    <a-button class="button flex justify-center items-center h-full"
-                        @click="currentThemeIndex ? currentThemeIndex = 0 : currentThemeIndex = 1; themeChange(colorTheme[currentThemeIndex])">
-                        <BulbOutlined />{{ colorTheme[currentThemeIndex ? 0 : 1] }}
-                    </a-button>
-                    <a-button class="button flex justify-center items-center h-full" :icon="h(MenuOutlined)"
-                        @click="naviDrawer = !naviDrawer" />
-                    <!-- TODO 公安备案注释TEMP -->
-                    <!-- <ClientOnly>
-                        <!== 用户 ==>
-                        <a-popover :title="loginStatus ? userData.name : '登录'" trigger="click" placement="bottomRight">
-                            <!== 已登录页面 ==>
-                            <template v-if="loginStatus" #content>
-                                <a-space size="middle" direction="vertical" class="items-center w-full">
-                                    <a-button class="w-96"
-                                        @click="editUserMsgShow = true; Object.assign(userUpdateData, userData)">编辑信息</a-button>
-                                    <a-modal v-model:open="editUserMsgShow" title="信息编辑" @ok="updateUserData">
-                                        <a-space size="small" direction="vertical" class="px-16 py-8 w-full">
-                                            <div class="flex flex-col items-center">
-                                                <a-avatar class="avatar mb-4" :size="200"
-                                                    :src="`${config.public.ossUrl}/image/userAvatar/${userData.id}.png?timestamp=${avatarTimestamp}`"
-                                                    :loadError="handleImageError">
-                                                    <template v-if="!userImageStatus">
-                                                        <span>
-                                                            {{ loginStatus ? userData.name : 'User' }}
-                                                        </span>
-                                                    </template>
-                                                </a-avatar>
-                                                <a-upload v-model:file-list="imageFileList" name="file"
-                                                    :action="config.public.apiUrl + '/user/uploadUserAvatar?id=' + userData.id"
-                                                    :max-count="1" accept="image/*" :headers="fileHeaders" :before-upload="beforeFileUpload"
-                                                    @change="handleUploadImageChange">
-                                                    <a-button>
-                                                        <upload-outlined></upload-outlined>
-                                                        上传头像
-                                                    </a-button>
-                                                </a-upload>
-                                            </div>
-                                            <span class="label px-4">用户名</span>
-                                            <a-input class="text-center" v-model:value="userUpdateData.name"
-                                                placeholder="请输入用户名" />
-                                        </a-space>
-                                        <template #footer>
-                                            <a-button @click="editUserMsgShow = false">取消</a-button>
-                                            <a-button :loading="userUpdateLoading" @click="updateUserData">提交</a-button>
-                                        </template>
-                                    </a-modal>
-                                    <a-button class="w-96" @click="quit">退出登录</a-button>
-                                </a-space>
-                            </template>
-                            <!== 未登录页面 ==>
-                            <template v-else #content>
-                                <a-space size="middle" direction="vertical" class="items-center w-full">
-                                    <a-input class="w-96 text-center" v-model:value="userData.mail"
-                                        placeholder="请输入邮箱" />
-                                    <a-button class="w-96" v-if="sendCodeRest <= 0"
-                                        @click="sendMailCode">发送验证码</a-button>
-                                    <a-button class="w-96" v-else :disabled="true">请 {{ sendCodeRest }} 秒后重试</a-button>
-                                    <a-input class="w-96 text-center" v-model:value="userData.code"
-                                        placeholder="请输入验证码" />
-                                    <a-button class="w-96" @click="login">登录</a-button>
-                                </a-space>
-                            </template>
-                            <a-avatar class="avatar"
-                                :src="`${config.public.ossUrl}/image/userAvatar/${userData.id}.png?timestamp=${avatarTimestamp}`"
-                                :loadError="handleImageError">
-                                <template v-if="!userImageStatus">
-                                    <span>
-                                        {{ loginStatus ? userData.name : '登录' }}
-                                    </span>
-                                </template>
-                            </a-avatar>
-                        </a-popover>
-                    </ClientOnly>  -->
-                </a-space>
-            </div>
-        </div>
-        <a-drawer v-model:open="naviDrawer" class="navi-top-drawer" title="灯下灯" placement="top" height="auto">
-            <a-tree @select="changePath" v-model:expandedKeys="expandedKeys" :tree-data="naviData">
-            </a-tree>
-        </a-drawer>
-    </a-affix>
+      <div class="entry-switch" role="list" aria-label="入口切换">
+        <button
+          v-for="item in primaryLinks"
+          :key="item.key"
+          class="nav-item primary"
+          :class="{ active: isActive(item.path) }"
+          type="button"
+          role="listitem"
+          @click="goTo(item.path)"
+        >
+          {{ item.label }}
+        </button>
+      </div>
+
+      <div class="desktop-links" role="list" aria-label="站点页面">
+        <button
+          v-for="item in secondaryLinks"
+          :key="item.key"
+          class="nav-item"
+          :class="{ active: isActive(item.path) }"
+          type="button"
+          role="listitem"
+          @click="goTo(item.path)"
+        >
+          {{ item.label }}
+        </button>
+      </div>
+
+      <div class="nav-tools">
+        <button
+          class="tool-button"
+          type="button"
+          @click="toggleTheme"
+          :title="`切换到 ${colorTheme[currentThemeIndex ? 0 : 1]}`"
+        >
+          <BulbOutlined />
+          <span>{{ currentTheme }}</span>
+        </button>
+        <button
+          class="tool-button menu-button"
+          type="button"
+          @click="naviDrawer = !naviDrawer"
+          title="打开导航"
+        >
+          <MenuOutlined />
+        </button>
+      </div>
+    </nav>
+    <a-drawer
+      v-model:open="naviDrawer"
+      class="navi-top-drawer"
+      title="灯下灯"
+      placement="top"
+      height="auto"
+    >
+      <a-tree
+        @select="changePath"
+        v-model:expandedKeys="expandedKeys"
+        :tree-data="naviData"
+      ></a-tree>
+    </a-drawer>
+  </header>
 </template>
 
 <style lang="scss" scoped>
-#affix {
-
-    #navi-header {
-        background: color-mix(in srgb, $main-car-color 88%, transparent);
-        border-bottom: 1px solid color-mix(in srgb, $main-text-color 14%, transparent);
-        backdrop-filter: blur(18px) saturate(120%);
-
-        #navi-content {
-            max-width: 1248px;
-            min-height: 72px;
-            height: auto;
-
-            h1 {
-                font-size: 1.4rem;
-                font-weight: 700;
-            }
-
-            a {
-                font-size: 0.95rem;
-                font-weight: 600;
-
-                &:hover {
-                    color: $main-color;
-                }
-            }
-
-        }
-
-        .avatar {
-            cursor: $hover-cursor;
-        }
-
-    }
-
-    #navi-content-phone {
-        min-height: 60px;
-
-        h1 {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .button {
-            font-size: $xx-small-font-size;
-            height: 100%;
-            padding: 1rem;
-            background-color: transparent !important;
-            color: $main-text-color !important;
-
-            * {
-                line-height: normal;
-            }
-        }
-
-        button {
-            height: 32px !important;
-        }
-    }
-
-    .label {
-        color: $main-text-color;
-    }
+.site-nav-shell {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 1.2rem max(1.2rem, env(safe-area-inset-left)) 0;
+  pointer-events: none;
 }
 
-:deep(#affix .css-dev-only-do-not-override-19iuou) {
-    height: 100% !important;
+.site-nav-capsule {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: min(104rem, calc(100vw - 2.4rem));
+  min-height: 5.6rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(243, 247, 239, 0.56)),
+    rgba(248, 250, 245, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 20px 70px rgba(35, 48, 42, 0.16);
+  backdrop-filter: blur(24px) saturate(180%);
 }
 
-:deep(.ant-affix) {
-    border-bottom-width: 2px
+button {
+  font: inherit;
+}
+
+.brand-mark,
+.nav-item,
+.tool-button {
+  min-height: 4.4rem;
+  border: 0;
+  color: rgba(38, 51, 44, 0.78);
+  background: transparent;
+  cursor: $hover-cursor;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+
+  &:hover {
+    color: #26332c;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(63, 89, 70, 0.45);
+    outline-offset: 2px;
+  }
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 9.8rem;
+  padding: 0 1.8rem;
+  border-radius: 999px 10px 10px 999px;
+  color: #26332c;
+  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+  font-size: 1.72rem;
+  font-weight: 680;
+  white-space: nowrap;
+
+  &[aria-current='page'] {
+    background: rgba(255, 255, 255, 0.64);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.94);
+  }
+}
+
+.entry-switch,
+.desktop-links,
+.nav-tools {
+  display: inline-flex;
+  align-items: center;
+}
+
+.entry-switch {
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: rgba(38, 51, 44, 0.06);
+  box-shadow: inset 0 1px 4px rgba(23, 32, 29, 0.08);
+}
+
+.desktop-links {
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  font-size: 1.42rem;
+  font-weight: 680;
+  white-space: nowrap;
+
+  &.primary {
+    min-width: 7.2rem;
+    color: rgba(38, 51, 44, 0.82);
+  }
+
+  &.active {
+    color: #1f2d25;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 10px 28px rgba(52, 68, 58, 0.12);
+  }
+}
+
+.nav-tools {
+  justify-self: end;
+  gap: 0.45rem;
+}
+
+.tool-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-width: 4.4rem;
+  padding: 0 1.3rem;
+  border-radius: 10px 999px 999px 10px;
+  font-size: 1.28rem;
+  font-weight: 720;
+
+  :deep(.anticon) {
+    font-size: 1.55rem;
+  }
+}
+
+.menu-button {
+  display: none;
+  padding: 0;
+  border-radius: 999px;
+}
+
+@media (max-width: 1024px) {
+  .site-nav-capsule {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .desktop-links {
+    display: none;
+  }
+
+  .entry-switch {
+    justify-self: center;
+  }
+
+  .menu-button {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-nav-shell {
+    padding-top: 0.8rem;
+  }
+
+  .site-nav-capsule {
+    width: calc(100vw - 1.6rem);
+    min-height: 5rem;
+    gap: 0.35rem;
+    padding: 0.42rem;
+  }
+
+  .brand-mark {
+    min-width: 0;
+    padding: 0 1.15rem;
+    font-size: 1.45rem;
+  }
+
+  .entry-switch {
+    gap: 0.15rem;
+  }
+
+  .nav-item {
+    min-height: 3.9rem;
+    min-width: 5.6rem;
+    padding: 0 0.9rem;
+    font-size: 1.28rem;
+  }
+
+  .tool-button {
+    min-width: 3.9rem;
+    min-height: 3.9rem;
+    padding: 0;
+    border-radius: 999px;
+
+    span {
+      display: none;
+    }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-nav-capsule {
+    background: rgba(248, 250, 245, 0.96);
+    backdrop-filter: none;
+  }
 }
 </style>
 <style lang="scss">
 .navi-top-drawer {
-    width: 100vw !important;
+  width: 100vw !important;
 
-    .ant-drawer-header {
-        border-bottom: none;
-    }
+  .ant-drawer-header {
+    border-bottom: none;
+  }
 
-    .ant-drawer-header-title {
-        flex-direction: row-reverse;
-    }
+  .ant-drawer-header-title {
+    flex-direction: row-reverse;
+  }
 
-    .ant-drawer-body {
-        padding-top: 0px;
-    }
+  .ant-drawer-body {
+    padding-top: 0px;
+  }
 
-    .ant-tree-list-holder-inner {
-        align-items: flex-end;
-    }
+  .ant-tree-list-holder-inner {
+    align-items: flex-end;
+  }
 }
 </style>
