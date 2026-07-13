@@ -164,17 +164,17 @@ const handleImageError = () => {
   userImageStatus.value = false;
 };
 const getUserData = () => {
-  // 获取用户数据
+  // 获取用户数据（静默处理：过期/无效token不弹通知，直接清理）
   const token = utils.getCookie('token');
   if (!utils.isNullOrEmpty(token)) {
     // 若登录了
     api.getUserDataByToken().then((res) => {
-      if (utils.analysisData(res, false)) {
+      if (res.code >= 0 && res.data) {
         // 信息获取成功
         loginStatus.value = true;
         Object.assign(userData, res.data);
       } else {
-        // 信息获取失败
+        // 信息获取失败，静默清理，不打扰用户
         utils.removeCookie('token'); // 去除token
         loginStatus.value = false;
         userData = {};
