@@ -100,19 +100,19 @@
             </form>
           </a-tab-pane>
 
-          <!-- 账号密码登录 -->
-          <a-tab-pane key="password" tab="账号密码登录">
+          <!-- 邮箱密码登录 -->
+          <a-tab-pane key="password" tab="邮箱密码登录">
             <form @submit.prevent="loginByPassword" class="login-form">
               <div class="form-item">
-                <label class="form-label">管理员账号</label>
+                <label class="form-label">邮箱地址</label>
                 <a-input
-                  v-model:value="passwordLoginData.username"
+                  v-model:value="passwordLoginData.mail"
                   size="large"
-                  placeholder="请输入管理员账号"
-                  autocomplete="username"
+                  placeholder="请输入管理员邮箱"
+                  autocomplete="email"
                 >
                   <template #prefix>
-                    <UserOutlined />
+                    <MailOutlined />
                   </template>
                 </a-input>
               </div>
@@ -180,7 +180,7 @@ const codeLoginData = reactive({
 })
 
 const passwordLoginData = reactive({
-  username: '',
+  mail: '',
   password: '',
 })
 
@@ -219,8 +219,8 @@ const loginByCode = () => {
 }
 
 const loginByPassword = () => {
-  if (!passwordLoginData.username) {
-    notification.warning({ message: '请输入管理员账号' })
+  if (!passwordLoginData.mail) {
+    notification.warning({ message: '请输入邮箱地址' })
     return
   }
   if (!passwordLoginData.password) {

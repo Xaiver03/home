@@ -58,21 +58,21 @@ module.exports = {
     res.json(utils.postMessage(-1, "验证码错误❗️请检查重试", {}));
   },
 
-  // 账号密码登录
+  // 邮箱密码登录
   loginByPassword: async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      res.json(utils.postMessage(-1, "账号和密码不能为空❗️", {}));
+    const { mail, password } = req.body;
+    if (!mail || !password) {
+      res.json(utils.postMessage(-1, "邮箱和密码不能为空❗️", {}));
       return;
     }
-    let adminData = await adminService.getAdminByUsername(username);
+    let adminData = await adminService.getAdminByMail(mail);
     if (!adminData || !adminData.passwordHash) {
-      res.json(utils.postMessage(-1, "账号或密码错误❗️", {}));
+      res.json(utils.postMessage(-1, "邮箱或密码错误❗️", {}));
       return;
     }
     const isValid = await bcrypt.compare(password, adminData.passwordHash);
     if (!isValid) {
-      res.json(utils.postMessage(-1, "账号或密码错误❗️", {}));
+      res.json(utils.postMessage(-1, "邮箱或密码错误❗️", {}));
       return;
     }
     adminData = adminData.dataValues;

@@ -10,35 +10,26 @@ useHead({
   ],
 });
 
+// 安全解析配置内容（数据库JSON列已自动反序列化）
+const safeParse = (val, fallback) => {
+  if (!val) return fallback;
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return fallback; }
+  }
+  return val;
+};
+
 // 从配置中获取数据的计算属性
 const basicInfo = computed(() => {
-  try {
-    return store.$state.config['about-basic-info']?.content
-      ? JSON.parse(store.$state.config['about-basic-info'].content)
-      : {};
-  } catch (e) {
-    return {};
-  }
+  return safeParse(store.$state.config['about-basic-info']?.content, {});
 });
 
 const socialLinks = computed(() => {
-  try {
-    return store.$state.config['about-social-links']?.content
-      ? JSON.parse(store.$state.config['about-social-links'].content)
-      : [];
-  } catch (e) {
-    return [];
-  }
+  return safeParse(store.$state.config['about-social-links']?.content, []);
 });
 
 const pageTexts = computed(() => {
-  try {
-    return store.$state.config['about-page-texts']?.content
-      ? JSON.parse(store.$state.config['about-page-texts'].content)
-      : {};
-  } catch (e) {
-    return {};
-  }
+  return safeParse(store.$state.config['about-page-texts']?.content, {});
 });
 
 const keywordDescription = computed(() => {

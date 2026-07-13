@@ -3,32 +3,22 @@ const router = useRouter();
 const store = useNuxtStore();
 
 // 从 config 读取社交链接
-const profileSocialLinks = computed(() => {
-  try {
-    const raw = store.$state.config['about-social-links']?.content;
-    if (!raw) return [];
-    return typeof raw === 'string' ? JSON.parse(raw) : raw;
-  } catch {
-    return [];
+const safeParse = (val, fallback) => {
+  if (!val) return fallback;
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return fallback; }
   }
+  return val;
+};
+
+const profileSocialLinks = computed(() => {
+  return safeParse(store.$state.config['about-social-links']?.content, []);
 });
 
 // 从 config 读取名字和头像
 const profileName = computed(() => {
-  try {
-    const raw = store.$state.config['about-basic-info']?.content;
-    if (!raw) return '灯下灯';
-    const info = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return info.name || '灯下灯';
-  } catch { return '灯下灯'; }
-});
-const profileTagline = computed(() => {
-  try {
-    const raw = store.$state.config['about-basic-info']?.content;
-    if (!raw) return '';
-    const info = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return info.tagline || '';
-  } catch { return ''; }
+  const info = safeParse(store.$state.config['about-basic-info']?.content, {});
+  return info.name || '灯下灯';
 });
 
 definePageMeta({
