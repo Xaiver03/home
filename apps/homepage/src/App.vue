@@ -324,7 +324,7 @@ const loadHome = async () => {
   articles.value = normalizeArticles(latest);
   categories.value = Array.isArray(categoryList)
     ? categoryList
-        .filter((item) => Number.isInteger(Number(item?.id)) && item?.theme)
+        .filter((item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章')
         .map((item) => ({
           id: String(item.id),
           theme: String(item.theme).trim(),

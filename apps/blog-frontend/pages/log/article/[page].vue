@@ -91,7 +91,7 @@ const { data: categoryData } = await useAsyncData(
   'getCategories',
   async () => {
     const list = await api.getAllArticleTypes();
-    return (list || []).filter((item) => Number.isInteger(Number(item?.id)) && item?.theme);
+    return (list || []).filter((item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章');
   },
 );
 if (categoryData.value) {
