@@ -211,7 +211,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 #logPage {
-  ::v-deep .ant-card .ant-card-head-title {
+  :deep(.ant-card .ant-card-head-title) {
     text-align: center;
   }
 
@@ -245,20 +245,20 @@ onMounted(() => {
 
 }
 
-::v-deep .tooltip {
+:deep(.tooltip) {
   max-width: 50rem;
   white-space: normal;
   /* 允许文本换行 */
 }
 
-::v-deep .tipCol {
+:deep(.tipCol) {
   margin: 1rem;
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-::v-deep .tipPoint {
+:deep(.tipPoint) {
   height: 1rem;
   width: 1rem;
   background-color: $main-text-color;

@@ -1,13 +1,14 @@
+@use './variable.scss' as *;
+
 // ant组件库的全局样式修改
-// @import './variable.scss'; // 引入变量
 
 // 布局组件
 .ant-layout {
 
-    background-color: $main-background-color;
+    background-color: transparent;
 
     .ant-layout-header {
-        background-color: $main-background-color;
+        background-color: transparent;
     }
 
 
@@ -18,7 +19,7 @@
 
     // 背景颜色
     .ant-menu-light{
-        background-color: $main-background-color;
+        background-color: $surface-glass;
         color: $main-text-color;
     }
 
@@ -85,8 +86,17 @@ a:hover {
 }
 
 // 按钮 — 不在 antReset 中覆盖颜色，交给 ConfigProvider darkAlgorithm
+.ant-btn {
+    border-radius: $radius-control;
+    font-family: $font-body;
+    transition: background $motion-fast, border-color $motion-fast, box-shadow $motion-fast, transform $motion-fast;
+}
+.ant-btn:not(:disabled):active {
+    transform: scale(.98);
+}
 .ant-btn:not(:disabled):focus-visible {
     outline: none;
+    box-shadow: $focus-ring;
 }
 .ant-btn-default:disabled {
     color: $secondary-text-color;
@@ -120,11 +130,17 @@ a:hover {
 }
 // card
 .ant-card {
-    background-color: $main-car-color;
+    background: $surface-glass;
+    border: 1px solid $surface-border;
+    border-radius: $radius-card;
+    box-shadow: $surface-inner-highlight, $surface-shadow-soft;
+    backdrop-filter: blur($surface-blur) saturate(165%);
     color: $main-text-color;
+    font-family: $font-body;
 
     .ant-card-head {
         color: $main-text-color;
+        border-bottom-color: $surface-border;
 
     }
 }
@@ -144,14 +160,16 @@ a:hover {
 
 // picker
 .ant-picker {
-    background-color: $main-car-color;
+    background-color: $surface-control;
     color: $main-text-color;
+    border-color: $surface-border;
+    border-radius: $radius-control;
     .ant-picker-separator {
         color: $main-text-color;
     }
 
     .ant-picker-clear {
-        background: $main-car-color;
+        background: $color-bg-surface;
         color: $main-text-color;
     }
 }
@@ -166,10 +184,11 @@ a:hover {
 
 // segmented
 .ant-segmented {
-    background-color: $main-car-color;
+    background-color: $surface-control;
     color: $main-text-color;
+    border-radius: $radius-control;
     .ant-segmented-item-selected {
-        background-color: $secondary-car-color;
+        background-color: $surface-glass-strong;
         color: $main-text-color;
     }
     .ant-segmented-item:hover:not(.ant-segmented-item-selected):not(.ant-segmented-item-disabled) {
@@ -184,35 +203,39 @@ a:hover {
 
 // select
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    background-color: $main-car-color;
+    background-color: $surface-control;
     color: $main-text-color;
+    border-radius: $radius-control;
 
     .ant-select-selection-placeholder {
-        color: $main-text-color;
+        color: $secondary-text-color;
     }
 }
 .ant-select-selector {
-    border-color: $main-text-color !important;
+    border-color: $surface-border !important;
 }
 
 // 所有的input！
 input {
     color: $main-text-color !important;
-    background-color: transparent !important;
+    background-color: $surface-control !important;
     &::placeholder {
-        color: $main-text-color !important;
+        color: $secondary-text-color !important;
     }
 }
 
 // input
 .ant-input {
     color: $main-text-color;
-    background-color: $main-background-color;
+    background-color: $surface-control;
+    border-color: $surface-border;
+    border-radius: $radius-control;
     &::placeholder {
-        color: $main-text-color;
+        color: $secondary-text-color;
     }
     &:focus {
         border-color: $main-text-color;
+        box-shadow: $focus-ring;
     }
 }
 
@@ -225,18 +248,20 @@ input {
 .ant-table-wrapper {
 
     .ant-table-thead >tr>th {
-        background-color: $secondary-car-color;
+        background-color: $surface-glass-strong;
         color: $main-text-color;
+        border-bottom-color: $surface-border;
     }
 
     .ant-table {
-        background: $main-car-color;
+        background: $surface-glass;
         color: $main-text-color;
+        border-radius: $radius-card;
     }
 
     .ant-table-tbody >tr.ant-table-row:hover>td {
-        background-color: $secondary-car-color;
-        background: $secondary-car-color;
+        background-color: $surface-hover;
+        background: $surface-hover;
     }
 }
 
@@ -302,9 +327,13 @@ input {
 // modal
 .ant-modal .ant-modal-content {
     color: $main-text-color;
-    background-color: $main-car-color;
+    background-color: $surface-glass-strong;
+    border: 1px solid $surface-border;
+    border-radius: $radius-panel;
+    box-shadow: $surface-shadow;
+    backdrop-filter: blur($surface-blur) saturate(165%);
     .ant-modal-header {
-        background: $main-car-color;
+        background: transparent;
     }
     .ant-modal-title {
         color: $main-text-color;
@@ -356,14 +385,11 @@ input {
 // card
 .ant-card {
     .ant-card-grid {
-        box-shadow: 1px 0 0 0 $secondary-car-color,0 1px 0 0 $secondary-car-color,1px 1px 0 0 $secondary-car-color,1px 0 0 0 $secondary-car-color inset,0 1px 0 0 $secondary-car-color inset;
+        box-shadow: 1px 0 0 0 $surface-border,0 1px 0 0 $surface-border,1px 1px 0 0 $surface-border,1px 0 0 0 $surface-border inset,0 1px 0 0 $surface-border inset;
         &:hover {
-            box-shadow:  0px 0px 0px 0px $secondary-text-color, 0px 0px 1px 0 $secondary-text-color, 0 0 10px 2px $secondary-text-color;
+            box-shadow: $focus-ring;
         }
     }
-}
-.ant-card-bordered {
-    border: none !important;
 }
 
 // empty

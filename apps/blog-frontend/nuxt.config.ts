@@ -74,10 +74,19 @@ export default defineNuxtConfig({
     "@/assets/scss/index.scss", // 引入 SCSS 入口文件
   ],
   plugins: [{ src: "@/plugins/mdEditorEmoji.client.js", mode: "client" }],
+  nitro: {
+    externals: {
+      inline: ["tslib"],
+    },
+  },
   vite: {
+    build: {
+      chunkSizeWarningLimit: 1200,
+    },
     css: {
       preprocessorOptions: {
         scss: {
+          api: 'modern-compiler',
           additionalData: '@use "~/assets/scss/variables.scss" as *;', // 在所有 SCSS 文件中引入变量文件
         },
       },

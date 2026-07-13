@@ -28,7 +28,7 @@ const naviData = ref([
 <style lang="scss" scoped>
 #user-page {
 
-  ::v-deep .ant-card .ant-card-head-title {
+  :deep(.ant-card .ant-card-head-title) {
     text-align: center;
   }
 

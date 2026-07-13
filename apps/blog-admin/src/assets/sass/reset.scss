@@ -1,4 +1,4 @@
-// @import './variable.scss'; // 引入变量
+@use './variable.scss' as *;
 
 // 对一些固定标签样式的重设...
 ul {

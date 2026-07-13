@@ -1,3 +1,5 @@
+@use './variable.scss' as *;
+
 .jsoneditor {
     border-color: $secondary-car-color !important;
     // color: $main-text-color !important;

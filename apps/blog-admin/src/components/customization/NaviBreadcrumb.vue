@@ -29,15 +29,15 @@ watch(
 
 <style lang="scss" scoped>
 .ant-breadcrumb {
-  ::v-deep ol {
+  :deep(ol) {
     margin: 1rem 2rem;
   }
 
-  ::v-deep .ant-breadcrumb-link {
+  :deep(.ant-breadcrumb-link) {
     margin: 0 1rem;
   }
 
-  ::v-deep a {
+  :deep(a) {
     color: $main-text-color;
     padding: 0 1rem;
   }

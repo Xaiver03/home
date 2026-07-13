@@ -33,7 +33,7 @@ const props = defineProps({
     padding: 0;
 }
 
-:deep(#preview p, ::v-deep #preview span) {
+:deep(#preview p, #preview span) {
     font-size: $x-small-font-size;
 }
 

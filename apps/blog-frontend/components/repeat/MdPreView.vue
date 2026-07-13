@@ -50,7 +50,7 @@ const props = defineProps({
 :deep(#preview h3) {
   color: $main-text-color;
   font-weight: 820;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
@@ -73,7 +73,7 @@ const props = defineProps({
   margin: 2rem 0;
   padding: 1.2rem 1.6rem;
   border-left: 4px solid $main-color;
-  background: rgba(255, 255, 255, 0.46);
+  background: $surface-control;
   border-radius: 0 8px 8px 0;
   color: $secondary-text-color;
 }

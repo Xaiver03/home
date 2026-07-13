@@ -1,8 +1,8 @@
 // Sass入口文件
-@import 'reset';
-@import 'base';
-@import 'iconfont';
-@import 'antReset';
-@import 'mdEditReset';
-@import 'jsonEditorReset';
+@use 'reset';
+@use 'base';
+@use 'iconfont';
+@use 'antReset';
+@use 'mdEditReset';
+@use 'jsonEditorReset';
 @import 'tailwind.css';

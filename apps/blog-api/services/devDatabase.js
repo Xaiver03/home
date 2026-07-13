@@ -51,6 +51,14 @@ const previewTables = [
     createTime DATETIME NOT NULL,
     updatedTime DATETIME NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS admin (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mail VARCHAR(255) NOT NULL,
+    username VARCHAR(255) UNIQUE,
+    passwordHash VARCHAR(255),
+    createTime DATETIME NOT NULL,
+    updatedTime DATETIME
+  )`,
 ];
 
 const bootstrapPreviewDatabase = async (sequelize) => {
