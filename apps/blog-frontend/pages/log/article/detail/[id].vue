@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import { MdCatalog } from 'md-editor-v3';
 const router = useRouter();
 const store = useNuxtStore();
 const config = useRuntimeConfig();
@@ -393,10 +394,16 @@ onMounted(() => {
       </div>
     </article>
     <!-- 文章内容 -->
-    <div id="log-content" class="blog-glass-panel">
-      <RepeatEmptyPlaceholder :data-show="articleData?.mdContent?.length > 0" class="w-full">
-        <RepeatMdPreView :md-content="articleData?.mdContent" />
-      </RepeatEmptyPlaceholder>
+    <div class="article-reading-layout">
+      <aside class="article-outline blog-glass-panel">
+        <p class="outline-title">Outline</p>
+        <MdCatalog editorId="preview" />
+      </aside>
+      <div id="log-content" class="blog-glass-panel">
+        <RepeatEmptyPlaceholder :data-show="articleData?.mdContent?.length > 0" class="w-full">
+          <RepeatMdPreView :md-content="articleData?.mdContent" />
+        </RepeatEmptyPlaceholder>
+      </div>
     </div>
     <!-- 版权 -->
     <div id="statement-bar" class="blog-glass-panel">
@@ -724,6 +731,30 @@ onMounted(() => {
   }
 
   // 文章内容
+  .article-reading-layout {
+    display: grid;
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .article-outline {
+    position: sticky;
+    top: 9rem;
+    max-height: calc(100vh - 12rem);
+    overflow: auto;
+    padding: 1.6rem;
+  }
+
+  .outline-title {
+    margin: 0 0 1.2rem;
+    color: $secondary-text-color;
+    font-size: 1.2rem;
+    font-weight: 820;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
   #log-content,
   #comment-bar {
     padding: clamp(2rem, 4vw, 5rem);
@@ -902,6 +933,18 @@ onMounted(() => {
 
 :deep(#preview) {
   border-radius: 8px;
+}
+
+@media (max-width: 1100px) {
+  #log-page {
+    .article-reading-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .article-outline {
+      display: none;
+    }
+  }
 }
 
 @media (max-width: 900px) {

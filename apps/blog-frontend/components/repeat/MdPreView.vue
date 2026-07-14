@@ -40,9 +40,7 @@ const props = defineProps({
 :deep(#preview) {
   color: $main-text-color;
   background: transparent;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', sans-serif;
+  font-family: $font-body;
 }
 
 :deep(#preview h1),
@@ -59,7 +57,18 @@ const props = defineProps({
 :deep(#preview blockquote),
 :deep(#preview span) {
   font-size: 1.75rem;
-  line-height: 1.85;
+  line-height: 1.8;
+}
+
+:deep(#preview p) {
+  margin: 1.15em 0;
+}
+
+:deep(#preview h1),
+:deep(#preview h2),
+:deep(#preview h3) {
+  margin-top: 2.2em;
+  margin-bottom: 0.8em;
 }
 
 :deep(#preview p),
