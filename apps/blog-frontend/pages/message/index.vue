@@ -576,7 +576,7 @@ onBeforeUnmount(() => {
                 :src="
                   message.userId <= 0
                     ? store.$state.config['my-avatar']?.content
-                    : `${config.public.ossUrl}/image/userAvatar/${message.user?.id}.png`
+                    : `${config.public.storageUrl}/image/userAvatar/${message.user?.id}.png`
                 "
                 :alt="message.user?.name + '头像'"
                 :size="store.phoneModelOrNot ? 32 : 64"
@@ -672,7 +672,7 @@ onBeforeUnmount(() => {
                       :src="
                         childMessage.userId <= 0
                           ? store.$state.config['my-avatar']?.content
-                          : `${config.public.ossUrl}/image/userAvatar/${childMessage.user?.id}.png`
+                          : `${config.public.storageUrl}/image/userAvatar/${childMessage.user?.id}.png`
                       "
                       :alt="childMessage.user?.name + '头像'"
                       @error="handleAvatarError"

@@ -69,7 +69,7 @@ const getMore = () => {
           :to="`/log/article/detail/${item.id}`"
         >
           <RepeatDataCard
-            :imagePath="`${config.public.ossUrl}/image/articleCover/${item.id}.png`"
+            :imagePath="`${config.public.storageUrl}/image/articleCover/${item.id}.png`"
             :data="item"
             :dataOption="{
               mainAttribute: 'topic',

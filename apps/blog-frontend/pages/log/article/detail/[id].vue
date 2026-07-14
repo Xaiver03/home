@@ -10,7 +10,7 @@ const articleCatalog = ref([]);
 const hasArticleCatalog = computed(() => articleCatalog.value.length > 0);
 const coverImageVisible = ref(false);
 const coverImageSrc = computed(
-  () => `${config.public.ossUrl}/image/articleCover/${articleData.value?.id}.png`,
+  () => `${config.public.storageUrl}/image/articleCover/${articleData.value?.id}.png`,
 );
 const updateArticleCatalog = (catalog) => {
   articleCatalog.value = Array.isArray(catalog) ? catalog : [];
@@ -566,7 +566,7 @@ onMounted(() => {
                         </template>
                         <template #avatar>
                             <a-avatar
-                                :src="comment.userId == -1 ? store.$state.config['my-avatar']?.content : `${config.public.ossUrl}/image/userAvatar/${comment.user?.id}.png`"
+                                :src="comment.userId == -1 ? store.$state.config['my-avatar']?.content : `${config.public.storageUrl}/image/userAvatar/${comment.user?.id}.png`"
                                 :alt="comment.user?.name + '头像'"
                                 @error="handleAvatarError">
                                 <template #icon>
@@ -610,7 +610,7 @@ onMounted(() => {
                                 </template>
                                 <template #avatar>
                                     <a-avatar
-                                        :src="childComment.userId == -1 ? store.$state.config['my-avatar']?.content : `${config.public.ossUrl}/image/userAvatar/${childComment.user?.id}.png`"
+                                        :src="childComment.userId == -1 ? store.$state.config['my-avatar']?.content : `${config.public.storageUrl}/image/userAvatar/${childComment.user?.id}.png`"
                                         :alt="childComment.user?.name + '头像'"
                                         @error="handleAvatarError">
                                         <template #icon>

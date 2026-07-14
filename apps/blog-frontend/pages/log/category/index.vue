@@ -31,7 +31,7 @@ const { data: dataList, error: getCategoriesError } = await useAsyncData(
           :key="item.id"
         >
           <RepeatDataCard
-            :imagePath="`${config.public.ossUrl}/image/articleTypeCover/${item.id}.png`"
+            :imagePath="`${config.public.storageUrl}/image/articleTypeCover/${item.id}.png`"
             :data="item"
             :dataOption="{
               mainAttribute: 'theme',

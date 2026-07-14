@@ -26,12 +26,12 @@ const props = defineProps({
   imagePath: {
     type: String,
     default: null,
-  }, // 图片路径，默认是 ${config.public.ossUrl}/image/articleCover/${props.articleData.id}.png
+  }, // 图片路径，默认是 ${config.public.storageUrl}/image/articleCover/${props.articleData.id}.png
 });
 const candidateImageSrc = computed(() => {
   if (props.imagePath) return props.imagePath;
   if (!props.data?.id) return null;
-  return `${config.public.ossUrl}/image/articleCover/${props.data.id}.png`;
+  return `${config.public.storageUrl}/image/articleCover/${props.data.id}.png`;
 });
 const imageStatus = ref('missing');
 let imageProbeId = 0;

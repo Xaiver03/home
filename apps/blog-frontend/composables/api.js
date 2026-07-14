@@ -143,13 +143,13 @@ export const api = {
    * @param {*} data 格式：{file: 文件二进制 , path: 上传到oss的路径（若uuidOrNot为false，需要包括文件名和文件后缀）,uuidOrNot: 是否生成uuid }
    */
   uploadImage: async (data) => {
-    return await http.post('/oss/customer/uploadImage', data, null, {
+    return await http.post('/storage/customer/uploadImage', data, null, {
       // "Content-Type": "multipart/form-data",
     });
   },
   // 删除图片
   deleteImage: async (data) => {
-    return http.delete(`/oss/customer/deleteImage?path=${data.path}`);
+    return http.delete(`/storage/customer/deleteImage?path=${data.path}`);
   },
   // #endregion
 };
