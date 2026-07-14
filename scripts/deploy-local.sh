@@ -8,7 +8,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REMOTE_DIR="${DEPLOY_REMOTE_DIR:-/opt/home}"
 SSH_PORT="${DEPLOY_SSH_PORT:-22}"
-SSH_ARGS=(-p "$SSH_PORT" -o ConnectTimeout=15 -o ServerAliveInterval=15)
+SSH_ARGS=(
+  -p "$SSH_PORT"
+  -o ConnectTimeout=15
+  -o ServerAliveInterval=15
+  -o ServerAliveCountMax=10
+)
 
 if [[ -z "${DEPLOY_SSH_HOST:-}" || -z "${DEPLOY_SSH_USER:-}" ]]; then
   echo "缺少 DEPLOY_SSH_HOST 或 DEPLOY_SSH_USER。" >&2
@@ -30,28 +35,17 @@ pnpm --filter blog-frontend build:pro
 echo "==> 检查后端测试"
 pnpm --filter blog-api test
 
-echo "==> 上传源码和本地构建产物"
-rsync -az --delete \
-  --exclude='.git/' \
-  --exclude='node_modules/' \
-  --exclude='.nuxt/' \
-  --exclude='.output/' \
-  --exclude='dist/' \
-  --exclude='logs/' \
-  --exclude='database*.db' \
-  -e "ssh ${SSH_ARGS[*]}" \
-  "$ROOT_DIR/" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}:${REMOTE_DIR}/"
-
-echo "==> 单独上传压缩后的构建产物"
+echo "==> 单连接上传源码、构建产物并重启服务"
 tar czf - \
-  -C "$ROOT_DIR/apps/homepage" dist \
-  -C "$ROOT_DIR/apps/blog-admin" dist \
-  -C "$ROOT_DIR/apps/blog-frontend" .output \
+  --exclude='./.git' \
+  --exclude='./node_modules' \
+  --exclude='*/node_modules' \
+  --exclude='*/.nuxt' \
+  --exclude='*/logs' \
+  --exclude='database*.db' \
+  --exclude='*/database*.db' \
+  -C "$ROOT_DIR" . \
   | ssh "${SSH_ARGS[@]}" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}" \
-    "tar xzf - -C '$REMOTE_DIR'"
-
-echo "==> 在服务器重启服务（跳过服务器构建）"
-ssh "${SSH_ARGS[@]}" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}" \
-  "cd '$REMOTE_DIR' && bash deploy.sh --skip-build"
+    "mkdir -p '$REMOTE_DIR' && tar xzf - -C '$REMOTE_DIR' && cd '$REMOTE_DIR' && bash deploy.sh --skip-build"
 
 echo "本地上传部署完成。"
