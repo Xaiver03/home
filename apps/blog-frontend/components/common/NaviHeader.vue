@@ -55,16 +55,16 @@ const primaryLinks = [
     key: '/log/article',
   },
   {
-    title: '留言板',
-    label: '留言板',
-    path: '/message',
-    key: '/message',
-  },
-  {
     title: '关于我',
     label: '关于我',
     path: '/about',
     key: '/about',
+  },
+  {
+    title: '留言板',
+    label: '留言板',
+    path: '/message',
+    key: '/message',
   },
 ];
 const naviData = reactive(primaryLinks.map((item) => ({ ...item }))); // 导航数据

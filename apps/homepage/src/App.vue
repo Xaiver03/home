@@ -23,7 +23,8 @@
         <a href="#top" @click="menuOpen = false">首页</a>
         <a href="/blog/" @click="menuOpen = false">博客</a>
         <a href="/blog/log/article" @click="menuOpen = false">文章</a>
-        <a href="/blog/about" @click="menuOpen = false">关于</a>
+        <a href="/blog/about" @click="menuOpen = false">关于我</a>
+        <a href="/blog/message" @click="menuOpen = false">留言板</a>
       </nav>
     </header>
 

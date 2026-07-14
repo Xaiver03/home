@@ -202,9 +202,15 @@ const loadPublicQuestions = async (page = 1, append = false) => {
       pageSize: 6,
       data: {},
     });
-    askPublicTotal.value = res.count || 0;
-    publicQuestions.value = append ? [...publicQuestions.value, ...res.rows] : res.rows;
+    const rows = Array.isArray(res?.rows) ? res.rows : [];
+    askPublicTotal.value = Number(res?.count) || 0;
+    publicQuestions.value = append ? [...publicQuestions.value, ...rows] : rows;
     askPublicPage.value = page;
+  } catch (error) {
+    // 公开树洞加载失败时保留页面和表单，不能因为接口暂时不可用卸载整页。
+    publicQuestions.value = [];
+    askPublicTotal.value = 0;
+    console.warn('公开树洞加载失败:', error?.message || error);
   } finally {
     publicLoading.value = false;
   }
