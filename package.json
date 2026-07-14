@@ -2,8 +2,8 @@
   "name": "@xld/monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "邓湘雷的个人主页 + 博客系统 Monorepo",
-  "author": "灯下灯/Xaiver",
+  "description": "晓黎团队官网 + CEO 博客系统 Monorepo",
+  "author": "晓黎团队",
   "license": "MIT",
   "homepage": "https://xiangleideng.site",
   "repository": {

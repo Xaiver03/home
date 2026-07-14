@@ -2,15 +2,15 @@
 
 html {
   scroll-behavior: smooth;
-  background: #ebece5;
+  background: #f3f0e8;
 }
 
 body {
   min-width: 20rem;
   min-height: 100%;
   margin: 0;
-  color: #171b1a;
-  background: #ebece5;
+  color: #101722;
+  background: #f3f0e8;
   font-family:
     'HarmonyOS Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
 }
@@ -38,7 +38,7 @@ img {
 
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #1d4d40;
+  outline: 2px solid #f3a313;
   outline-offset: 0.2rem;
 }
 
@@ -51,6 +51,6 @@ a:focus-visible {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9ca79e;
-  border: 0.18rem solid #ebece5;
+  background: #7e8b99;
+  border: 0.18rem solid #f3f0e8;
 }
