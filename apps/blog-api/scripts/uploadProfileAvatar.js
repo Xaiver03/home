@@ -3,6 +3,7 @@
 /** 上传站长头像到 MinIO，并同步 configuration.my-avatar。 */
 const fs = require('fs');
 const path = require('path');
+process.env.NODE_CONFIG_DIR = process.env.NODE_CONFIG_DIR || path.join(__dirname, '../config');
 const { Configuration, sequelize } = require('../models');
 const storageService = require('../services/storageService');
 

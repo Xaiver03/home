@@ -6,6 +6,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+process.env.NODE_CONFIG_DIR = process.env.NODE_CONFIG_DIR || path.join(__dirname, '../config');
 const storageService = require('../services/storageService');
 
 const sourceDir = path.resolve(process.argv[2] || path.join(__dirname, '../public/uploads'));
