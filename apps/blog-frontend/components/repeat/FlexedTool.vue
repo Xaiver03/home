@@ -53,6 +53,7 @@ const randomFriend = () => {
 }
 
 const refreshCatalogVisibility = async () => {
+  if (!import.meta.client) return
   await nextTick()
   const isArticlePage = /^\/log\/article\/.*/.test(router.currentRoute.value.path)
   const hasCatalog = document.querySelectorAll(
