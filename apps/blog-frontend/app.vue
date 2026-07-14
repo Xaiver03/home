@@ -80,7 +80,7 @@ const seo = [
   },
   {
     path: '/about',
-    title: '关于Xaiver',
+    title: '关于我',
     description: '关于Xaiver，这里是Xaiver的简介，记录着我的成长🧩'
   },
   {

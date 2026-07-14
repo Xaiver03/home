@@ -290,7 +290,6 @@ const messageImageUpload = async (files, callback) => {
         formData.append('uuidOrNot', true); // 上传到oss的路径
         api.uploadImage(formData).then((res) => {
           // 上传oss图片
-          console.log(res);
           if (utils.analysisData(res)) {
             uploadUnSaveImagesPath.value.push(res.data.path); // 记录上传的未保存图片路径
             rev(res);
@@ -374,13 +373,17 @@ onBeforeUnmount(() => {
               <a-radio-button value="author">作者</a-radio-button>
             </a-radio-group>
           </a-space>
-          <!-- TODO 公安备案注释TEMP -->
-          <!-- <a-button @click="messageModelShow = true; phoneAdaptation()">
+          <a-button
+            @click="
+              messageModelShow = true;
+              phoneAdaptation();
+            "
+          >
             <template #icon>
               <FormatPainterOutlined />
             </template>
-留下痕迹
-          </a-button> -->
+            留下痕迹
+          </a-button>
         </a-space>
         <a-space class="flex md:hidden">
           <a-button
