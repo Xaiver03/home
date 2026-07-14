@@ -557,6 +557,7 @@ button {
   }
 
   .mobile-tab-bar {
+    pointer-events: auto;
     position: fixed;
     right: 0;
     bottom: 0;

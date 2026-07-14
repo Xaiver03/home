@@ -68,7 +68,7 @@ const currentPage = useState('currentPage', () => route.params.page);
 const pageSize = useState('pageSize', () => 10);
 // 服务端 - 获取文章列表和分类
 const { data: articleList, error: articleListError } = await useAsyncData(
-  'getArticleList',
+  `getArticleList-page-${route.params.page}`,
   async () => {
     total.value = 0;
     currentPage.value = route.params.page;
@@ -85,6 +85,9 @@ const { data: articleList, error: articleListError } = await useAsyncData(
         }
         return res.rows;
       });
+  },
+  {
+    watch: [() => route.params.page],
   },
 );
 const { data: categoryData } = await useAsyncData(

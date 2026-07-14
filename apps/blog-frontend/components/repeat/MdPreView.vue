@@ -96,9 +96,15 @@ const props = defineProps({
 }
 
 :deep(#preview figure img) {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
   display: block;
+}
+
+:deep(#preview img) {
+  max-width: 100%;
+  height: auto;
 }
 
 :deep(#preview pre),

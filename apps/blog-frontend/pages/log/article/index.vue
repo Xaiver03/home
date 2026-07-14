@@ -65,7 +65,7 @@ const currentPage = useState('currentPage', () => 1);
 const pageSize = useState('pageSize', () => 10);
 // 服务端 - 获取文章列表和分类
 const { data: articleList, error: articleListError } = await useAsyncData(
-  'getArticleList',
+  'getArticleList-index',
   async () => {
     total.value = 0;
     currentPage.value = 1;

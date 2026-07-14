@@ -62,7 +62,7 @@ const currentPage = useState('currentPage', () => route.params.page);
 const pageSize = useState('pageSize', () => 10);
 // 服务端 - 获取留言
 const { data: messageList, error: messageListError } = await useAsyncData(
-  'getMessageList',
+  `getMessageList-page-${route.params.page}`,
   async () => {
     total.value = 0;
     currentPage.value = route.params.page;
@@ -78,6 +78,9 @@ const { data: messageList, error: messageListError } = await useAsyncData(
         total.value = res.count;
         return res.rows;
       });
+  },
+  {
+    watch: [() => route.params.page],
   },
 );
 if (messageListError) {

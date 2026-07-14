@@ -80,7 +80,7 @@ const queryForm = reactive({
 });
 // 服务端 - 获取留言
 const { data: messageList, error: messageListError } = await useAsyncData(
-  'getMessageList',
+  'getMessageList-index',
   async () => {
     currentPage.value = 1;
     pageSize.value = 10;

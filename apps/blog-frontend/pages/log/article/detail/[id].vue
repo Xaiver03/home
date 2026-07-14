@@ -35,7 +35,7 @@ definePageMeta({
 
 // 获取文章数据以及文章内容
 const { data: articleData, error: articleError } = await useAsyncData(
-  'getArticleDetail',
+  `getArticleDetail-${route.params.id}`,
   async () => {
     const id = route.params.id;
     return await api.getArticleContentById(id).then((res) => {
@@ -47,6 +47,9 @@ const { data: articleData, error: articleError } = await useAsyncData(
       }
       return null;
     });
+  },
+  {
+    watch: [() => route.params.id],
   },
 );
 watch(() => articleData.value?.id, probeCoverImage, { immediate: true });
