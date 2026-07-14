@@ -84,12 +84,28 @@ pnpm --filter blog-api migration:generate --name <migration-name>
 - **blog-frontend**：修改 `.env.dev` / `.env.local`（monorepo 根目录）
 - 环境变量模板：`.env.example`
 
-## 生产服务器
+## 生产服务器与部署
 
-- **SSH**: `ssh finlaw`（124.223.13.226，ubuntu）
+- **SSH**: `ssh finlaw`（服务器连接需先确认 SSH 握手正常）
 - **部署路径**: `/opt/home`
 - **Web 服务器**: Nginx（`/etc/nginx/sites-enabled/xiangleideng.site`），修改后需 `systemctl reload nginx`
 - **域名**: https://xiangleideng.site
+
+### 默认部署流程
+
+当前默认使用本地构建上传，不依赖服务器执行 `git pull`：
+
+```bash
+DEPLOY_SSH_HOST=... \
+DEPLOY_SSH_USER=... \
+DEPLOY_SSH_PORT=... \
+DEPLOY_SSH_KEY=... \
+./scripts/deploy-local.sh
+```
+
+脚本会本地构建 homepage、blog-admin、blog-frontend，运行 blog-api 测试，通过 rsync 上传源码和构建产物，最后在服务器执行 `deploy.sh --skip-build` 重启服务。
+
+GitHub Actions 的 `deploy.yml` 只保留手动触发，作为备用部署通道；GitHub Runner 曾出现 `ssh: handshake failed: EOF`，因此不能把它当作默认部署成功依据。部署完成后必须检查线上 HTML、页面状态码和关键交互。
 
 ## 注意事项
 
@@ -106,17 +122,17 @@ pnpm --filter blog-api migration:generate --name <migration-name>
 **每次代码修改完成后的强制步骤：**
 
 1. **构建** — `cd apps/blog-admin && npm run build`（前端修改时）
-2. **部署** — 将构建产物复制到 `apps/blog-api/public/mgmt/`，同步后端代码到 finlaw
+2. **部署** — 默认执行 `scripts/deploy-local.sh`，不要只在服务器执行 git pull
 3. **Commit + Push** — 按逻辑分组提交，直接 push 到 origin/dev
-4. **🤖 监控 CI/CD** — push 后立即用 `gh run list --branch dev --limit 3` 查看触发状态，然后用 `gh run watch <RUN_ID>` 监控直到完成
-5. **验证** — CI Build Check 和 CD Deploy 两个 workflow 都必须 `completed success`
+4. **🤖 监控 CI** — push 后检查 Build Check；只有手动触发备用 CD 时才监控 CD
+5. **验证** — 本地构建、上传日志、线上状态码和关键页面都要确认；若 SSH 失败，明确记录为部署阻塞，不得声称已上线
 
-**CD 部署流程：**
-- GitHub Actions 在 push dev 时自动触发
+**备用 CD 部署流程：**
+- 手动触发 `.github/workflows/deploy.yml`
 - `test` job → 全部测试通过
-- `deploy` job → SSH 到 finlaw（124.223.13.226）→ 运行 `/opt/home/scripts/deploy.sh`
-- 服务器上：git pull → pnpm install → 构建 → pm2 restart → nginx reload
-- **严禁在 CI/CD 完成前就声称工作已完成**
+- `deploy` job → SSH 到服务器 → 运行 `/opt/home/deploy.sh`
+- 服务器上执行构建、pm2 restart 和 nginx reload
+- **严禁在 CI/CD 或本地上传完成前就声称工作已完成**
 
 **推送后检查清单：**
 - [ ] `git push` 成功

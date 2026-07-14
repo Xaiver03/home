@@ -1,9 +1,6 @@
 name: CD Deploy
 
 on:
-  push:
-    branches:
-      - dev
   workflow_dispatch:
     inputs:
       skip_build:
