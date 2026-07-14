@@ -2,6 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+// 让脚本从仓库根目录执行时，也能加载 blog-api 自己的 config 目录。
+// 保留外部显式传入的 NODE_CONFIG_DIR，便于部署环境覆盖默认配置。
+if (!process.env.NODE_CONFIG_DIR) {
+  process.env.NODE_CONFIG_DIR = path.resolve(__dirname, '../config');
+}
+
 const CATEGORY_DEFINITIONS = {
   'AI 与智能体': 'Agent 架构、沙箱、权限与 AI 开发工具。',
   'AI 与产品': 'AI 产品思考、个人工作流与知识管理。',
