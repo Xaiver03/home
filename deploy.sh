@@ -166,7 +166,7 @@ sleep 2
 
 # ---- Step 5: 重载 Nginx ----
 step "Step 5/6: 重载 Nginx"
-if /usr/sbin/nginx -t 2>&1 && /usr/sbin/nginx -s reload 2>&1; then
+if sudo /usr/sbin/nginx -t 2>&1 && sudo /usr/sbin/nginx -s reload 2>&1; then
   log "Nginx 重载成功"
 else
   warn "Nginx 重载失败，请检查配置"

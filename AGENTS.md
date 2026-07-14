@@ -38,6 +38,7 @@ pnpm --filter blog-frontend build
   ```
 
 - `scripts/deploy-local.sh` 会本地构建 homepage、blog-admin、blog-frontend，运行 blog-api 测试，然后通过 rsync 上传并在服务器执行 `deploy.sh --skip-build`。
+- Nginx 检查与重载必须使用 `sudo nginx -t`、`sudo nginx -s reload`；Let's Encrypt 证书位于 `/etc/letsencrypt`，普通用户直接检查会产生权限误报。
 - GitHub 的手动 CD 仍可作为备用方案，但服务器 SSH 必须先通过握手检查；不要把部署成功建立在服务器 `git pull` 上。
 - 不提交密钥、SMTP 密码、数据库密码或构建产物中的敏感配置。
 

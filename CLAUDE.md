@@ -88,7 +88,8 @@ pnpm --filter blog-api migration:generate --name <migration-name>
 
 - **SSH**: `ssh finlaw`（服务器连接需先确认 SSH 握手正常）
 - **部署路径**: `/opt/home`
-- **Web 服务器**: Nginx（`/etc/nginx/sites-enabled/xiangleideng.site`），修改后需 `systemctl reload nginx`
+- **Web 服务器**: Nginx（`/etc/nginx/sites-enabled/xiangleideng.site`），修改后使用 `sudo nginx -t && sudo nginx -s reload`
+- Let's Encrypt 证书位于 `/etc/letsencrypt`，不要用普通用户直接读取证书判断配置是否有效。
 - **域名**: https://xiangleideng.site
 
 ### 默认部署流程
