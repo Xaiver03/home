@@ -18,11 +18,16 @@ if (!filePath) {
   const extension = path.extname(filePath).toLowerCase();
   const contentType = extension === '.png' ? 'image/png' : 'image/jpeg';
   const result = await storageService.uploadBuffer('image/profile/avatar.jpg', buffer, contentType);
-  const configuration = await Configuration.findOne({ where: { label: 'my-avatar' } });
-  if (configuration) {
-    await configuration.update({ content: result.url, type: 'STRING' });
-  } else {
+  // 兼容历史页面、浏览器缓存和旧数据库记录，保留旧路径的同图别名。
+  await storageService.uploadBuffer('avatar.jpg', buffer, contentType);
+
+  const configurations = await Configuration.findAll({ where: { label: 'my-avatar' } });
+  if (configurations.length === 0) {
     await Configuration.create({ label: 'my-avatar', content: result.url, type: 'STRING' });
+  } else {
+    await Promise.all(
+      configurations.map((configuration) => configuration.update({ content: result.url, type: 'STRING' })),
+    );
   }
   console.log(`头像已上传：${result.url}`);
 })().catch((error) => {
