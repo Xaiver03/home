@@ -733,7 +733,7 @@ onMounted(() => {
   // 文章内容
   .article-reading-layout {
     display: grid;
-    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    grid-template-columns: minmax(26rem, 30rem) minmax(0, 1fr);
     gap: 2rem;
     align-items: start;
   }
@@ -741,9 +741,11 @@ onMounted(() => {
   .article-outline {
     position: sticky;
     top: 9rem;
+    height: calc(100vh - 12rem);
+    min-height: 42rem;
     max-height: calc(100vh - 12rem);
     overflow: auto;
-    padding: 1.6rem;
+    padding: 2rem 1.8rem;
   }
 
   .outline-title {
@@ -753,6 +755,19 @@ onMounted(() => {
     font-weight: 820;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+  .article-outline :deep(.md-editor-catalog) {
+    width: 100%;
+    font-size: 1.45rem;
+  }
+
+  .article-outline :deep(.md-editor-catalog-link) {
+    display: block;
+    padding: 0.7rem 0.9rem;
+    line-height: 1.55;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   #log-content,
