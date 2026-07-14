@@ -17,7 +17,7 @@
                         <a-descriptions-item label="简介" :span="2">{{ item.introduction }}</a-descriptions-item>
                         <a-descriptions-item label="封面">
                             <a-image :width="50" :height="50" class="object-cover"
-                                :src="`${proxy.GLOBAL.VUE_APP_OSS_IMAGE_BASE_URL + proxy.GLOBAL.VUE_APP_OSS_BASE_DIR}/image/articleCover/${item.id}.png`"
+                                :src="`${proxy.GLOBAL.VUE_APP_STORAGE_IMAGE_BASE_URL + proxy.GLOBAL.VUE_APP_STORAGE_BASE_DIR}/image/articleCover/${item.id}.png`"
                                 :fallback="store.state.config?.['not-found-image']?.content || ''"></a-image>
                         </a-descriptions-item>
                         <a-descriptions-item label="人气">{{ item.popularity }}</a-descriptions-item>
@@ -57,7 +57,7 @@
                 <div class="columns-2">
                     <a-form-item label="封面" name="cover">
                         <a-upload v-model:file-list="imageFileList" name="file"
-                        :action="proxy.GLOBAL.VUE_APP_BASE_URL + '/oss/uploadImageQueryIn?path=/image/articleCover/' + currentColumn.id"
+                        :action="proxy.GLOBAL.VUE_APP_BASE_URL + '/storage/uploadImageQueryIn?path=/image/articleCover/' + currentColumn.id"
                         :headers="fileHeaders" @change="handleUploadImageChange">
                         <a-button>上传封面</a-button>
                     </a-upload>

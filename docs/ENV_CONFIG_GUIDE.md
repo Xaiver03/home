@@ -80,12 +80,12 @@ MAIL_FROM=light@xiangleideng.site
 MAIL_FROM_NAME=邓湘雷の博客
 ```
 
-### 6. 七牛云 OSS
+### 6. MinIO 对象存储
 ```bash
-QINIU_ACCESS_KEY=
-QINIU_SECRET_KEY=
-QINIU_BUCKET=
-QINIU_DOMAIN=
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
+MINIO_BUCKET=
+MINIO_DOMAIN=
 ```
 
 ### 7. 站点信息

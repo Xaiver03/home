@@ -18,6 +18,17 @@ export default {
       "user":"your-mail@gmail.com",
       "pass":"your-mail-pass"
     },
+    "storage": {
+      "provider": "minio",
+      "endpoint": "minio.example.com",
+      "port": 9000,
+      "useSSL": false,
+      "accessKey": "MINIO_ACCESS_KEY",
+      "secretKey": "MINIO_SECRET_KEY",
+      "bucket": "home",
+      "region": "us-east-1",
+      "publicUrl": "/uploads"
+    },
     "comment": {
       "entityType": ["Article", "Message"],
       "adminCustomerEmail": ["your-mail@gmail.com"]

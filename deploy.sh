@@ -101,12 +101,20 @@ else
   fi
 fi
 
+# 将生产对象存储等运行时变量注入当前部署进程和 PM2。
+if [ -f "$REPO_DIR/.env.pro" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . "$REPO_DIR/.env.pro"
+  set +a
+fi
+
 # ---- Step 4: 重启后端服务 ----
 step "Step 4/6: 重启后端服务"
 
 # blog-api (spaceP_pro)
 if pm2 list | grep -q "spaceP_pro"; then
-  pm2 restart spaceP_pro 2>&1 | tail -3
+  pm2 restart spaceP_pro --update-env 2>&1 | tail -3
 else
   cd "$REPO_DIR/apps/blog-api"
   pm2 start ecosystem.config.js --env pro 2>&1 | tail -5

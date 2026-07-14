@@ -48,8 +48,8 @@
 | **配置管理** |||
 | 获取全局配置 | `GET /api/configuration/reception/getConfig` | ✅ 一致 | 正常 |
 | **OSS 管理** |||
-| 上传图片 | `POST /api/oss/customer/uploadImage` | ✅ 一致 | 正常 |
-| 删除图片 | `DELETE /api/oss/customer/deleteImage` | ✅ 一致 | 正常 |
+| 上传图片 | `POST /api/storage/customer/uploadImage` | ✅ 一致 | 正常 |
+| 删除图片 | `DELETE /api/storage/customer/deleteImage` | ✅ 一致 | 正常 |
 | **管理员** |||
 | 管理员登录 | `POST /api/admin/reception/login` | ✅ 一致 | 正常 |
 

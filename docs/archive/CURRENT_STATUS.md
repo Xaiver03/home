@@ -70,7 +70,7 @@ bash scripts/sync-database.sh
   - Redis 配置（已移除密码）
   - 邮件配置
   - 评论系统配置
-  - 七牛云配置（可选）
+  - MinIO 对象存储配置
 
 ### 3. ✅ .gitignore 更新
 - 忽略自动生成的文件：

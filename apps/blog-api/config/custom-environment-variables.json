@@ -19,6 +19,17 @@
     "from_email": "MAIL_FROM",
     "from_name": "MAIL_FROM_NAME"
   },
+  "storage": {
+    "provider": "STORAGE_PROVIDER",
+    "endpoint": "MINIO_ENDPOINT",
+    "port": "MINIO_PORT",
+    "useSSL": "MINIO_USE_SSL",
+    "accessKey": "MINIO_ACCESS_KEY",
+    "secretKey": "MINIO_SECRET_KEY",
+    "bucket": "MINIO_BUCKET",
+    "region": "MINIO_REGION",
+    "publicUrl": "STORAGE_PUBLIC_URL"
+  },
   "tokenSecretKey": "JWT_SECRET",
   "author": {
     "name": "AUTHOR_NAME",

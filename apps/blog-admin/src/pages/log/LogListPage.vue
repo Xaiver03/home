@@ -31,14 +31,14 @@
         <template v-if="column.key === 'cover'">
           <div class="actionBar" v-if="currentColumn['id'] === record['id']">
             <a-upload v-model:file-list="imageFileList" name="file"
-              :action="proxy.GLOBAL.VUE_APP_BASE_URL + '/oss/uploadImageQueryIn?path=/image/articleCover/' + record.id"
+              :action="proxy.GLOBAL.VUE_APP_BASE_URL + '/storage/uploadImageQueryIn?path=/image/articleCover/' + record.id"
               :headers="fileHeaders" @change="handleUploadImageChange">
               <a>上传封面</a>
             </a-upload>
             <a @click="deleteArticleCover(record.id)">删除封面</a>
           </div>
           <a-image :width="100" v-else
-            :src="`${proxy.GLOBAL.VUE_APP_OSS_IMAGE_BASE_URL + proxy.GLOBAL.VUE_APP_OSS_BASE_DIR}/image/articleCover/${record.id}.png`"
+            :src="`${proxy.GLOBAL.VUE_APP_STORAGE_IMAGE_BASE_URL + proxy.GLOBAL.VUE_APP_STORAGE_BASE_DIR}/image/articleCover/${record.id}.png`"
             :fallback="store.state.config?.['not-found-image']?.content || ''"></a-image>
         </template>
         <!-- 文章类目 -->

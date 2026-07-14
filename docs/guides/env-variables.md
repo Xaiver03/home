@@ -20,7 +20,7 @@
 | `PORT_BLOG_ADMIN` | blog-admin 开发服务端口 | `8083` |
 | `NUXT_PUBLIC_ENV` | Nuxt 环境标识（透传给 blog-frontend） | `dev` |
 | `NUXT_PUBLIC_API_URL` | blog-frontend 使用的 API 地址 | `http://localhost:8086/api` |
-| `NUXT_PUBLIC_OSS_URL` | OSS 地址（可选，留空则禁用） | 空 |
+| `NUXT_PUBLIC_STORAGE_URL` | MinIO 资源地址（可选，留空则禁用） | 空 |
 | `NUXT_PUBLIC_BASE_URL` | blog-frontend 站点基础地址 | `http://localhost:3004` |
 
 ---
@@ -76,10 +76,10 @@
 | `mail.from_name` | 发件人显示名称 | `邓湘雷の博客` |
 | `comment.entityType` | 允许评论的实体类型 | `["Article", "Message"]` |
 | `comment.adminCustomerEmail` | 管理员邮箱列表（接收评论通知） | — |
-| `qiniu.accessKey` | 七牛云 AccessKey（可选，用于文件上传） | 空 |
-| `qiniu.secretKey` | 七牛云 SecretKey（可选） | 空 |
-| `qiniu.bucket` | 七牛云存储空间名（可选） | 空 |
-| `qiniu.domain` | 七牛云访问域名（可选） | 空 |
+| `MINIO_ACCESS_KEY` | MinIO Access Key | 必填 |
+| `MINIO_SECRET_KEY` | MinIO Secret Key | 必填 |
+| `MINIO_BUCKET` | MinIO Bucket | 必填 |
+| `MINIO_ENDPOINT` | MinIO 服务地址 | 必填 |
 | `tokenSecretKey` | JWT 签名密钥（生产环境务必修改） | `xld_blog_jwt_secret_2025_dev` |
 | `vipCustomerEmail` | 管理员邮箱列表（可登录后台） | — |
 | `author.name` | 博客作者名称 | `邓湘雷` |
@@ -100,7 +100,7 @@
 | `NUXT_PUBLIC_BASE_URL` | 博客前台站点地址（用于 SEO） | `http://localhost:3015` |
 | `NUXT_PUBLIC_SITE_NAME` | 博客站点名称 | `邓湘雷の博客` |
 | `NUXT_PUBLIC_SITE_DESC` | 博客站点描述 | `邓湘雷的个人博客，分享技术、生活与思考` |
-| `NUXT_PUBLIC_OSS_URL` | OSS 资源基础地址（可选，留空则禁用） | 空 |
+| `NUXT_PUBLIC_STORAGE_URL` | MinIO 资源基础地址（可选，留空则禁用） | 空 |
 
 ---
 
@@ -141,7 +141,7 @@ PORT_BLOG_FRONTEND=3004
 PORT_BLOG_ADMIN=8083
 NUXT_PUBLIC_ENV=dev
 NUXT_PUBLIC_API_URL=http://localhost:8086/api
-NUXT_PUBLIC_OSS_URL=
+NUXT_PUBLIC_STORAGE_URL=
 NUXT_PUBLIC_BASE_URL=http://localhost:3004
 EOF
 
@@ -155,7 +155,7 @@ NUXT_PUBLIC_API_URL=http://localhost:8086/api
 NUXT_PUBLIC_BASE_URL=http://localhost:3004
 NUXT_PUBLIC_SITE_NAME=邓湘雷の博客
 NUXT_PUBLIC_SITE_DESC=邓湘雷的个人博客，分享技术、生活与思考
-NUXT_PUBLIC_OSS_URL=
+NUXT_PUBLIC_STORAGE_URL=
 EOF
 
 # 5. 复制 blog-api 开发配置（已有默认值，按需修改）

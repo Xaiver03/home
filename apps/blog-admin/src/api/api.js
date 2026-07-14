@@ -77,29 +77,29 @@ export default {
   },
   // #endregion
 
-  // #region oss--
+  // #region MinIO storage
   /**
-   * 获取oss目录下的所有文件
+   * 获取 MinIO 目录下的所有文件
    * @param {String} path 目录路径（不需要环境，/开头）
    * @param {String} delimiter 可选，若为'/'，则只返回当前目录下的文件和文件夹，没有文件夹下的文件
    * @returns {Array} 文件数组
    */
   getFilesInPath(path,delimiter) {
-    return req.get("/oss/getFileInPath", { path,delimiter });
+    return req.get("/storage/getFileInPath", { path,delimiter });
   },
   /**
-   * 上传oss图片
-   * @param {*} data 格式：{file: 文件二进制 , path: 上传到oss的路径（若uuidOrNot为false，需要包括文件名和文件后缀）,uuidOrNot: 是否生成uuid }
+   * 上传图片到 MinIO
+   * @param {*} data 格式：{file: 文件二进制 , path: 上传路径, uuidOrNot: 是否生成uuid }
    */
   uploadImage(data) {
-    return req.postFormData("/oss/uploadImage", data);
+    return req.postFormData("/storage/uploadImage", data);
   },
   /**
-   * 删除oss图片
-   *  @param {*} data 格式：{path: 文件在oss中的路径包括文件名及文件后缀}
+   * 删除 MinIO 图片
+   *  @param {*} data 格式：{path: MinIO 对象路径}
    */
   deleteImage(data) {
-    return req.delete("/oss/deleteImage", data);
+    return req.delete("/storage/deleteImage", data);
   },
   // #endregion
 

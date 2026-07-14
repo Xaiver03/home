@@ -30,7 +30,8 @@ const cors = require("cors"); // 跨域
 var indexRouter = require("./routes/index");
 var userRouter = require("./routes/user");
 var articleRouter = require("./routes/article");
-var ossRouter = require("./routes/oss");
+var storageRouter = require("./routes/storage");
+var storageController = require("./controller/storageController");
 var adminRouter = require("./routes/admin");
 var commentRouter = require("./routes/comment");
 var friendLinkRouter = require("./routes/friendLink")
@@ -54,6 +55,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// 对外保持 /uploads/... 兼容路径，实际内容统一从 MinIO 流式读取
+app.get('/uploads/*', storageController.serveObject);
 
 // 博客前台 Nuxt3 静态文件配置
 app.use('/blog/_nuxt', express.static(path.join(__dirname, '../space-log-nuxt3/app/.output/public/_nuxt')));
@@ -94,7 +98,7 @@ app.use(checkToken); // JWT认证 token合法性
 // API路由（带 /api 前缀）
 app.use("/api/article", articleRouter);
 app.use("/api/user", userRouter);
-app.use("/api/oss", ossRouter);
+app.use("/api/storage", storageRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/friendLink",friendLinkRouter)

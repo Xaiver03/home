@@ -88,7 +88,7 @@
                 <div v-else-if="item.user" class="flex items-center my-2">
                   <a-image :width="60" :height="60" style="border-color: #fff;" :preview="false"
                     class="border-solid border-2 rounded-full overflow-hidden object-cover"
-                    :src="`${proxy.GLOBAL.VUE_APP_OSS_IMAGE_BASE_URL + proxy.GLOBAL.VUE_APP_OSS_BASE_DIR}/image/userAvatar/${item.user.id}.png`"
+                    :src="`${proxy.GLOBAL.VUE_APP_STORAGE_IMAGE_BASE_URL + proxy.GLOBAL.VUE_APP_STORAGE_BASE_DIR}/image/userAvatar/${item.user.id}.png`"
                     :fallback="store.state.config?.['not-found-image']?.content || ''"></a-image>
                   <span class="mx-5">{{ item.user.name }}</span>
                 </div>

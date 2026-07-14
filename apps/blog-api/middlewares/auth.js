@@ -50,7 +50,7 @@ module.exports = {
             description: '请登录后再发送评论叭~邮箱登录很快的🙂‍',
           };
           break;
-        case '/oss/customer/uploadImage':
+        case '/storage/customer/uploadImage':
           msg = {
             message: '上传失败⭕️',
             description: '请登录后再上传叭~邮箱登录很快的🙂‍',

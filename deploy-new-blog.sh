@@ -154,7 +154,7 @@ create_frontend_env() {
     cat > .env.pro << EOF
 # Nuxt3 前台生产环境配置
 NUXT_PUBLIC_API_URL=https://xiangleideng.site/api
-NUXT_PUBLIC_OSS_URL=https://kodo.openpenpal.com
+NUXT_PUBLIC_STORAGE_URL=/uploads
 NUXT_PUBLIC_BASE_URL=https://xiangleideng.site
 NUXT_PUBLIC_ENV=pro
 NUXT_PORT=3000
@@ -177,8 +177,8 @@ create_admin_env() {
 NODE_ENV=pro
 VUE_APP_PORT=8080
 VUE_APP_BASE_URL=https://xiangleideng.site/api
-VUE_APP_OSS_IMAGE_BASE_URL=https://kodo.openpenpal.com
-VUE_APP_OSS_BASE_DIR=/blog
+VUE_APP_STORAGE_IMAGE_BASE_URL=
+VUE_APP_STORAGE_BASE_DIR=/uploads
 EOF
 
     # 复制到其他环境
@@ -201,13 +201,16 @@ create_backend_config() {
     "mysql": "blog_user:C3AnRPL8HHGNbd33reAV@tcp(127.0.0.1:3306)/space_blog?charset=utf8mb4&parseTime=true&loc=Local",
     "sqlite": "file:blog.db"
   },
-  "qiniu": {
-    "access_key": "P8w00uvjzM1hFjXa6inOG52T_7IVYolhMfy3dVst",
-    "secret_key": "LluHUa84A_MF-P6-BAwlOGOgAtMInk-K-vcgDwM8",
-    "bucket": "xiangleideng",
-    "domain": "kodo.openpenpal.com",
-    "zone": "Zone_z2",
-    "baseDir": "/blog"
+  "storage": {
+    "provider": "minio",
+    "endpoint": "${MINIO_ENDPOINT:-}",
+    "port": ${MINIO_PORT:-9000},
+    "useSSL": ${MINIO_USE_SSL:-false},
+    "accessKey": "${MINIO_ACCESS_KEY:-}",
+    "secretKey": "${MINIO_SECRET_KEY:-}",
+    "bucket": "${MINIO_BUCKET:-home}",
+    "region": "${MINIO_REGION:-us-east-1}",
+    "publicUrl": "/uploads"
   },
   "mail": {
     "smtp_host": "gz-smtp.qcloudmail.com",
@@ -409,7 +412,7 @@ show_result() {
     echo "⚠️  重要提醒："
     echo "   1. 请编辑后端配置文件: $BACKEND_PATH/config/pro.json"
     echo "   2. 使用MySQL数据库，确保数据库连接信息正确"
-    echo "   3. 七牛云存储已配置，如需修改请更新qiniu部分"
+    echo "   3. MinIO 对象存储必须配置 MINIO_ENDPOINT、MINIO_ACCESS_KEY、MINIO_SECRET_KEY 和 MINIO_BUCKET"
     echo "   4. 腾讯云邮件服务已配置，如需修改请更新mail部分"
     echo "   5. 建议修改JWT密钥以提高安全性"
     echo ""

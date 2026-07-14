@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const ossController = require("../controller/ossController");
+const storageController = require("../controller/storageController");
 var { checkPermissions } = require("../middlewares/auth");
 var { limitCustomerFileUpload } = require("../middlewares/rateLimit");
 
 // 后台
-router.get("/getFileInPath", checkPermissions(), ossController.getFileInPath);
-router.post("/uploadImage", checkPermissions(), ossController.uploadImage);
+router.get("/getFileInPath", checkPermissions(), storageController.getFileInPath);
+router.post("/uploadImage", checkPermissions(), storageController.uploadImage);
 router.post(
   "/uploadImageQueryIn",
   checkPermissions(),
-  ossController.uploadImageQueryIn
+  storageController.uploadImageQueryIn
 );
-router.delete("/deleteImage", checkPermissions(), ossController.deleteImage);
+router.delete("/deleteImage", checkPermissions(), storageController.deleteImage);
 
 // 客户端
 router.post(
@@ -21,11 +21,11 @@ router.post(
     message: "触发限制啦⛔️",
     description: "上传文件过于频繁，触发防脚本🤖，请稍后重试"
   }),
-  ossController.customerUploadImage
+  storageController.customerUploadImage
 );
 router.delete(
   "/customer/deleteImage",
-  ossController.customerDeleteImage
+  storageController.customerDeleteImage
 );
 
 module.exports = router; // 导出路由器

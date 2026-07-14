@@ -1,156 +1,150 @@
 const fs = require('fs');
 const path = require('path');
 const { IncomingForm } = require('formidable');
+const Minio = require('minio');
 const config = require('config');
 
-// 本地存储配置
-const storageConfig = config.has('storage') ? config.get('storage') : {
-  baseDir: path.resolve(__dirname, '../public/uploads'),
-  publicUrl: '/uploads',
-};
+const storageConfig = config.get('storage');
 
-const UPLOAD_DIR = storageConfig.baseDir;
-
-// 确保上传目录存在
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+if (storageConfig.provider !== 'minio') {
+  throw new Error('对象存储必须配置为 MinIO（storage.provider=minio）');
 }
 
+const requiredConfig = ['endpoint', 'accessKey', 'secretKey', 'bucket'];
+const missingConfig = requiredConfig.filter((key) => !storageConfig[key]);
+if (missingConfig.length > 0) {
+  throw new Error(`MinIO 配置缺失：${missingConfig.join(', ')}`);
+}
+
+const client = new Minio.Client({
+  endPoint: storageConfig.endpoint,
+  port: Number(storageConfig.port || 9000),
+  useSSL: storageConfig.useSSL === true || storageConfig.useSSL === 'true',
+  accessKey: storageConfig.accessKey,
+  secretKey: storageConfig.secretKey,
+  region: storageConfig.region || undefined,
+});
+
+const bucket = storageConfig.bucket;
+const publicUrl = storageConfig.publicUrl || '/uploads';
+const tempDir = path.resolve(__dirname, '../temp/images');
+
+fs.mkdirSync(tempDir, { recursive: true });
+
+const objectName = (value, allowEmpty = false) => {
+  const normalized = path.posix.normalize(String(value || '').replaceAll('\\', '/'));
+  const clean = normalized.replace(/^\/+/, '');
+  if ((!clean || clean === '.') && allowEmpty) return '';
+  if (!clean || clean === '.' || clean.startsWith('../') || clean.includes('/../')) {
+    throw new Error(`非法对象路径：${value}`);
+  }
+  return clean;
+};
+
+const publicPath = (value) => `${publicUrl.replace(/\/$/, '')}/${objectName(value)}`;
+
+const putObject = (key, data, size, metaData = {}) => new Promise((resolve, reject) => {
+  client.putObject(bucket, key, data, size, metaData, (error, result) => {
+    if (error) return reject(error);
+    resolve(result);
+  });
+});
+
+const getObject = (key) => new Promise((resolve, reject) => {
+  client.getObject(bucket, key, (error, stream) => {
+    if (error) return reject(error);
+    resolve(stream);
+  });
+});
+
+const statObject = (key) => new Promise((resolve, reject) => {
+  client.statObject(bucket, key, (error, stat) => {
+    if (error) return reject(error);
+    resolve(stat);
+  });
+});
+
+const deleteObject = (key) => new Promise((resolve, reject) => {
+  client.removeObject(bucket, key, (error) => {
+    if (error) return reject(error);
+    resolve(200);
+  });
+});
+
+const listObjects = (prefix) => new Promise((resolve, reject) => {
+  const result = [];
+  const stream = client.listObjectsV2(bucket, prefix, false);
+  stream.on('data', (item) => result.push({
+    name: item.prefix || item.name,
+    type: item.prefix ? 'directory' : 'file',
+    size: item.size || 0,
+  }));
+  stream.on('error', reject);
+  stream.on('end', () => resolve(result));
+});
+
 module.exports = {
-  /**
-   * 读取请求中的文件并保存到临时目录
-   */
-  readAndSaveFile: async (req) => {
-    return new Promise((resolve, reject) => {
-      const form = new IncomingForm({
-        uploadDir: path.resolve(__dirname, '../temp/images'),
-        maxFileSize: 30 * 1024 * 1024,
-      });
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          const error = {
-            msg: `文件上传出错，错误代码：${err.code || err.message}`,
-            status: 500,
-          };
-          if (err.code === 1009) {
-            error.msg = '文件过大，请压缩后上传（30MB以下）';
-          }
-          return reject(error);
-        }
-        const tempFilePath = files.file[0].filepath;
-        resolve({ fields, files, tempFilePath });
-      });
+  readAndSaveFile: async (req) => new Promise((resolve, reject) => {
+    const form = new IncomingForm({ uploadDir: tempDir, maxFileSize: 30 * 1024 * 1024 });
+    form.parse(req, (error, fields, files) => {
+      if (error) {
+        return reject({
+          msg: error.code === 1009 ? '文件过大，请压缩后上传（30MB以下）' : `文件上传出错：${error.message}`,
+          status: 500,
+        });
+      }
+      const file = Array.isArray(files.file) ? files.file[0] : files.file;
+      if (!file) return reject({ msg: '未找到上传文件', status: 400 });
+      resolve({ fields, files: { file: [file] }, tempFilePath: file.filepath });
     });
-  },
+  }),
 
-  /** 删除本地临时文件 */
   deleteLocalFile: (filePath) => {
-    try { fs.unlinkSync(filePath); } catch (e) { /* ignore */ }
+    try { fs.unlinkSync(filePath); } catch (error) { /* temporary file cleanup is best effort */ }
   },
 
-  /**
-   * 上传文件到本地存储
-   * @param {String} storagePath 存储路径（包含文件名及后缀）
-   * @param {String} tempFilePath 临时文件路径
-   * @returns 上传结果
-   */
   uploadFileStream: async (storagePath, tempFilePath) => {
-    const fullPath = path.join(UPLOAD_DIR, storagePath);
-    const dir = path.dirname(fullPath);
-
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    // 复制文件到存储目录
-    fs.copyFileSync(tempFilePath, fullPath);
-
-    const publicPath = storagePath.startsWith('/') ? storagePath : '/' + storagePath;
-    return {
-      code: 200,
-      msg: '上传成功',
-      url: `${publicPath}`,
-      name: publicPath,
-      res: { status: 200 },
-    };
+    const key = objectName(storagePath);
+    const stat = fs.statSync(tempFilePath);
+    await putObject(key, fs.createReadStream(tempFilePath), stat.size);
+    return { code: 200, msg: '上传成功', url: publicPath(key), name: `/${key}`, res: { status: 200 } };
   },
 
-  /**
-   * 获取本地目录下的文件列表
-   */
-  getFileInPath: async (dirPath, delimiter = null) => {
-    const fullPath = path.join(UPLOAD_DIR, dirPath || '');
-    if (!fs.existsSync(fullPath)) {
-      return [];
-    }
+  uploadBuffer: async (storagePath, buffer, contentType) => {
+    const key = objectName(storagePath);
+    await putObject(key, buffer, buffer.length, contentType ? { 'Content-Type': contentType } : {});
+    return { code: 200, msg: '上传成功', url: publicPath(key), name: `/${key}`, res: { status: 200 } };
+  },
 
-    const items = fs.readdirSync(fullPath, { withFileTypes: true });
-    return items.map(item => {
-      const relativePath = path.join(dirPath || '', item.name);
-      return {
-        name: item.isDirectory() ? relativePath + '/' : relativePath,
-        type: item.isDirectory() ? 'directory' : 'file',
-        size: item.isDirectory() ? 0 : fs.statSync(path.join(fullPath, item.name)).size,
-      };
+  uploadOrUpdateFile: async (storagePath, content) => {
+    await putObject(objectName(storagePath), Buffer.from(content, 'utf8'), Buffer.byteLength(content), {
+      'Content-Type': 'text/markdown; charset=utf-8',
     });
-  },
-
-  /**
-   * 删除本地文件
-   */
-  deleteFile: async (filePath) => {
-    const fullPath = path.join(UPLOAD_DIR, filePath);
-    if (fs.existsSync(fullPath)) {
-      fs.unlinkSync(fullPath);
-      return 200;
-    }
-    return 404;
-  },
-
-  /**
-   * 上传文本内容到本地文件
-   */
-  uploadOrUpdateFile: async (filePath, content) => {
-    const fullPath = path.join(UPLOAD_DIR, filePath);
-    const dir = path.dirname(fullPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(fullPath, content, 'utf8');
     return 200;
   },
 
-  /**
-   * 上传 Buffer 到本地存储
-   */
-  uploadBuffer: async (storagePath, buffer) => {
-    const fullPath = path.join(UPLOAD_DIR, storagePath);
-    const dir = path.dirname(fullPath);
-
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    fs.writeFileSync(fullPath, buffer);
-
-    const publicPath = storagePath.startsWith('/') ? storagePath : '/' + storagePath;
-    return {
-      code: 200,
-      msg: '上传成功',
-      url: `${publicPath}`,
-      name: publicPath,
-      res: { status: 200 },
-    };
+  getFileContent: async (storagePath) => {
+    const stream = await getObject(objectName(storagePath));
+    const chunks = [];
+    for await (const chunk of stream) chunks.push(chunk);
+    return Buffer.concat(chunks).toString('utf8');
   },
 
-  /**
-   * 获取本地文件内容
-   */
-  getFileContent: async (filePath) => {
-    const fullPath = path.join(UPLOAD_DIR, filePath);
-    if (fs.existsSync(fullPath)) {
-      return fs.readFileSync(fullPath, 'utf8');
+  getFileInPath: async (directoryPath) => listObjects(objectName(directoryPath || '', true)),
+
+  deleteFile: async (storagePath) => {
+    try {
+      await statObject(objectName(storagePath));
+      return await deleteObject(objectName(storagePath));
+    } catch (error) {
+      if (error.code === 'NotFound' || error.code === 'NoSuchKey' || error.statusCode === 404) return 404;
+      throw error;
     }
-    throw new Error(`文件不存在: ${filePath}`);
+  },
+
+  getObjectStream: async (storagePath) => {
+    const key = objectName(storagePath);
+    const [stream, stat] = await Promise.all([getObject(key), statObject(key)]);
+    return { stream, stat };
   },
 };
