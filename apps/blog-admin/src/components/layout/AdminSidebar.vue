@@ -133,6 +133,7 @@ const menuGroups = [
       { key: '/log/type', label: '博客类目', icon: AppstoreOutlined },
       { key: '/log/comment', label: '评论管理', icon: CommentOutlined },
       { key: '/message', label: '留言管理', icon: MessageOutlined },
+      { key: '/question', label: '匿名问答', icon: MessageOutlined },
     ],
   },
   {

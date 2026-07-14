@@ -108,6 +108,18 @@ export const api = {
   },
   // #endregion
 
+  // #region 匿名问答
+  addQuestion: async (data) => {
+    return await http.post('/question/reception/addQuestion', data);
+  },
+  getQuestionByTrackingCode: async (data) => {
+    return await http.post('/question/reception/getQuestionByTrackingCode', data);
+  },
+  searchPublicQuestion: async (data) => {
+    return await http.post('/question/reception/searchPublicQuestion', data);
+  },
+  // #endregion
+
   // #region 友链
   // 获取所有友链
   getAllFriendLink: async () => {

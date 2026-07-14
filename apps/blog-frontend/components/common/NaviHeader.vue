@@ -69,6 +69,12 @@ const secondaryLinks = [
     key: '/message',
   },
   {
+    title: '匿名问答',
+    label: '匿名问答',
+    path: '/ask',
+    key: '/ask',
+  },
+  {
     title: '朋友们',
     label: '朋友们',
     path: '/link',

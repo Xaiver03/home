@@ -34,6 +34,7 @@ var ossRouter = require("./routes/oss");
 var adminRouter = require("./routes/admin");
 var commentRouter = require("./routes/comment");
 var friendLinkRouter = require("./routes/friendLink")
+var questionRouter = require("./routes/question")
 var configurationRouter = require("./routes/configuration")
 var weatherRouter = require("./routes/weather"); // 天气API路由
 var musicRouter = require("./routes/music"); // 音乐Cookie管理路由
@@ -97,6 +98,7 @@ app.use("/api/oss", ossRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/friendLink",friendLinkRouter)
+app.use("/api/question",questionRouter)
 app.use('/api/configuration',configurationRouter)
 app.use('/api/weather', weatherRouter); // 天气API路由
 app.use('/api/music', musicRouter); // 音乐Cookie管理路由

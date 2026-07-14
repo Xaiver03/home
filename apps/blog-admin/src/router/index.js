@@ -53,6 +53,12 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
+        path: '/question',
+        name: '匿名问答',
+        component: () => import('../pages/question/QaListPage.vue'),
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/message/phone-edit',
         name: '留言编辑手机端',
         component: () => import('../pages/message/phone/MessageEditPage.vue'),

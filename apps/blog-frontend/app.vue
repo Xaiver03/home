@@ -107,6 +107,11 @@ const seo = [
     path: '/message',
     title: '留言',
     description: '留下想说的话。'
+  },
+  {
+    path: '/ask',
+    title: '匿名问答',
+    description: '匿名提问，保存追踪码，等待审核与答复。'
   }
 ]
 watch(() => router.currentRoute.value.path, (newVal) => {

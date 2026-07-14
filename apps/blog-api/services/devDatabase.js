@@ -59,6 +59,22 @@ const previewTables = [
     createTime DATETIME NOT NULL,
     updatedTime DATETIME
   )`,
+  `CREATE TABLE IF NOT EXISTS question (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    trackingCode VARCHAR(32) NOT NULL UNIQUE,
+    question TEXT NOT NULL,
+    answer TEXT,
+    nickname VARCHAR(100),
+    contact VARCHAR(255),
+    status VARCHAR(10) NOT NULL DEFAULT 'pending',
+    isPublic TINYINT(1) NOT NULL DEFAULT 0,
+    answerTime DATETIME,
+    ip VARCHAR(64),
+    userAgent TEXT,
+    remark TEXT,
+    createTime DATETIME NOT NULL,
+    updatedTime DATETIME NOT NULL
+  )`,
 ];
 
 const bootstrapPreviewDatabase = async (sequelize) => {

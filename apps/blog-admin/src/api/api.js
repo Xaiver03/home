@@ -203,6 +203,21 @@ export default {
   },
   // #endregion
 
+  // #region 匿名问答--
+  getQuestionList(pageData, data) {
+    return req.getParamsIn("/question/getAllQuestion", pageData, data);
+  },
+  searchQuestion(data) {
+    return req.post("/question/searchQuestion", data);
+  },
+  updateQuestion(data) {
+    return req.post("/question/updateQuestion", data);
+  },
+  deleteQuestionById(data) {
+    return req.delete("/question/deleteQuestion", data);
+  },
+  // #endregion
+
   // #region 友链--
   // 获取全部友链
   getAllFriendLink() {
