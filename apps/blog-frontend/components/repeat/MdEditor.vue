@@ -45,7 +45,7 @@ watch(
 </script>
 
 <template>
-    <div id="md" class="w-full">
+    <div id="md" class="w-full h-full md-editor-shell">
         <MdEditor style="height: 100%;" v-model="mdContent" v-bind="props.options" :preview="props.preview" @onSave="save(mdContent)"
             @onUploadImg="props.uploadImage" @onChange="props.editChange()">
             <!-- 自定义工具栏插槽 -->

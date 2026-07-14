@@ -38,7 +38,7 @@ const primaryLinks = [
   {
     title: '首页',
     label: '首页',
-    path: 'https://xiangleideng.site/',
+    path: 'https://xiangleideng.site/#top',
     key: 'homepage',
     external: true,
   },
@@ -57,53 +57,21 @@ const primaryLinks = [
 ];
 const secondaryLinks = [
   {
-    title: '关于我',
-    label: '关于我',
+    title: '关于',
+    label: '关于',
     path: '/about',
     key: '/about',
   },
   {
-    title: '留言',
-    label: '留言',
-    path: '/message',
-    key: '/message',
-  },
-  {
-    title: '朋友们',
-    label: '朋友们',
-    path: '/link',
-    key: '/link',
-  },
-];
-const naviData = reactive([
-  {
-    title: '首页',
-    label: '首页',
-    key: 'homepage',
-    path: 'https://xiangleideng.site/',
+    title: 'GitHub',
+    label: 'GitHub',
+    path: 'https://github.com/Xaiver03',
+    key: 'github',
     external: true,
   },
-  {
-    title: '入口',
-    label: '入口',
-    key: 'root-entry',
-    children: primaryLinks,
-  },
-  {
-    title: '博客',
-    label: '博客',
-    key: 'root-document',
-    children: [
-      {
-        title: '文章列表',
-        label: '文章列表',
-        path: '/log/article',
-        key: '/log/article',
-      },
-    ],
-  },
-  ...secondaryLinks,
-]); // 导航数据
+];
+const topNavLinks = [...primaryLinks, ...secondaryLinks];
+const naviData = reactive(topNavLinks.map((item) => ({ ...item }))); // 导航数据
 let naviDrawer = ref(false);
 const expandedKeys = ref([]);
 const isActive = (path) => {

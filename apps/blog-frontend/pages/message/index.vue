@@ -835,9 +835,9 @@ onBeforeUnmount(() => {
           <client-only>
             <RepeatMdEditor
               ref="mdEditor"
-              class="grow h-3/5"
+              class="message-md-editor"
               :options="editorOptions"
-              :preview="editorPreview"
+              :preview="false"
               :uploadImage="messageImageUpload"
             >
             </RepeatMdEditor>
@@ -864,7 +864,7 @@ onBeforeUnmount(() => {
     width: 100%;
     margin: 0 auto;
 
-    .message-toolbar {
+  .message-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1092,6 +1092,13 @@ onBeforeUnmount(() => {
 .model-content {
   color: $main-text-color;
   height: 60vh;
+  display: flex;
+  flex-direction: column;
+
+  .message-md-editor {
+    flex: 1;
+    min-height: 320px;
+  }
 
   #replyObj {
     font-size: $x-small-font-size;
