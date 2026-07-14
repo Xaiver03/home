@@ -36,6 +36,12 @@ log "========== CI/CD 自动部署开始 =========="
 
 if [ "$SKIP_BUILD" = true ]; then
   log "跳过 Git 同步和构建步骤 (--skip-build，使用本地上传的文件)"
+  if [ -d "$REPO_DIR/apps/blog-admin/dist" ]; then
+    mkdir -p "$REPO_DIR/apps/blog-api/public/admin"
+    rm -rf "$REPO_DIR/apps/blog-api/public/admin/"*
+    cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/admin/"
+    log "已同步本地 blog-admin 构建产物"
+  fi
 else
   # ---- Step 1: 拉取最新代码 ----
   step "Step 1/6: 拉取最新代码"

@@ -35,10 +35,20 @@ rsync -az --delete \
   --exclude='.git/' \
   --exclude='node_modules/' \
   --exclude='.nuxt/' \
+  --exclude='.output/' \
+  --exclude='dist/' \
   --exclude='logs/' \
   --exclude='database*.db' \
   -e "ssh ${SSH_ARGS[*]}" \
   "$ROOT_DIR/" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}:${REMOTE_DIR}/"
+
+echo "==> 单独上传压缩后的构建产物"
+tar czf - \
+  -C "$ROOT_DIR/apps/homepage" dist \
+  -C "$ROOT_DIR/apps/blog-admin" dist \
+  -C "$ROOT_DIR/apps/blog-frontend" .output \
+  | ssh "${SSH_ARGS[@]}" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}" \
+    "tar xzf - -C '$REMOTE_DIR'"
 
 echo "==> 在服务器重启服务（跳过服务器构建）"
 ssh "${SSH_ARGS[@]}" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}" \
