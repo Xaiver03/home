@@ -60,6 +60,9 @@ const initEditorPreview = () => {
 const total = useState('total', () => 0);
 const currentPage = useState('currentPage', () => route.params.page);
 const pageSize = useState('pageSize', () => 10);
+const handleAvatarError = (event) => {
+  event?.target?.removeAttribute?.('src');
+};
 // 服务端 - 获取留言
 const { data: messageList, error: messageListError } = await useAsyncData(
   `getMessageList-page-${route.params.page}`,
@@ -419,6 +422,7 @@ onBeforeUnmount(() => {
                 "
                 :alt="message.user?.name + '头像'"
                 :size="store.phoneModelOrNot ? 32 : 64"
+                @error="handleAvatarError"
               >
                 <template #icon>
                   <UserOutlined
@@ -517,6 +521,7 @@ onBeforeUnmount(() => {
                           : `${config.public.ossUrl}/image/userAvatar/${childMessage.user?.id}.png`
                       "
                       :alt="childMessage.user?.name + '头像'"
+                      @error="handleAvatarError"
                     >
                       <template #icon>
                         <UserOutlined

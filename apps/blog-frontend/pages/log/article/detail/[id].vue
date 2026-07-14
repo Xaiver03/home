@@ -15,6 +15,9 @@ const coverImageSrc = computed(
 const updateArticleCatalog = (catalog) => {
   articleCatalog.value = Array.isArray(catalog) ? catalog : [];
 };
+const handleAvatarError = (event) => {
+  event?.target?.removeAttribute?.('src');
+};
 
 const probeCoverImage = async () => {
   coverImageVisible.value = false;
@@ -564,7 +567,8 @@ onMounted(() => {
                         <template #avatar>
                             <a-avatar
                                 :src="comment.userId == -1 ? store.$state.config['my-avatar']?.content : `${config.public.ossUrl}/image/userAvatar/${comment.user?.id}.png`"
-                                :alt="comment.user?.name + '头像'">
+                                :alt="comment.user?.name + '头像'"
+                                @error="handleAvatarError">
                                 <template #icon>
                                     <UserOutlined class="flex justify-center items-center w-full h-full" />
                                 </template>
@@ -607,7 +611,8 @@ onMounted(() => {
                                 <template #avatar>
                                     <a-avatar
                                         :src="childComment.userId == -1 ? store.$state.config['my-avatar']?.content : `${config.public.ossUrl}/image/userAvatar/${childComment.user?.id}.png`"
-                                        :alt="childComment.user?.name + '头像'">
+                                        :alt="childComment.user?.name + '头像'"
+                                        @error="handleAvatarError">
                                         <template #icon>
                                             <UserOutlined class="flex justify-center items-center w-full h-full" />
                                         </template>

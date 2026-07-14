@@ -3,7 +3,7 @@
         <div v-if="visible" id="loading"
             class="loader-page fixed h-[100vh] w-[100vw] inset-0 z-[9999] flex flex-col items-center justify-center">
             <div class="rotate-box rounded-full overflow-hidden ">
-                <img class="h-[120px] w-[120px] " :src="avatarSrc">
+            <img class="h-[120px] w-[120px] " :src="avatarSrc" @error="handleAvatarError">
             </div>
             <p class="my-[10px] text-[20px]">欢迎来到Xaiver的空间</p>
             <p class="text-[10px]">加载中...</p>
@@ -12,8 +12,16 @@
 </template>
 
 <script setup>
+import avatarFallback from '@/assets/images/bokey.png'
 const store = useNuxtStore()
-const avatarSrc = computed(() => store.$state.config['my-avatar']?.content || '')
+const avatarSrc = ref(avatarFallback)
+const syncAvatar = () => {
+    avatarSrc.value = store.$state.config['my-avatar']?.content || avatarFallback
+}
+const handleAvatarError = () => {
+    avatarSrc.value = avatarFallback
+}
+watch(() => store.$state.config['my-avatar']?.content, syncAvatar, { immediate: true })
 const visible = ref(true)
 
 // SSR 阶段（服务端）默认显示

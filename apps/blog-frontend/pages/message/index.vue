@@ -78,6 +78,9 @@ const questionForm = reactive({
 const queryForm = reactive({
   trackingCode: '',
 });
+const handleAvatarError = (event) => {
+  event?.target?.removeAttribute?.('src');
+};
 // 服务端 - 获取留言
 const { data: messageList, error: messageListError } = await useAsyncData(
   'getMessageList-index',
@@ -577,6 +580,7 @@ onBeforeUnmount(() => {
                 "
                 :alt="message.user?.name + '头像'"
                 :size="store.phoneModelOrNot ? 32 : 64"
+                @error="handleAvatarError"
               >
                 <template #icon>
                   <UserOutlined
@@ -671,6 +675,7 @@ onBeforeUnmount(() => {
                           : `${config.public.ossUrl}/image/userAvatar/${childMessage.user?.id}.png`
                       "
                       :alt="childMessage.user?.name + '头像'"
+                      @error="handleAvatarError"
                     >
                       <template #icon>
                         <UserOutlined

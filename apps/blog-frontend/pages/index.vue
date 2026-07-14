@@ -1,6 +1,16 @@
 <script setup>
+import avatarFallback from '@/assets/images/bokey.png';
+
 const router = useRouter();
 const store = useNuxtStore();
+const profileAvatarSrc = ref(avatarFallback);
+const syncProfileAvatar = () => {
+  profileAvatarSrc.value = store.$state.config['my-avatar']?.content || avatarFallback;
+};
+const handleProfileAvatarError = () => {
+  profileAvatarSrc.value = avatarFallback;
+};
+watch(() => store.$state.config['my-avatar']?.content, syncProfileAvatar, { immediate: true });
 
 // 从 config 读取社交链接
 const safeParse = (val, fallback) => {
@@ -105,7 +115,8 @@ const likeMessage = (message) => {
       </div>
       <div class="hero-profile">
         <img
-          :src="store.$state.config['my-avatar']?.content"
+          :src="profileAvatarSrc"
+          @error="handleProfileAvatarError"
           alt="灯下灯头像"
           v-motion-pop-visible-once
         />
