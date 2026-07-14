@@ -32,6 +32,19 @@ const applyQuestionFilters = (selectOptions, options = {}) => {
     if (utils.isNullOrEmpty(options[key])) continue;
     if (key == "question") {
       selectOptions.where.question = { [Op.like]: "%" + options[key] + "%" };
+    } else if (key == "answer") {
+      if (options[key] === '__ANSWERED__') {
+        selectOptions.where.answer = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: "" }] };
+      } else if (options[key] === '__UNANSWERED__') {
+        selectOptions.where[Op.and] = [
+          ...(selectOptions.where[Op.and] || []),
+          {
+            [Op.or]: [{ answer: null }, { answer: "" }],
+          },
+        ];
+      } else {
+        selectOptions.where.answer = { [Op.like]: "%" + options[key] + "%" };
+      }
     } else if (key == "keyword") {
       selectOptions.where[Op.or] = [
         { question: { [Op.like]: "%" + options[key] + "%" } },

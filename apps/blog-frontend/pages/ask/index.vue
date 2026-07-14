@@ -11,7 +11,7 @@ const publicLoading = ref(false);
 const submitLoading = ref(false);
 const queryLoading = ref(false);
 const submittedTrackingCode = ref('');
-const queryResult = ref(null);
+const emptyQueryMessage = ref('');
 
 const questionForm = reactive({
   nickname: '',
@@ -70,7 +70,7 @@ const submitQuestion = async () => {
   if (utils.isNullOrEmpty(questionForm.question)) {
     notification.open({
       message: '提示💡',
-      description: '请先写下你的问题。',
+      description: '先把想问的写下来吧。',
       placement: 'top',
       duration: 3,
     });
@@ -82,6 +82,7 @@ const submitQuestion = async () => {
     if (utils.analysisData(res)) {
       submittedTrackingCode.value = res.data.trackingCode;
       queryForm.trackingCode = res.data.trackingCode;
+      emptyQueryMessage.value = '';
       questionForm.nickname = '';
       questionForm.contact = '';
       questionForm.question = '';
@@ -102,14 +103,17 @@ const queryQuestion = async () => {
     return;
   }
   queryLoading.value = true;
+  emptyQueryMessage.value = '';
   try {
     const res = await api.getQuestionByTrackingCode({
       trackingCode: queryForm.trackingCode,
     });
     if (utils.analysisData(res, false)) {
       queryResult.value = res.data;
+      emptyQueryMessage.value = '';
     } else {
       queryResult.value = null;
+      emptyQueryMessage.value = '暂时没有查到这条提问，看看追踪码有没有输错。';
     }
   } finally {
     queryLoading.value = false;
@@ -121,7 +125,7 @@ const copyTrackingCode = async (trackingCode) => {
   await navigator.clipboard.writeText(trackingCode);
   notification.open({
     message: '已复制',
-    description: '追踪码已经复制到剪贴板。',
+    description: '追踪码已复制，可以直接去查询。',
     placement: 'top',
     duration: 2,
   });
@@ -137,7 +141,7 @@ await loadPublicQuestions();
         <span class="blog-eyebrow">Anonymous Q&A</span>
         <h1>匿名问答</h1>
       </div>
-      <p>你可以匿名提问，保存追踪码后回来查看答复。内容必须经后台审核后才会公开展示。</p>
+      <p>你可以匿名提问。提交后记得保存追踪码，之后可以回来查看回复和审核进度。通过审核的内容，才会出现在公开列表里。</p>
     </header>
 
     <div class="ask-grid">
@@ -146,30 +150,31 @@ await loadPublicQuestions();
           <span>01</span>
           <div>
             <h2>提交问题</h2>
-            <p>默认私密，仅站长后台可见。公开展示由后台审核决定。</p>
+            <p>默认不会公开，只有站长能看到。是否公开，会根据内容再决定。</p>
           </div>
         </div>
+        <p class="helper-copy">提交成功后会生成追踪码，记得保存，后面查询回复要用。</p>
         <div class="form-stack">
           <label>
             <span>昵称（可选）</span>
-            <a-input v-model:value="questionForm.nickname" placeholder="匿名访客" :maxlength="100" />
+            <a-input v-model:value="questionForm.nickname" placeholder="留空则显示为“匿名访客”" :maxlength="100" />
           </label>
           <label>
-            <span>联系方式（可选，不公开）</span>
-            <a-input v-model:value="questionForm.contact" placeholder="邮箱 / 微信 / 其他方便回复的方式" :maxlength="255" />
+            <span>联系方式（可选，仅用于必要时联系，不会公开）</span>
+            <a-input v-model:value="questionForm.contact" placeholder="比如邮箱或微信，方便需要时联系你" :maxlength="255" />
           </label>
           <label>
             <span>问题</span>
             <a-textarea
               v-model:value="questionForm.question"
-              placeholder="写下你想问的问题。请不要提交隐私、密码、密钥等敏感信息。"
+              placeholder="把想问的写在这里。请不要留下密码、验证码、密钥或其他敏感信息。"
               :rows="8"
               :maxlength="1500"
               show-count
             />
           </label>
           <button class="blog-action" type="button" :disabled="submitLoading" @click="submitQuestion">
-            {{ submitLoading ? '提交中...' : '提交匿名问题' }} <span aria-hidden="true">→</span>
+            {{ submitLoading ? '提交中...' : '提交问题' }} <span aria-hidden="true">→</span>
           </button>
         </div>
         <a-alert
@@ -184,7 +189,8 @@ await loadPublicQuestions();
             <button class="tracking-code" type="button" @click="copyTrackingCode(submittedTrackingCode)">
               {{ submittedTrackingCode }}
             </button>
-            <p>请截图或复制保存。没有追踪码就无法从前台找回这条问答。</p>
+            <p>这串追踪码只会出现这一次，记得截图或复制保存。</p>
+            <p>之后查询回复，需要用到它。</p>
           </template>
         </a-alert>
       </section>
@@ -193,12 +199,12 @@ await loadPublicQuestions();
         <div class="panel-heading">
           <span>02</span>
           <div>
-            <h2>查询答复</h2>
-            <p>输入提交后得到的追踪码，查看审核状态和答复。</p>
+            <h2>查询回复</h2>
+            <p>输入追踪码，就能查看这条提问的审核状态和回复。</p>
           </div>
         </div>
         <div class="query-row">
-          <a-input v-model:value="queryForm.trackingCode" placeholder="例如 QA8F3K2M9P" @pressEnter="queryQuestion" />
+          <a-input v-model:value="queryForm.trackingCode" placeholder="输入你的追踪码，例如 QA8F3K2M9P" @pressEnter="queryQuestion" />
           <button class="blog-action secondary" type="button" :disabled="queryLoading" @click="queryQuestion">
             {{ queryLoading ? '查询中...' : '查询' }}
           </button>
@@ -206,18 +212,19 @@ await loadPublicQuestions();
         <div v-if="queryResult" class="query-result">
           <div class="result-meta">
             <a-tag :color="statusColor(queryResult.status)">{{ statusText(queryResult.status) }}</a-tag>
-            <a-tag v-if="queryResult.answer" color="blue">已答复</a-tag>
-            <a-tag v-else color="default">等待答复</a-tag>
+            <a-tag v-if="queryResult.answer" color="blue">已回复</a-tag>
+            <a-tag v-else color="default">待回复</a-tag>
             <span>{{ utils.formatDate(queryResult.createTime, true) }}</span>
           </div>
           <h3>你的问题</h3>
           <p class="preserve-text">{{ queryResult.question }}</p>
           <template v-if="queryResult.answer">
-            <h3>答复</h3>
+            <h3>回复</h3>
             <p class="preserve-text answer-text">{{ queryResult.answer }}</p>
           </template>
-          <p v-else class="muted-text">还没有答复。若状态仍为待审核，说明这条问题还不会公开展示。</p>
+          <p v-else class="muted-text">暂时还没有回复。如果状态还是“待审核”，这条内容目前也不会出现在公开列表里。</p>
         </div>
+        <a-alert v-else-if="emptyQueryMessage" class="query-empty" type="info" show-icon :message="emptyQueryMessage" />
       </section>
     </div>
 
@@ -226,9 +233,10 @@ await loadPublicQuestions();
         <span>03</span>
         <div>
           <h2>公开问答</h2>
-          <p>这里只展示已经后台审核通过、允许公开、并且已有答复的问答。</p>
+          <p>这里只展示已通过审核、允许公开，并且已经回复的问题。</p>
         </div>
       </div>
+      <p class="helper-copy">也许你想问的问题，别人已经先问过了。</p>
       <RepeatEmptyPlaceholder :dataReady="Boolean(publicQuestions)" :dataShow="publicQuestions.length > 0">
         <div class="public-list">
           <article v-for="item in publicQuestions" :key="item.id" class="public-item">
@@ -312,6 +320,13 @@ await loadPublicQuestions();
     }
   }
 
+  .helper-copy {
+    margin-bottom: 1.4rem;
+    color: $secondary-text-color;
+    font-size: 1.35rem;
+    line-height: 1.7;
+  }
+
   .tracking-alert {
     margin-top: 1.6rem;
   }
@@ -342,6 +357,10 @@ await loadPublicQuestions();
     border: 1px solid $surface-border;
     border-radius: 8px;
     background: $surface-control;
+  }
+
+  .query-empty {
+    margin-top: 1.6rem;
   }
 
   .result-meta {
