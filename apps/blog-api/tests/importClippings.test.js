@@ -177,6 +177,32 @@ describe('image rewriting helpers', () => {
     expect(storageService.uploadBuffer).not.toHaveBeenCalled();
     expect(rewritten).toBe(content);
   });
+
+  it('rewrites local relative image links and skips data images', async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'clippings-images-'));
+    const sourceFilePath = path.join(directory, 'article.md');
+    const imagePath = path.join(directory, 'cover.png');
+    fs.writeFileSync(imagePath, Buffer.from('local-png'));
+
+    const storageService = {
+      uploadBuffer: jest.fn().mockImplementation(async (storagePath) => ({
+        url: storagePath,
+      })),
+    };
+    const content = `![本地图](./cover.png)\n\n![内嵌图](data:image/png;base64,abc)`;
+
+    const rewritten = await rewriteArticleImages(content, {
+      articleId: 13,
+      sourceFilePath,
+      storageService,
+    });
+
+    expect(storageService.uploadBuffer).toHaveBeenCalledTimes(1);
+    expect(rewritten).toMatch(/!\[本地图\]\(\/uploads\/image\/articleContent\/13\/image-001-/);
+    expect(rewritten).toContain('![内嵌图](data:image/png;base64,abc)');
+
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
 });
 
 describe('importClippings', () => {
