@@ -3,6 +3,13 @@ const redisService = require("../services/redisService");
 const utils = require("../utils/index");
 const config = require("config");
 
+const getMailSender = () => {
+  const mailConfig = config.get("mail");
+  const email = mailConfig.from_email || mailConfig.smtp_user;
+  const name = mailConfig.from_name || config.get("author.name");
+  return `${name}<${email}>`;
+};
+
 module.exports = {
   // 匿名树洞回复通知。只有联系方式是邮箱时才发送，微信等其他联系方式不触发邮件。
   sendQuestionAnswerMail: async (question) => {
@@ -12,7 +19,7 @@ module.exports = {
     const trackingCode = encodeURIComponent(question.trackingCode);
     const answerUrl = `${config.get("author.website")}/blog/message?tab=ask&trackingCode=${trackingCode}`;
     const options = {
-      from: "邓湘雷の博客<light@xiangleideng.site>",
+      from: getMailSender(),
       to: email,
       subject: `你的匿名树洞有新回复（${question.trackingCode}）`,
       html: `
@@ -142,7 +149,7 @@ module.exports = {
 
         `; // 邮箱模板信息
     const options = {
-      from: "邓湘雷の博客<light@xiangleideng.site>", // 发送方 - 必须与SMTP用户一致
+      from: getMailSender(), // 与验证码邮件共用同一套 SMTP 发件人配置
       to: mail, //接收者邮箱，多个邮箱用逗号间隔
       subject: `欢迎登录,你的验证码${code}`, // 标题
       html: mailContent,
