@@ -24,7 +24,6 @@
         <a href="/blog/" @click="menuOpen = false">博客</a>
         <a href="/blog/log/article" @click="menuOpen = false">文章</a>
         <a href="/blog/about" @click="menuOpen = false">关于</a>
-        <a href="https://github.com/Xaiver03" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
     </header>
 

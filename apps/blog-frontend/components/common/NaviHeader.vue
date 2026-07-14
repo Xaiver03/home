@@ -62,13 +62,6 @@ const secondaryLinks = [
     path: '/about',
     key: '/about',
   },
-  {
-    title: 'GitHub',
-    label: 'GitHub',
-    path: 'https://github.com/Xaiver03',
-    key: 'github',
-    external: true,
-  },
 ];
 const topNavLinks = [...primaryLinks, ...secondaryLinks];
 const naviData = reactive(topNavLinks.map((item) => ({ ...item }))); // 导航数据
