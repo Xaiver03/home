@@ -93,6 +93,31 @@ function getPublishedAt(frontmatterPublished, content) {
   return new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T12:00:00+08:00`);
 }
 
+function stripClippingMetadata(content) {
+  const lines = content.split(/\r?\n/);
+  const firstContentLineIndex = lines.findIndex((line) => line.trim().length > 0);
+  let publishedAt = null;
+
+  if (firstContentLineIndex >= 0 && firstContentLineIndex < 8) {
+    const firstContentLine = lines[firstContentLineIndex].trim();
+    const dateMatch = firstContentLine.match(/(\d{4}年\d{1,2}月\d{1,2}日)\s+\d{1,2}:\d{2}/);
+    if (dateMatch) {
+      publishedAt = getPublishedAt(null, dateMatch[1]);
+      lines.splice(firstContentLineIndex, 1);
+    }
+  }
+
+  const cleanedContent = lines
+    .join('\n')
+    .replace(/^\s*\*\*微信扫一扫赞赏作者\*\*\s*$/gm, '')
+    .replace(/^\s*\*微信扫一扫赞赏作者\*\s*$/gm, '')
+    .replace(/^\n+/, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return { content: cleanedContent, publishedAt };
+}
+
 function getDescription(description, content) {
   if (description && description !== 'tags:') {
     return description;
@@ -116,6 +141,7 @@ function sanitizeDatabaseText(value) {
 
 function parseClipping(markdown, fileName) {
   const { fields, content } = getFrontmatter(markdown);
+  const metadata = stripClippingMetadata(content);
   const title = sanitizeDatabaseText(
     fields.title || path.basename(fileName, path.extname(fileName)),
   );
@@ -125,9 +151,9 @@ function parseClipping(markdown, fileName) {
     title,
     source: fields.source || null,
     author: fields.author || null,
-    description: sanitizeDatabaseText(getDescription(fields.description, content)),
-    content: `${content}${sourceNote}`,
-    publishedAt: getPublishedAt(fields.published, content),
+    description: sanitizeDatabaseText(getDescription(fields.description, metadata.content)),
+    content: `${metadata.content}${sourceNote}`,
+    publishedAt: getPublishedAt(fields.published, '') || metadata.publishedAt,
   };
 }
 
@@ -316,6 +342,7 @@ async function importClippings(sourceDirectory, dependencies, options) {
             introduction: item.description,
             typeId: articleType.id,
             status: 'publish',
+            ...(item.publishedAt ? { createTime: item.publishedAt } : {}),
             updatedTime: new Date(),
           },
           { transaction },
@@ -410,5 +437,6 @@ module.exports = {
   getImageExtension,
   importClippings,
   parseClipping,
+  stripClippingMetadata,
   rewriteArticleImages,
 };

@@ -8,6 +8,7 @@ const {
   importClippings,
   parseClipping,
   rewriteArticleImages,
+  stripClippingMetadata,
 } = require('../scripts/importClippings');
 
 describe('parseClipping', () => {
@@ -56,6 +57,26 @@ title: "日期测试"
     expect(parseClipping(clipping, '日期测试.md').publishedAt?.toISOString()).toBe(
       '2026-05-08T04:00:00.000Z',
     );
+  });
+
+  it('moves WeChat clipping metadata date into publishedAt and removes it from the body', () => {
+    const clipping = `---
+title: "日期测试"
+---
+灯下灯 灯火间 *2026年5月28日 20:14*
+
+正文第一段。
+
+**微信扫一扫赞赏作者**`;
+
+    const parsed = parseClipping(clipping, '日期测试.md');
+    expect(parsed.publishedAt?.toISOString()).toBe('2026-05-28T04:00:00.000Z');
+    expect(parsed.content).toBe('正文第一段。');
+  });
+
+  it('does not remove ordinary dates that appear later in the article', () => {
+    const content = '正文第一段。\n\n——2026年3月19日凌晨5:43分';
+    expect(stripClippingMetadata(content).content).toBe(content);
   });
 
   it('removes non-BMP characters from database metadata but preserves the article body', () => {
