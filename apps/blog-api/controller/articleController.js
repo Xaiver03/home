@@ -1,6 +1,6 @@
 const articleService = require('../services/articleService');
 const utils = require('../utils/index');
-const qiniuService = require('../services/qiniuService');
+const storageService = require('../services/storageService');
 const articleTypeService = require('../services/articleTypeService');
 
 module.exports = {
@@ -43,7 +43,7 @@ module.exports = {
   // 获取文章内容
   getArticleContent: async (req, res) => {
     try {
-      const content = await qiniuService.getFileContent(
+      const content = await storageService.getFileContent(
         `/file/article/${req.params.id}.md`,
       );
       const data = await articleService.getArticleById(req.params.id);
@@ -110,7 +110,7 @@ module.exports = {
     };
     try {
       const article = await articleService.createArticle(data);
-      await qiniuService.uploadOrUpdateFile(
+      await storageService.uploadOrUpdateFile(
         `/file/article/${article.dataValues.id}.md`,
         req.body.content,
       );
@@ -125,7 +125,7 @@ module.exports = {
   // 修改文章内容
   updateArticleContent: async (req, res) => {
     try {
-      await qiniuService.uploadOrUpdateFile(
+      await storageService.uploadOrUpdateFile(
         `/file/article/${req.body.id}.md`,
         req.body.content,
       );

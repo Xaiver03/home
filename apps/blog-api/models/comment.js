@@ -174,7 +174,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         // 删除评论前，删除oss图片
         beforeBulkDestroy: async (comment) => {
-          const qiniuService = require("../services/qiniuService"); // 避免循环依赖
+          const storageService = require("../services/storageService"); // 避免循环依赖
           const commentService = require("../services/commentService");
           let commentArr = [];
           if (typeof comment.where.id == "string") {
@@ -195,12 +195,12 @@ module.exports = function (sequelize, DataTypes) {
                   commentItem.get({ plain: true }).entityType
                 )
               ) {
-                const commentImages = await qiniuService.getFileInPath(
+                const commentImages = await storageService.getFileInPath(
                   `/image/messageImage/${commentItem.get({ plain: true }).userId == -1 ? "admin" : id}`
                 ); // 获取评论的所有图片文件
                 // 删除评论图片
                 for (item of commentImages) {
-                  await qiniuService.deleteFile(item.name, false);
+                  await storageService.deleteFile(item.name, false);
                 }
               }
             }

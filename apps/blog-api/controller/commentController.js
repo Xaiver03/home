@@ -1,7 +1,7 @@
 const utils = require("../utils/index");
 const commentService = require("../services/commentService");
 const tokenService = require("../services/tokenService");
-const qiniuService = require("../services/qiniuService");
+const storageService = require("../services/storageService");
 const fs = require("fs");
 
 module.exports = {
@@ -104,11 +104,11 @@ module.exports = {
   // 上传评论图片到oss
   uploadCommentImage: async (req, res) => {
     let result = {};
-    const { fields, files, tempFilePath } = await qiniuService.readAndSaveFile(
+    const { fields, files, tempFilePath } = await storageService.readAndSaveFile(
       req
     );
     const path = "/image/commentImage/" + req.query.id + path.extname(files.file[0].originalFilename);
-    result = await qiniuService.uploadFileStream(path, tempFilePath);
+    result = await storageService.uploadFileStream(path, tempFilePath);
     fs.unlinkSync(tempFilePath); // 删除临时文件
     res.json(
       utils.postMessage(

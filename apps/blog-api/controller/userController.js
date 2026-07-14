@@ -1,6 +1,6 @@
 const userService = require("../services/userService");
 const utils = require("../utils/index");
-const qiniuService = require("../services/qiniuService");
+const storageService = require("../services/storageService");
 const mailService = require("../services/mailService");
 const redisService = require("../services/redisService");
 const tokenService = require("../services/tokenService");
@@ -158,14 +158,14 @@ module.exports = {
   uploadUserAvatar: async (req, res) => {
     let tokenData = tokenService.checkToken(req.headers["authorization"]);
     let result = {};
-    const { fields, files, tempFilePath } = await qiniuService.readAndSaveFile(
+    const { fields, files, tempFilePath } = await storageService.readAndSaveFile(
       req
     );
     const ossPath =
       "/image/userAvatar/" +
       tokenData.data.id +
       '.png';
-    result = await qiniuService.uploadFileStream(ossPath, tempFilePath);
+    result = await storageService.uploadFileStream(ossPath, tempFilePath);
     fs.unlinkSync(tempFilePath); // 删除临时文件
     res.json(
       utils.postMessage(
@@ -182,7 +182,7 @@ module.exports = {
   // --删除--
   // 删除用户
   deleteUserById: async (req, res) => {
-    let status = await qiniuService.deleteFile(
+    let status = await storageService.deleteFile(
       `/image/userAvatar/${req.query.id}.png`
     );
     res.json(

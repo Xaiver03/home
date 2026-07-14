@@ -306,7 +306,7 @@ function getImportPlan(sourceDirectory, { includeExternal = false } = {}) {
 async function importClippings(sourceDirectory, dependencies, options) {
   const { Article, ArticleType, sequelize, storageService } = dependencies || {
     ...require('../models'),
-    storageService: require('../services/qiniuService'),
+    storageService: require('../services/storageService'),
   };
   const plan = getImportPlan(sourceDirectory, options);
   let transaction;

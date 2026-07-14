@@ -67,7 +67,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         // 删除前，删除所有封面
         beforeBulkDestroy: async (friendLink) => {
-          const qiniuService = require("../services/qiniuService"); // 避免循环依赖
+          const storageService = require("../services/storageService"); // 避免循环依赖
           let friendLinksArr = [];
           if (typeof friendLink.where.id == "string") {
             friendLinksArr = [friendLink.where.id];
@@ -80,7 +80,7 @@ module.exports = function (sequelize, DataTypes) {
           }
           try {
             for (const id of friendLinksArr) {
-              await qiniuService.deleteFile(`/image/friendLinkCover/${id}.png`);
+              await storageService.deleteFile(`/image/friendLinkCover/${id}.png`);
             }
           } catch (error) {
             throw new Error(`删除友链时出错: ${error.message}`);

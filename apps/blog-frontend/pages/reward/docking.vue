@@ -20,7 +20,6 @@ onMounted(() => {
 <template>
     <div id="docking-page">
         <div class="flex flex-col justify-center items-center pt-24 gap-y-6">
-            <img src="@/assets/images/bokey.png" class="w-1/4 rounded-3xl">
             <p>如果愿意，留下你的痕迹</p>
             <div class="msg rounded-md p-2 px-4 flex justify-between items-center" v-if="enterAmount">
                 <p class="small-fs">金额</p>

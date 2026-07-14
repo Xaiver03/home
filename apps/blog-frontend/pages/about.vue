@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, computed } from 'vue';
-import avatarFallback from '@/assets/images/bokey.png';
 import {
   BookOutlined,
   BulbOutlined,
@@ -11,12 +10,12 @@ import {
   WechatOutlined,
 } from '@ant-design/icons-vue';
 const store = useNuxtStore();
-const profileAvatarSrc = ref(avatarFallback);
+const profileAvatarSrc = ref('');
 const syncProfileAvatar = () => {
-  profileAvatarSrc.value = store.$state.config['my-avatar']?.content || avatarFallback;
+  profileAvatarSrc.value = store.$state.config['my-avatar']?.content || '';
 };
 const handleProfileAvatarError = () => {
-  profileAvatarSrc.value = avatarFallback;
+  profileAvatarSrc.value = '';
 };
 watch(() => store.$state.config['my-avatar']?.content, syncProfileAvatar, { immediate: true });
 definePageMeta({
@@ -148,6 +147,7 @@ onBeforeUnmount(() => {
     <!-- xaiver bar -->
     <a-card hoverable id="xaiver" class="relative blog-glass-panel">
       <img
+        v-if="profileAvatarSrc"
         class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2"
         :src="profileAvatarSrc"
         @error="handleProfileAvatarError"

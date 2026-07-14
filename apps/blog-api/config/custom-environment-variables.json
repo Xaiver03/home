@@ -19,12 +19,6 @@
     "from_email": "MAIL_FROM",
     "from_name": "MAIL_FROM_NAME"
   },
-  "qiniu": {
-    "accessKey": "QINIU_ACCESS_KEY",
-    "secretKey": "QINIU_SECRET_KEY",
-    "bucket": "QINIU_BUCKET",
-    "domain": "QINIU_DOMAIN"
-  },
   "tokenSecretKey": "JWT_SECRET",
   "author": {
     "name": "AUTHOR_NAME",

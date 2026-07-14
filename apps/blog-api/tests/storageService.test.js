@@ -1,10 +1,10 @@
 const { execFileSync } = require('child_process');
 const path = require('path');
 
-describe('qiniuService local storage', () => {
+describe('storageService local storage', () => {
   it('uses a writable project-local fallback directory in development', () => {
     expect(() => {
-      execFileSync(process.execPath, ['-e', 'require("./services/qiniuService")'], {
+      execFileSync(process.execPath, ['-e', 'require("./services/storageService")'], {
         cwd: path.resolve(__dirname, '..'),
         env: {
           ...process.env,

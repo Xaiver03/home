@@ -70,7 +70,7 @@ module.exports = function (sequelize, DataTypes) {
       hooks: {
         // 文章的删除钩子，删除该文章的oss文件内容以及文章下的评论
         beforeBulkDestroy: async (article) => {
-          const qiniuService = require("../services/qiniuService"); // 避免循环依赖
+          const storageService = require("../services/storageService"); // 避免循环依赖
           const commentService = require("../services/commentService")
           let articleArr = [];
           if (typeof article.where.id == "string") {
@@ -84,15 +84,15 @@ module.exports = function (sequelize, DataTypes) {
           }
           try {
             for (const id of articleArr) {
-              const articleImages = await qiniuService.getFileInPath(
+              const articleImages = await storageService.getFileInPath(
                 `/image/articleContent/${id}`
               ); // 获取文章图片目录的所有图片文件
               // 删除文章图片
               for (item of articleImages) {
-                await qiniuService.deleteFile(item.name, false);
+                await storageService.deleteFile(item.name, false);
               }
-              await qiniuService.deleteFile(`/file/article/${id}.md`);
-              await qiniuService.deleteFile(`/image/articleCover/${id}.png`);
+              await storageService.deleteFile(`/file/article/${id}.md`);
+              await storageService.deleteFile(`/image/articleCover/${id}.png`);
               const commentSearchData = await commentService.searchAllComment({
                 entityType: "Article",
                 entityId: id

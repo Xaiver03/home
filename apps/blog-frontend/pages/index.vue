@@ -1,14 +1,12 @@
 <script setup>
-import avatarFallback from '@/assets/images/bokey.png';
-
 const router = useRouter();
 const store = useNuxtStore();
-const profileAvatarSrc = ref(avatarFallback);
+const profileAvatarSrc = ref('');
 const syncProfileAvatar = () => {
-  profileAvatarSrc.value = store.$state.config['my-avatar']?.content || avatarFallback;
+  profileAvatarSrc.value = store.$state.config['my-avatar']?.content || '';
 };
 const handleProfileAvatarError = () => {
-  profileAvatarSrc.value = avatarFallback;
+  profileAvatarSrc.value = '';
 };
 watch(() => store.$state.config['my-avatar']?.content, syncProfileAvatar, { immediate: true });
 
@@ -115,6 +113,7 @@ const likeMessage = (message) => {
       </div>
       <div class="hero-profile">
         <img
+          v-if="profileAvatarSrc"
           :src="profileAvatarSrc"
           @error="handleProfileAvatarError"
           alt="灯下灯头像"

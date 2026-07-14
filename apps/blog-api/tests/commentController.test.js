@@ -6,7 +6,7 @@ jest.mock('../services/tokenService', () => ({
   checkToken: jest.fn(),
 }));
 
-jest.mock('../services/qiniuService', () => ({}));
+jest.mock('../services/storageService', () => ({}));
 
 jest.mock('../utils/index', () => ({
   isAdminCustomer: jest.fn(() => false),

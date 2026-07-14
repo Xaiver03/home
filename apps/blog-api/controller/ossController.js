@@ -1,5 +1,5 @@
 const utils = require("../utils/index");
-const storageService = require("../services/qiniuService");
+const storageService = require("../services/storageService");
 const tokenService = require("../services/tokenService");
 const uuid = require("uuid");
 let path = require("path");

@@ -14,13 +14,6 @@ export default {
       "password": "password",
       "database": "database name"
     },
-    "oss": {
-        "region": "oss-region",
-        "accessKeyId": "oss-accessKeyId",
-        "accessKeySecret": "oss-accessKeySecret",
-        "bucket": "oss-bucket",
-        "baseDir": "oss-base-dir"
-    },
     "mail": {
       "user":"your-mail@gmail.com",
       "pass":"your-mail-pass"
@@ -32,4 +25,3 @@ export default {
     "tokenSecretKey":"your-token-secret-key",
     "vipCustomerEmail": ["your-mail@gmail.com"]
 }
-  

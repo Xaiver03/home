@@ -43,7 +43,6 @@ const goToReward = (amount) => {
 <template>
     <div id="reward-page">
         <div class="flex flex-col justify-center items-center pt-24 gap-y-6">
-            <img src="@/assets/images/bokey.png" class="w-1/4 rounded-3xl">
             <h2>谢谢老板，老板大气</h2>
             <div class="flex">
                 <p>🌈小弟会努力更新的</p><p class="reverse">🌈</p>

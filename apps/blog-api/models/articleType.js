@@ -43,14 +43,14 @@ module.exports = function (sequelize, DataTypes) {
         beforeBulkDestroy: async (articleType, options) => {
           try {
             const articleService = require("../services/articleService"); // 避免循环依赖
-            const qiniuService = require("../services/qiniuService"); // 避免循环依赖
+            const storageService = require("../services/storageService"); // 避免循环依赖
             const articles = (
               await articleService.getAllArticleIdByTypeId(articleType.where.id)
             ).rows;
             const ids = articles.map((item) => item.dataValues.id);
             await articleService.deleteArticleById(ids); // 删除类目下的所有文章
             // 删除类目的封面
-            await qiniuService.deleteFile(
+            await storageService.deleteFile(
               `/image/articleTypeCover/${articleType.where.id}.png`
             );
           } catch (e) {

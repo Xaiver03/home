@@ -1,7 +1,7 @@
 jest.mock('../services/articleService', () => ({
   searchArticle: jest.fn(),
 }));
-jest.mock('../services/qiniuService', () => ({}));
+jest.mock('../services/storageService', () => ({}));
 jest.mock('../services/articleTypeService', () => ({}));
 jest.mock('../utils/index', () => ({
   postMessage: jest.fn((code, msg, data) => ({ code, msg, data })),
