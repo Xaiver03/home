@@ -8,8 +8,25 @@ const route = useRoute();
 const articleAuthor = computed(() => store.$state.config['article-author']?.content || '邓湘雷');
 const articleCatalog = ref([]);
 const hasArticleCatalog = computed(() => articleCatalog.value.length > 0);
+const coverImageVisible = ref(false);
+const coverImageSrc = computed(
+  () => `${config.public.ossUrl}/image/articleCover/${articleData.value?.id}.png`,
+);
 const updateArticleCatalog = (catalog) => {
   articleCatalog.value = Array.isArray(catalog) ? catalog : [];
+};
+
+const probeCoverImage = async () => {
+  coverImageVisible.value = false;
+  if (!import.meta.client || !articleData.value?.id) return;
+
+  try {
+    const response = await fetch(coverImageSrc.value, { method: 'HEAD', cache: 'no-store' });
+    const contentType = response.headers.get('content-type') || '';
+    coverImageVisible.value = response.ok && contentType.startsWith('image/');
+  } catch {
+    coverImageVisible.value = false;
+  }
 };
 
 definePageMeta({
@@ -32,6 +49,7 @@ const { data: articleData, error: articleError } = await useAsyncData(
     });
   },
 );
+watch(() => articleData.value?.id, probeCoverImage, { immediate: true });
 useHead({
   title: `${articleData.value?.topic} 【 邓湘雷的博客 】`,
   meta: [
@@ -390,9 +408,9 @@ onMounted(() => {
           <span>阅读 {{ articleData?.popularity }}</span>
         </div>
       </div>
-      <div id="image-box">
+      <div v-if="coverImageVisible" id="image-box">
         <img
-          :src="`${config.public.ossUrl}/image/articleCover/${articleData?.id}.png`"
+          :src="coverImageSrc"
           :alt="articleData?.topic"
           :preview="false"
         />
