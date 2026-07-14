@@ -54,8 +54,6 @@ const primaryLinks = [
     path: '/log/article',
     key: '/log/article',
   },
-];
-const secondaryLinks = [
   {
     title: '关于我',
     label: '关于我',
@@ -63,8 +61,7 @@ const secondaryLinks = [
     key: '/about',
   },
 ];
-const topNavLinks = [...primaryLinks, ...secondaryLinks];
-const naviData = reactive(topNavLinks.map((item) => ({ ...item }))); // 导航数据
+const naviData = reactive(primaryLinks.map((item) => ({ ...item }))); // 导航数据
 let naviDrawer = ref(false);
 const expandedKeys = ref([]);
 const isActive = (path) => {
@@ -285,20 +282,6 @@ onMounted(() => {
         </button>
       </div>
 
-      <div class="desktop-links" role="list" aria-label="站点页面">
-        <button
-          v-for="item in secondaryLinks"
-          :key="item.key"
-          class="nav-item"
-          :class="{ active: !item.external && isActive(item.path) }"
-          type="button"
-          role="listitem"
-          @click="goTo(item.path, item.external)"
-        >
-          {{ item.label }}
-        </button>
-      </div>
-
       <div class="nav-tools">
         <button
           class="tool-button"
@@ -350,7 +333,7 @@ onMounted(() => {
 .site-nav-capsule {
   pointer-events: auto;
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
   width: $nav-shell-width;
@@ -416,7 +399,6 @@ button {
 }
 
 .entry-switch,
-.desktop-links,
 .nav-tools {
   display: inline-flex;
   align-items: center;
@@ -428,11 +410,6 @@ button {
   border-radius: $radius-capsule;
   background: $surface-control;
   box-shadow: inset 0 1px 4px color-mix(in srgb, $main-text-color 8%, transparent);
-}
-
-.desktop-links {
-  justify-content: center;
-  gap: 0.2rem;
 }
 
 .nav-item {
@@ -487,10 +464,6 @@ button {
 @media (max-width: 1024px) {
   .site-nav-capsule {
     grid-template-columns: auto minmax(0, 1fr) auto;
-  }
-
-  .desktop-links {
-    display: none;
   }
 
   .entry-switch {
