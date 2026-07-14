@@ -11,13 +11,14 @@ html {
 }
 @media (max-width: 768px) {
     html {
-        font-size: 5px !important;
+        font-size: 6.4px !important;
     }
 }
 p {
     color: $main-text-color;
 }
 body {
+    overflow-x: hidden;
     /* 定义滚动条整体样式 */
     &::-webkit-scrollbar {
         /* 设置滚动条宽度 */

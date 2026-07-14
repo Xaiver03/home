@@ -1,5 +1,6 @@
 const utils = require("../utils/index");
 const questionService = require("../services/questionService");
+const mailService = require("../services/mailService");
 
 module.exports = {
   createQuestion: async (req, res) => {
@@ -86,11 +87,19 @@ module.exports = {
 
   updateQuestion: async (req, res) => {
     try {
+      const result = await questionService.updateQuestion(req.body);
+      if (result.answerAdded) {
+        try {
+          await mailService.sendQuestionAnswerMail(result.question);
+        } catch (mailError) {
+          console.error("匿名树洞回复通知邮件发送失败:", mailError.message);
+        }
+      }
       res.json(
         utils.postMessage(
           undefined,
           "保存成功✅",
-          await questionService.updateQuestion(req.body)
+          result.result
         )
       );
     } catch (err) {

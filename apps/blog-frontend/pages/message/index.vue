@@ -502,6 +502,12 @@ onMounted(() => {
   getUserData();
   initEditorPreview();
   loadPublicQuestions();
+  const trackingCode = String(route.query.trackingCode || '').trim().toUpperCase();
+  if (trackingCode) {
+    activeSection.value = 'ask';
+    queryForm.trackingCode = trackingCode;
+    nextTick(queryQuestion);
+  }
   window.addEventListener('beforeunload', defaultUnSaveTip); // 监听浏览器关闭和刷新事件，提示还没保存
 });
 onBeforeUnmount(() => {

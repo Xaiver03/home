@@ -116,6 +116,9 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 #flexed-tool {
+  bottom: calc(6rem + env(safe-area-inset-bottom));
+  right: calc(1.6rem + env(safe-area-inset-right));
+
   .tool-item {
     align-items: center;
     appearance: none;
@@ -134,6 +137,17 @@ onUnmounted(() => {
 
     &:hover {
       color: $main-color;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  #flexed-tool {
+    right: calc(1rem + env(safe-area-inset-right));
+
+    .tool-item {
+      height: 4.4rem;
+      width: 4.4rem;
     }
   }
 }

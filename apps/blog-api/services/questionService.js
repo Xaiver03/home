@@ -162,10 +162,13 @@ module.exports = {
     if (nextQuestion.isPublic && utils.isNullOrEmpty(nextQuestion.answer)) {
       throw new Error("问答必须完成回答后才能公开展示");
     }
-    if (!utils.isNullOrEmpty(question.answer) && utils.isNullOrEmpty(currentQuestion.answerTime)) {
+    const answerAdded = !utils.isNullOrEmpty(question.answer) && utils.isNullOrEmpty(currentQuestion.answer);
+    if (answerAdded && utils.isNullOrEmpty(currentQuestion.answerTime)) {
       question.answerTime = new Date();
     }
-    return await Question.update(question, { where: { id: question.id } });
+    const result = await Question.update(question, { where: { id: question.id } });
+    const updatedQuestion = await Question.findByPk(question.id);
+    return { result, question: updatedQuestion, answerAdded };
   },
 
   deleteQuestionById: async (id) => {

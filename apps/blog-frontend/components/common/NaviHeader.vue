@@ -483,7 +483,9 @@ button {
 
 @media (max-width: 640px) {
   .site-nav-shell {
-    padding-top: 0.8rem;
+    padding-top: calc(0.8rem + env(safe-area-inset-top));
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   .site-nav-capsule {

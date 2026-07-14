@@ -1,5 +1,14 @@
 <script setup>
 import { onMounted, computed } from 'vue';
+import {
+  BookOutlined,
+  BulbOutlined,
+  CodeOutlined,
+  GithubOutlined,
+  LinkOutlined,
+  UserOutlined,
+  WechatOutlined,
+} from '@ant-design/icons-vue';
 const store = useNuxtStore();
 definePageMeta({
   layout: 'classics',
@@ -33,15 +42,24 @@ const pageTexts = computed(() => {
 });
 
 const keywordDescription = computed(() => {
-  return (
-    store.$state.config['about-keyword-description']?.content ||
-    '我的构成元素，对自己的探索希望能越来越多'
-  );
+  return store.$state.config['about-keyword-description']?.content || '';
 });
 
 const finalThoughtsHint = computed(() => {
-  return store.$state.config['final-thoughts-hint']?.content || '点一点有惊喜';
+  return store.$state.config['final-thoughts-hint']?.content || '';
 });
+
+const isImageIcon = (value) => /^(https?:\/\/|\/)/i.test(String(value || ''));
+const getIconComponent = (value) => {
+  const name = String(value || '').toLowerCase();
+  if (name.includes('github')) return GithubOutlined;
+  if (name.includes('wechat') || name.includes('公众号')) return WechatOutlined;
+  if (name.includes('book') || name.includes('文章')) return BookOutlined;
+  if (name.includes('user') || name.includes('person')) return UserOutlined;
+  if (name.includes('bulb') || name.includes('infj')) return BulbOutlined;
+  if (name.includes('link') || name.includes('url')) return LinkOutlined;
+  return CodeOutlined;
+};
 
 // #region 词云
 const cloud = ref(null);
@@ -134,10 +152,13 @@ onBeforeUnmount(() => {
         <div
           v-for="link in socialLinks"
           :key="link.name"
-          :class="`icon iconfont ${link.icon}`"
+          class="about-social-icon"
           @click="goTo(link.url, $event)"
           :title="link.name"
-        ></div>
+        >
+          <img v-if="isImageIcon(link.icon)" :src="link.icon" :alt="link.name" />
+          <component v-else :is="getIconComponent(link.iconClass || link.icon || link.name)" />
+        </div>
       </div>
     </a-card>
 
@@ -180,14 +201,13 @@ onBeforeUnmount(() => {
       <span class="card-title absolute top-8">Hi👏🏻</span>
       <div class="card-text">{{ basicInfo.welcomeText || '🎉欢迎来到我的空间🎉' }}</div>
       <div class="card-text">
-        {{ basicInfo.introduction || '我是一个开发者' }}<span class="iconfont icon-infj mx-4"></span
-        >{{ basicInfo.profession || '' }}
+        {{ basicInfo.introduction || '' }}<BulbOutlined v-if="basicInfo.introduction || basicInfo.profession" class="about-inline-icon mx-4" />{{ basicInfo.profession || '' }}
       </div>
       <div id="INFJ-bg" class="absolute text-9xl top-8 right-8">
-        {{ basicInfo.personality || 'INFJ' }}
+        {{ basicInfo.personality || '' }}
       </div>
       <div id="INFJ-attach" class="absolute text-9xl left-8">
-        {{ basicInfo.personalityDesc || '提倡者' }}
+        {{ basicInfo.personalityDesc || '' }}
       </div>
     </a-card>
 
@@ -215,7 +235,7 @@ onBeforeUnmount(() => {
                 :color="item.color"
               >
                 <template #icon>
-                  <i class="mr-4" :class="`iconfont ${item.iconClass}`"></i>
+                  <component :is="getIconComponent(item.iconClass || item.name)" class="about-inline-icon mr-4" />
                 </template>
                 {{ item.name }}
               </a-tag>
@@ -376,6 +396,42 @@ onBeforeUnmount(() => {
         transform: translateY(-2px);
         border-color: $color-border-strong;
       }
+    }
+
+    .about-social-icon {
+      align-items: center;
+      background: $surface-control;
+      border: 1px solid $color-border-strong;
+      border-radius: $radius-control;
+      color: $color-accent-primary;
+      display: inline-flex;
+      font-size: 2.4rem;
+      height: 4.4rem;
+      justify-content: center;
+      transition:
+        transform 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease;
+      width: 4.4rem;
+
+      &:hover {
+        border-color: $color-accent-primary;
+        color: $main-text-color;
+        transform: translateY(-2px);
+      }
+
+      img {
+        border-radius: 4px !important;
+        box-shadow: none;
+        height: 2.4rem !important;
+        padding: 0 !important;
+        width: 2.4rem !important;
+      }
+    }
+
+    .about-inline-icon {
+      color: $color-accent-primary;
+      vertical-align: -0.12em;
     }
   }
 

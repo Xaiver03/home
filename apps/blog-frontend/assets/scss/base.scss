@@ -29,6 +29,24 @@ body {
   width: min(92%, $content-max-width);
 }
 
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .blog-action,
+  button,
+  .ant-btn,
+  .ant-input,
+  .ant-input-affix-wrapper {
+    min-height: 4.4rem;
+  }
+}
+
 .blog-page-shell {
   display: grid;
   gap: 3rem;

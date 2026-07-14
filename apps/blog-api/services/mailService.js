@@ -1,8 +1,34 @@
 const transporter = require("../db/mail");
 const redisService = require("../services/redisService");
 const utils = require("../utils/index");
+const config = require("config");
 
 module.exports = {
+  // 匿名树洞回复通知。只有联系方式是邮箱时才发送，微信等其他联系方式不触发邮件。
+  sendQuestionAnswerMail: async (question) => {
+    const email = String(question?.contact || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+
+    const trackingCode = encodeURIComponent(question.trackingCode);
+    const answerUrl = `${config.get("author.website")}/blog/message?tab=ask&trackingCode=${trackingCode}`;
+    const options = {
+      from: "邓湘雷の博客<light@xiangleideng.site>",
+      to: email,
+      subject: `你的匿名树洞有新回复（${question.trackingCode}）`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; line-height: 1.7; color: #17201d;">
+          <h2>你的匿名树洞有新回复</h2>
+          <p>追踪码：<strong>${question.trackingCode}</strong></p>
+          <p>点击下面的链接，输入页面自动带入的追踪码即可查看回复：</p>
+          <p><a href="${answerUrl}">查看树洞回复</a></p>
+          <p style="color: #65706a;">如果链接未自动查询，请手动保存并输入追踪码。</p>
+        </div>
+      `,
+    };
+    await transporter.sendMail(options);
+    return true;
+  },
+
   // 发送验证码邮件
   sendCodeMail: async (mail) => {
     const code = utils.getRandomChar(); // 获取验证码

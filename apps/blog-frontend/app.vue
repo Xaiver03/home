@@ -25,7 +25,7 @@ const reScreenSize = () => {
   const root = document.documentElement
   let w = root.clientWidth; // 获取设备的宽度
   if (w <= 786) {
-    root.style.fontSize = '5px'
+    root.style.fontSize = '6.4px'
     return
   }
   let n =
