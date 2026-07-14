@@ -6,6 +6,11 @@ const store = useNuxtStore();
 const config = useRuntimeConfig();
 const route = useRoute();
 const articleAuthor = computed(() => store.$state.config['article-author']?.content || '邓湘雷');
+const articleCatalog = ref([]);
+const hasArticleCatalog = computed(() => articleCatalog.value.length > 0);
+const updateArticleCatalog = (catalog) => {
+  articleCatalog.value = Array.isArray(catalog) ? catalog : [];
+};
 
 definePageMeta({
   layout: 'classics',
@@ -395,13 +400,16 @@ onMounted(() => {
     </article>
     <!-- 文章内容 -->
     <div class="article-reading-layout">
-      <aside class="article-outline blog-glass-panel">
+      <aside v-if="hasArticleCatalog" class="article-outline blog-glass-panel">
         <p class="outline-title">Outline</p>
-        <MdCatalog editorId="preview" />
+        <MdCatalog editorId="preview" scrollElement="html" :scrollElementOffsetTop="96" />
       </aside>
       <div id="log-content" class="blog-glass-panel">
         <RepeatEmptyPlaceholder :data-show="articleData?.mdContent?.length > 0" class="w-full">
-          <RepeatMdPreView :md-content="articleData?.mdContent" />
+          <RepeatMdPreView
+            :md-content="articleData?.mdContent"
+            :on-get-catalog="updateArticleCatalog"
+          />
         </RepeatEmptyPlaceholder>
       </div>
     </div>
