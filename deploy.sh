@@ -34,26 +34,26 @@ done
 echo "" | tee -a "$LOG_FILE"
 log "========== CI/CD 自动部署开始 =========="
 
-# ---- Step 1: 拉取最新代码 ----
-step "Step 1/6: 拉取最新代码"
-cd "$REPO_DIR"
-git fetch origin --quiet
-LOCAL=$(git rev-parse HEAD)
-REMOTE=$(git rev-parse origin/dev)
-
-if [ "$LOCAL" = "$REMOTE" ] && [ "$SKIP_BUILD" = false ]; then
-  warn "代码无变化 ($(git rev-parse --short HEAD))，跳过部署"
-  log "========== 无需部署 =========="
-  exit 0
-fi
-
-# 强制对齐远程（丢弃本地修改，确保部署一致性）
-git reset --hard origin/dev 2>&1 | tail -3
-log "代码已更新: $(git rev-parse --short HEAD) — $(git log -1 --pretty='%s')"
-
 if [ "$SKIP_BUILD" = true ]; then
-  log "跳过构建步骤 (--skip-build)"
+  log "跳过 Git 同步和构建步骤 (--skip-build，使用本地上传的文件)"
 else
+  # ---- Step 1: 拉取最新代码 ----
+  step "Step 1/6: 拉取最新代码"
+  cd "$REPO_DIR"
+  git fetch origin --quiet
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git rev-parse origin/dev)
+
+  if [ "$LOCAL" = "$REMOTE" ]; then
+    warn "代码无变化 ($(git rev-parse --short HEAD))，跳过部署"
+    log "========== 无需部署 =========="
+    exit 0
+  fi
+
+  # 强制对齐远程（丢弃本地修改，确保部署一致性）
+  git reset --hard origin/dev 2>&1 | tail -3
+  log "代码已更新: $(git rev-parse --short HEAD) — $(git log -1 --pretty='%s')"
+
   # ---- Step 2: 安装依赖 ----
   step "Step 2/6: 安装依赖"
   export npm_config_registry=https://registry.npmmirror.com
