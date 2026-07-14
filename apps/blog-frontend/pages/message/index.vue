@@ -188,6 +188,12 @@ const switchSection = (section) => {
   activeSection.value = section;
   navigateTo({ path: '/message', query: section === 'ask' ? { tab: 'ask' } : {} }, { replace: true });
 };
+const openMessageEditor = (parentId = null, subUserId = null) => {
+  currentMessage.parentId = parentId;
+  currentMessage.subUserId = subUserId;
+  messageModelShow.value = true;
+  phoneAdaptation();
+};
 const loadPublicQuestions = async (page = 1, append = false) => {
   publicLoading.value = true;
   try {
@@ -309,6 +315,7 @@ const submitMessage = () => {
         // pushNewDataInMessageList(res.data)
         mdEditor.value.mdContent = null; // 清空内容
         currentMessage.parentId = null;
+        currentMessage.subUserId = null;
         messageModelShow.value = false;
         uploadUnSaveImagesPath.value = []; // 清空图片暂存
         getMessageData(true);
@@ -501,15 +508,15 @@ onBeforeUnmount(() => {
     <header class="blog-section-head">
       <div>
         <span class="blog-eyebrow">Messages</span>
-        <h1>留言</h1>
+        <h1>留言板</h1>
       </div>
-      <p>这里保留短留言和开放交流。可以按时间、热度或作者留言筛选。</p>
+      <p>公开留言板保留交流，也可以进入匿名树洞，留下不想署名的问题。</p>
     </header>
     <div id="message-page-content">
       <div class="message-toolbar blog-glass-panel">
-        <a-space class="hidden md:flex section-tabs">
-          <a-button :type="activeSection === 'message' ? 'primary' : 'default'" @click="switchSection('message')">留言</a-button>
-          <a-button :type="activeSection === 'ask' ? 'primary' : 'default'" @click="switchSection('ask')">匿名问答</a-button>
+        <a-space class="section-tabs" role="tablist" aria-label="留言功能">
+          <a-button :type="activeSection === 'message' ? 'primary' : 'default'" :aria-pressed="activeSection === 'message'" @click="switchSection('message')">留言板</a-button>
+          <a-button :type="activeSection === 'ask' ? 'primary' : 'default'" :aria-pressed="activeSection === 'ask'" @click="switchSection('ask')">匿名树洞</a-button>
         </a-space>
         <a-space v-if="activeSection === 'message'" class="hidden md:flex">
           <a-space direction="vertical">
@@ -520,30 +527,22 @@ onBeforeUnmount(() => {
             </a-radio-group>
           </a-space>
           <a-button
-            @click="
-              messageModelShow = true;
-              phoneAdaptation();
-            "
+            @click="openMessageEditor()"
           >
             <template #icon>
               <FormatPainterOutlined />
             </template>
-            留下痕迹
+            写留言
           </a-button>
         </a-space>
-        <a-space class="flex md:hidden">
-          <a-button class="flex justify-center items-center" @click="switchSection(activeSection === 'message' ? 'ask' : 'message')">
-            {{ activeSection === 'message' ? '问答' : '留言' }}
-          </a-button>
+        <a-space v-if="activeSection === 'message'" class="flex md:hidden mobile-toolbar-actions">
           <a-button
             v-if="activeSection === 'message'"
             class="flex justify-center items-center"
-            @click="
-              messageModelShow = true;
-              phoneAdaptation();
-            "
+            @click="openMessageEditor()"
           >
             <FormatPainterOutlined />
+            <span>写留言</span>
           </a-button>
           <a-button v-if="activeSection === 'message'" class="flex justify-center items-center" @click="actionBarShow = true">
             <EllipsisOutlined />
@@ -598,10 +597,10 @@ onBeforeUnmount(() => {
                         >
                           {{ message.childMessageShowStatus ? '收起' : '展开' }}所有留言
                         </a-menu-item>
-                        <!-- <a-menu-item
-                          @click="currentMessage.parentId = message.id; currentMessage.subUserId = null; messageModelShow = true">
+                        <a-menu-item
+                          @click="openMessageEditor(message.id, null)">
                           ✏️{{ (ParsingReplyObject(message) ? "回复中" : "回复") }}
-                        </a-menu-item> -->
+                        </a-menu-item>
                       </a-menu>
                     </template>
                   </a-dropdown>
@@ -637,11 +636,11 @@ onBeforeUnmount(() => {
                           childMessage.like > 0 ? childMessage.like : '喜欢'
                         }}</span>
                       </div>
-                      <!-- <div class="actions flex items-center"
-                        @click="currentMessage.parentId = childMessage.parentId; currentMessage.subUserId = childMessage.userId; messageModelShow = true">
+                      <div class="actions flex items-center"
+                        @click="openMessageEditor(childMessage.parentId, childMessage.userId)">
                         <MessageOutlined />
                         <span class="ml-4">回复</span>
-                      </div> -->
+                      </div>
                     </a-space>
                   </template>
                   <template #author>
@@ -711,11 +710,11 @@ onBeforeUnmount(() => {
           <div class="panel-heading">
             <span>01</span>
             <div>
-              <h2>提交问题</h2>
-              <p>默认不会公开，只有站长能看到。是否公开，会根据内容再决定。</p>
+              <h2>匿名树洞</h2>
+              <p>不需要登录。默认不会公开，只有站长能看到；是否公开，会根据内容再决定。</p>
             </div>
           </div>
-          <p class="helper-copy">提交成功后会生成追踪码，记得保存，后面查询回复要用。</p>
+          <p class="helper-copy">把想说的话写下来。提交成功后会生成追踪码，记得保存，后面查询回复要用。</p>
           <div class="form-stack">
             <label>
               <span>昵称（可选）</span>
@@ -736,7 +735,7 @@ onBeforeUnmount(() => {
               />
             </label>
             <button class="blog-action" type="button" :disabled="submitQuestionLoading" @click="submitQuestion">
-              {{ submitQuestionLoading ? '提交中...' : '提交问题' }} <span aria-hidden="true">→</span>
+              {{ submitQuestionLoading ? '提交中...' : '投进树洞' }} <span aria-hidden="true">→</span>
             </button>
           </div>
           <a-alert v-if="submittedTrackingCode" class="tracking-alert" type="success" show-icon message="提问已收到">
@@ -746,7 +745,7 @@ onBeforeUnmount(() => {
                 {{ submittedTrackingCode }}
               </button>
               <p>这串追踪码只会出现这一次，记得截图或复制保存。</p>
-              <p>之后查询回复，需要用到它。</p>
+              <p>之后查询树洞回复，需要用到它。</p>
             </template>
           </a-alert>
         </section>
@@ -755,7 +754,7 @@ onBeforeUnmount(() => {
           <div class="panel-heading">
             <span>02</span>
             <div>
-              <h2>查询回复</h2>
+              <h2>查询树洞回复</h2>
               <p>输入追踪码，就能查看这条提问的审核状态和回复。</p>
             </div>
           </div>
@@ -787,7 +786,7 @@ onBeforeUnmount(() => {
           <div class="panel-heading">
             <span>03</span>
             <div>
-              <h2>最近公开问答</h2>
+              <h2>最近公开树洞</h2>
               <p>这里只展示已通过审核、允许公开，并且已经回复的问题。</p>
             </div>
           </div>
@@ -827,7 +826,7 @@ onBeforeUnmount(() => {
         @ok="submitMessage"
       >
         <div class="model-content flex flex-col">
-          <p class="mt-4 mb-4">⚠️限制1500字，支持匿名留言（Tips:工具栏可以拖动）</p>
+          <p class="mt-4 mb-4">⚠️限制1500字，留言板支持匿名发表（工具栏可以拖动）</p>
           <div v-if="currentMessage.parentId" id="replyObj" class="py-2 flex items-center">
             <p>
               回复@{{ currentParentMessageContent.userName }}:{{
@@ -874,16 +873,21 @@ onBeforeUnmount(() => {
     width: 100%;
     margin: 0 auto;
 
-  .message-toolbar {
+    .message-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
       padding: 1rem;
+      flex-wrap: wrap;
 
       .section-tabs {
         flex-wrap: wrap;
       }
+    }
+
+    .mobile-toolbar-actions {
+      margin-left: auto;
     }
 
     .ask-shell {
@@ -1094,6 +1098,30 @@ onBeforeUnmount(() => {
 
       .child-message-parting {
         border-left: 1px solid rgba(101, 112, 106, 0.28);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .message-toolbar {
+        align-items: stretch;
+      }
+
+      .section-tabs,
+      .mobile-toolbar-actions {
+        width: 100%;
+      }
+
+      .section-tabs :deep(.ant-space-item) {
+        flex: 1;
+      }
+
+      .section-tabs :deep(.ant-btn) {
+        width: 100%;
+      }
+
+      .mobile-toolbar-actions {
+        justify-content: flex-end;
+        margin-left: 0;
       }
     }
   }

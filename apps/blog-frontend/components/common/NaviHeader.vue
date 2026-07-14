@@ -55,6 +55,12 @@ const primaryLinks = [
     key: '/log/article',
   },
   {
+    title: '留言板',
+    label: '留言板',
+    path: '/message',
+    key: '/message',
+  },
+  {
     title: '关于我',
     label: '关于我',
     path: '/about',

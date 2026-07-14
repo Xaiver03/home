@@ -71,11 +71,20 @@ module.exports = {
       const hasUsableAuthorization =
         authorization && !/^Bearer\s+(null|undefined)$/i.test(authorization.trim());
       if (hasUsableAuthorization) {
-        const tokenData = tokenService.checkToken(authorization).data;
-        req.body.userId =
-          tokenData.power == "admin" || utils.isAdminCustomer(tokenData.mail)
-            ? -1
-            : tokenData.id;
+        try {
+          const tokenData = tokenService.checkToken(authorization).data;
+          req.body.userId =
+            tokenData.power == "admin" || utils.isAdminCustomer(tokenData.mail)
+              ? -1
+              : tokenData.id;
+        } catch (err) {
+          // 留言板允许匿名提交；旧 token 不能阻塞匿名留言。
+          if (req.body.entityType === "Message") {
+            req.body.userId = 0;
+          } else {
+            throw err;
+          }
+        }
       } else if (req.body.entityType === "Message") {
         req.body.userId = 0;
       } else {
