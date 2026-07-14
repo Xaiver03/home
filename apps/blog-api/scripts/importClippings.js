@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const CATEGORY_DEFINITIONS = {
   'AI 与智能体': 'Agent 架构、沙箱、权限与 AI 开发工具。',
@@ -133,6 +134,115 @@ function classifyArticle(title) {
   };
 }
 
+function stripUrlHash(url) {
+  return url.split('#')[0];
+}
+
+function isRemoteUrl(url) {
+  return /^https?:\/\//i.test(url);
+}
+
+function isDataImage(url) {
+  return /^data:image\//i.test(url);
+}
+
+function isVideoPageUrl(url) {
+  return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|bilibili\.com)\//i.test(url);
+}
+
+function getImageExtension(url, contentType = '') {
+  const lowerContentType = String(contentType).toLowerCase();
+  if (lowerContentType.includes('image/jpeg')) return '.jpg';
+  if (lowerContentType.includes('image/png')) return '.png';
+  if (lowerContentType.includes('image/webp')) return '.webp';
+  if (lowerContentType.includes('image/gif')) return '.gif';
+  if (lowerContentType.includes('image/svg+xml')) return '.svg';
+
+  const normalizedUrl = stripUrlHash(url);
+  const wxFmtMatch = normalizedUrl.match(/[?&]wx_fmt=([a-z0-9]+)/i);
+  if (wxFmtMatch) {
+    const format = wxFmtMatch[1].toLowerCase();
+    if (format === 'jpeg') return '.jpg';
+    if (['jpg', 'png', 'webp', 'gif', 'svg'].includes(format)) {
+      return `.${format}`;
+    }
+  }
+
+  const pathname = new URL(normalizedUrl, 'https://dummy.local').pathname;
+  const ext = path.extname(pathname).toLowerCase();
+  if (ext) return ext;
+  return '.png';
+}
+
+async function downloadRemoteImage(url) {
+  const requestUrl = stripUrlHash(url);
+  const response = await fetch(requestUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+      Referer: 'https://mp.weixin.qq.com/',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`下载图片失败：${response.status} ${requestUrl}`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  const arrayBuffer = await response.arrayBuffer();
+  return {
+    buffer: Buffer.from(arrayBuffer),
+    contentType,
+  };
+}
+
+async function rewriteArticleImages(content, { articleId, sourceFilePath, storageService }) {
+  const imagePattern = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g;
+  const seen = new Map();
+  let imageIndex = 0;
+  let rewritten = content;
+  const matches = [...content.matchAll(imagePattern)];
+
+  for (const match of matches) {
+    const [fullMatch, altText, rawUrl] = match;
+    const normalizedUrl = rawUrl.trim();
+
+    if (!normalizedUrl || normalizedUrl.startsWith('/uploads/')) continue;
+    if (isDataImage(normalizedUrl) || isVideoPageUrl(normalizedUrl)) continue;
+
+    let publicUrl = seen.get(normalizedUrl);
+    if (!publicUrl) {
+      imageIndex += 1;
+      let buffer = null;
+      let contentType = '';
+
+      if (isRemoteUrl(normalizedUrl)) {
+        const remoteImage = await downloadRemoteImage(normalizedUrl);
+        buffer = remoteImage.buffer;
+        contentType = remoteImage.contentType;
+      } else {
+        const absolutePath = path.isAbsolute(normalizedUrl)
+          ? normalizedUrl
+          : path.resolve(path.dirname(sourceFilePath), normalizedUrl);
+        if (!fs.existsSync(absolutePath)) {
+          continue;
+        }
+        buffer = fs.readFileSync(absolutePath);
+      }
+
+      const ext = getImageExtension(normalizedUrl, contentType);
+      const digest = crypto.createHash('md5').update(buffer).digest('hex').slice(0, 10);
+      const storagePath = `/image/articleContent/${articleId}/image-${String(imageIndex).padStart(3, '0')}-${digest}${ext}`;
+      const uploadResult = await storageService.uploadBuffer(storagePath, buffer);
+      publicUrl = `${uploadResult.url.startsWith('/uploads') ? '' : '/uploads'}${uploadResult.url}`;
+      seen.set(normalizedUrl, publicUrl);
+    }
+
+    rewritten = rewritten.replace(fullMatch, `![${altText}](${publicUrl})`);
+  }
+
+  return rewritten;
+}
+
 function findMarkdownFiles(directory) {
   return fs
     .readdirSync(directory, { withFileTypes: true })
@@ -220,7 +330,14 @@ async function importClippings(sourceDirectory, dependencies, options) {
         result.created += 1;
       }
 
-      await storageService.uploadOrUpdateFile(`/file/article/${article.id}.md`, item.content);
+      let articleContent = item.content;
+      articleContent = await rewriteArticleImages(articleContent, {
+        articleId: article.id,
+        sourceFilePath: item.filePath,
+        storageService,
+      });
+
+      await storageService.uploadOrUpdateFile(`/file/article/${article.id}.md`, articleContent);
     }
 
     await transaction.commit();
@@ -284,6 +401,8 @@ if (require.main === module) {
 module.exports = {
   classifyArticle,
   getImportPlan,
+  getImageExtension,
   importClippings,
   parseClipping,
+  rewriteArticleImages,
 };

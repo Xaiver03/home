@@ -121,6 +121,29 @@ module.exports = {
   },
 
   /**
+   * 上传 Buffer 到本地存储
+   */
+  uploadBuffer: async (storagePath, buffer) => {
+    const fullPath = path.join(UPLOAD_DIR, storagePath);
+    const dir = path.dirname(fullPath);
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(fullPath, buffer);
+
+    const publicPath = storagePath.startsWith('/') ? storagePath : '/' + storagePath;
+    return {
+      code: 200,
+      msg: '上传成功',
+      url: `${publicPath}`,
+      name: publicPath,
+      res: { status: 200 },
+    };
+  },
+
+  /**
    * 获取本地文件内容
    */
   getFileContent: async (filePath) => {

@@ -3,9 +3,11 @@ const os = require('os');
 const path = require('path');
 const {
   classifyArticle,
+  getImageExtension,
   getImportPlan,
   importClippings,
   parseClipping,
+  rewriteArticleImages,
 } = require('../scripts/importClippings');
 
 describe('parseClipping', () => {
@@ -131,7 +133,57 @@ author:
   });
 });
 
+describe('image rewriting helpers', () => {
+  it('derives image extensions from content type and wx_fmt query', () => {
+    expect(getImageExtension('https://example.com/image', 'image/jpeg')).toBe('.jpg');
+    expect(getImageExtension('https://mmbiz.qpic.cn/abc/640?wx_fmt=png')).toBe('.png');
+    expect(getImageExtension('https://example.com/a.webp')).toBe('.webp');
+  });
+
+  it('rewrites remote markdown image links to articleContent uploads', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      headers: { get: () => 'image/png' },
+      arrayBuffer: async () => Buffer.from('png-binary'),
+    });
+
+    const storageService = {
+      uploadBuffer: jest.fn().mockImplementation(async (storagePath) => ({
+        url: storagePath,
+      })),
+    };
+
+    const content = '正文\n\n![封面](https://mmbiz.qpic.cn/test/640?wx_fmt=png#imgIndex=0)';
+    const rewritten = await rewriteArticleImages(content, {
+      articleId: 12,
+      sourceFilePath: '/tmp/source.md',
+      storageService,
+    });
+
+    expect(storageService.uploadBuffer).toHaveBeenCalledTimes(1);
+    expect(rewritten).toMatch(/!\[封面\]\(\/uploads\/image\/articleContent\/12\/image-001-/);
+  });
+
+  it('preserves video-like pseudo-image links without downloading them', async () => {
+    const storageService = { uploadBuffer: jest.fn() };
+    const content = '![](https://www.youtube.com/watch?v=abc123)';
+
+    const rewritten = await rewriteArticleImages(content, {
+      articleId: 9,
+      sourceFilePath: '/tmp/source.md',
+      storageService,
+    });
+
+    expect(storageService.uploadBuffer).not.toHaveBeenCalled();
+    expect(rewritten).toBe(content);
+  });
+});
+
 describe('importClippings', () => {
+  afterEach(() => {
+    delete global.fetch;
+  });
+
   it('rolls back and closes the database connection when an import fails', async () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'clippings-'));
     fs.writeFileSync(
