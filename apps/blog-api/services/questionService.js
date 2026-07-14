@@ -34,7 +34,11 @@ const applyQuestionFilters = (selectOptions, options = {}) => {
       selectOptions.where.question = { [Op.like]: "%" + options[key] + "%" };
     } else if (key == "answer") {
       if (options[key] === '__ANSWERED__') {
-        selectOptions.where.answer = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: "" }] };
+        selectOptions.where[Op.and] = [
+          ...(selectOptions.where[Op.and] || []),
+          { answer: { [Op.ne]: null } },
+          { answer: { [Op.ne]: "" } },
+        ];
       } else if (options[key] === '__UNANSWERED__') {
         selectOptions.where[Op.and] = [
           ...(selectOptions.where[Op.and] || []),
@@ -121,13 +125,25 @@ module.exports = {
       where: {
         status: "approved",
         isPublic: true,
-        answer: { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: "" }] },
+        [Op.and]: [
+          { answer: { [Op.ne]: null } },
+          { answer: { [Op.ne]: "" } },
+        ],
       },
       attributes: publicAttributes,
       order: [["answerTime", "DESC"], ["createTime", "DESC"]],
     };
     if (options.order) {
-      selectOptions.order = JSON.parse(options.order);
+      try {
+        const parsedOrder = JSON.parse(options.order);
+        const allowFields = ["answerTime", "createTime"];
+        const safeOrder = parsedOrder.filter(
+          (item) => Array.isArray(item) && allowFields.includes(item[0]) && ["ASC", "DESC"].includes(String(item[1]).toUpperCase())
+        );
+        if (safeOrder.length > 0) {
+          selectOptions.order = safeOrder;
+        }
+      } catch (e) {}
     }
     delete options.order;
     applyQuestionFilters(selectOptions, options);

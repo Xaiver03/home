@@ -50,14 +50,18 @@ module.exports = {
   },
 
   searchPublicQuestion: async (req, res) => {
-    const options = req.body.data || {};
-    res.json(
-      await questionService.searchPublicQuestion(
-        req.body.currentPage,
-        req.body.pageSize,
-        options
-      )
-    );
+    try {
+      const options = req.body.data || {};
+      res.json(
+        await questionService.searchPublicQuestion(
+          req.body.currentPage,
+          req.body.pageSize,
+          options
+        )
+      );
+    } catch (err) {
+      res.json(utils.postMessage(-1, err.message, {}));
+    }
   },
 
   getAllQuestion: async (req, res) => {

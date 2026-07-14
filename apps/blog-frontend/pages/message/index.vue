@@ -59,6 +59,25 @@ const initEditorPreview = () => {
 const total = useState('total', () => 0);
 const currentPage = useState('currentPage', () => 1);
 const pageSize = useState('pageSize', () => 10);
+const route = useRoute();
+const activeSection = ref(route.query.tab === 'ask' ? 'ask' : 'message');
+const askPublicPage = ref(1);
+const askPublicTotal = ref(0);
+const publicQuestions = ref([]);
+const publicLoading = ref(false);
+const submitQuestionLoading = ref(false);
+const queryLoading = ref(false);
+const submittedTrackingCode = ref('');
+const emptyQueryMessage = ref('');
+const queryResult = ref(null);
+const questionForm = reactive({
+  nickname: '',
+  contact: '',
+  question: '',
+});
+const queryForm = reactive({
+  trackingCode: '',
+});
 // 服务端 - 获取留言
 const { data: messageList, error: messageListError } = await useAsyncData(
   'getMessageList',
@@ -137,6 +156,114 @@ const getMoreMessage = () => {
   } else {
     judgeMessageSortingGetMessageData();
   }
+};
+
+const questionStatusText = (status) => {
+  switch (status) {
+    case 'approved':
+      return '审核通过';
+    case 'rejected':
+      return '未通过';
+    case 'archived':
+      return '已封存';
+    case 'pending':
+      return '待审核';
+    default:
+      return '未知状态';
+  }
+};
+const questionStatusColor = (status) => {
+  switch (status) {
+    case 'approved':
+      return 'success';
+    case 'rejected':
+      return 'error';
+    case 'archived':
+      return 'warning';
+    default:
+      return 'processing';
+  }
+};
+const switchSection = (section) => {
+  activeSection.value = section;
+  navigateTo({ path: '/message', query: section === 'ask' ? { tab: 'ask' } : {} }, { replace: true });
+};
+const loadPublicQuestions = async (page = 1, append = false) => {
+  publicLoading.value = true;
+  try {
+    const res = await api.searchPublicQuestion({
+      currentPage: page,
+      pageSize: 6,
+      data: {},
+    });
+    askPublicTotal.value = res.count || 0;
+    publicQuestions.value = append ? [...publicQuestions.value, ...res.rows] : res.rows;
+    askPublicPage.value = page;
+  } finally {
+    publicLoading.value = false;
+  }
+};
+const submitQuestion = async () => {
+  if (utils.isNullOrEmpty(questionForm.question)) {
+    notification.open({
+      message: '提示💡',
+      description: '先把想问的写下来吧。',
+      placement: 'top',
+      duration: 3,
+    });
+    return;
+  }
+  submitQuestionLoading.value = true;
+  try {
+    const res = await api.addQuestion({ ...questionForm });
+    if (utils.analysisData(res)) {
+      submittedTrackingCode.value = res.data.trackingCode;
+      queryForm.trackingCode = res.data.trackingCode;
+      emptyQueryMessage.value = '';
+      questionForm.nickname = '';
+      questionForm.contact = '';
+      questionForm.question = '';
+    }
+  } finally {
+    submitQuestionLoading.value = false;
+  }
+};
+const queryQuestion = async () => {
+  if (utils.isNullOrEmpty(queryForm.trackingCode)) {
+    notification.open({
+      message: '提示💡',
+      description: '请输入追踪码。',
+      placement: 'top',
+      duration: 3,
+    });
+    return;
+  }
+  queryLoading.value = true;
+  emptyQueryMessage.value = '';
+  try {
+    const res = await api.getQuestionByTrackingCode({
+      trackingCode: queryForm.trackingCode,
+    });
+    if (utils.analysisData(res, false)) {
+      queryResult.value = res.data;
+      emptyQueryMessage.value = '';
+    } else {
+      queryResult.value = null;
+      emptyQueryMessage.value = '暂时没有查到这条提问，看看追踪码有没有输错。';
+    }
+  } finally {
+    queryLoading.value = false;
+  }
+};
+const copyTrackingCode = async (trackingCode) => {
+  if (!trackingCode || !import.meta.client) return;
+  await navigator.clipboard.writeText(trackingCode);
+  notification.open({
+    message: '已复制',
+    description: '追踪码已复制，可以直接去查询。',
+    placement: 'top',
+    duration: 2,
+  });
 };
 let userData = reactive({}); // 登录用户数据
 const getUserData = () => {
@@ -347,6 +474,7 @@ const phoneAdaptation = () => {
 onMounted(() => {
   getUserData();
   initEditorPreview();
+  loadPublicQuestions();
   window.addEventListener('beforeunload', defaultUnSaveTip); // 监听浏览器关闭和刷新事件，提示还没保存
 });
 onBeforeUnmount(() => {
@@ -365,7 +493,11 @@ onBeforeUnmount(() => {
     </header>
     <div id="message-page-content">
       <div class="message-toolbar blog-glass-panel">
-        <a-space class="hidden md:flex">
+        <a-space class="hidden md:flex section-tabs">
+          <a-button :type="activeSection === 'message' ? 'primary' : 'default'" @click="switchSection('message')">留言</a-button>
+          <a-button :type="activeSection === 'ask' ? 'primary' : 'default'" @click="switchSection('ask')">匿名问答</a-button>
+        </a-space>
+        <a-space v-if="activeSection === 'message'" class="hidden md:flex">
           <a-space direction="vertical">
             <a-radio-group v-model:value="messageSorting">
               <a-radio-button value="like">按热度</a-radio-button>
@@ -386,7 +518,11 @@ onBeforeUnmount(() => {
           </a-button>
         </a-space>
         <a-space class="flex md:hidden">
+          <a-button class="flex justify-center items-center" @click="switchSection(activeSection === 'message' ? 'ask' : 'message')">
+            {{ activeSection === 'message' ? '问答' : '留言' }}
+          </a-button>
           <a-button
+            v-if="activeSection === 'message'"
             class="flex justify-center items-center"
             @click="
               messageModelShow = true;
@@ -395,12 +531,12 @@ onBeforeUnmount(() => {
           >
             <FormatPainterOutlined />
           </a-button>
-          <a-button class="flex justify-center items-center" @click="actionBarShow = true">
+          <a-button v-if="activeSection === 'message'" class="flex justify-center items-center" @click="actionBarShow = true">
             <EllipsisOutlined />
           </a-button>
         </a-space>
       </div>
-      <div class="message-card">
+      <div v-if="activeSection === 'message'" class="message-card">
         <RepeatEmptyPlaceholder
           :dataReady="Boolean(messageList)"
           :dataShow="messageList?.length > 0"
@@ -560,6 +696,117 @@ onBeforeUnmount(() => {
           </div>
         </RepeatEmptyPlaceholder>
       </div>
+      <div v-else class="ask-shell">
+        <section class="ask-panel blog-glass-panel" v-motion-fade-visible-once>
+          <div class="panel-heading">
+            <span>01</span>
+            <div>
+              <h2>提交问题</h2>
+              <p>默认不会公开，只有站长能看到。是否公开，会根据内容再决定。</p>
+            </div>
+          </div>
+          <p class="helper-copy">提交成功后会生成追踪码，记得保存，后面查询回复要用。</p>
+          <div class="form-stack">
+            <label>
+              <span>昵称（可选）</span>
+              <a-input v-model:value="questionForm.nickname" placeholder="留空则显示为“匿名访客”" :maxlength="100" />
+            </label>
+            <label>
+              <span>联系方式（可选，仅用于必要时联系，不会公开）</span>
+              <a-input v-model:value="questionForm.contact" placeholder="比如邮箱或微信，方便需要时联系你" :maxlength="255" />
+            </label>
+            <label>
+              <span>问题</span>
+              <a-textarea
+                v-model:value="questionForm.question"
+                placeholder="把想问的写在这里。请不要留下密码、验证码、密钥或其他敏感信息。"
+                :rows="8"
+                :maxlength="1500"
+                show-count
+              />
+            </label>
+            <button class="blog-action" type="button" :disabled="submitQuestionLoading" @click="submitQuestion">
+              {{ submitQuestionLoading ? '提交中...' : '提交问题' }} <span aria-hidden="true">→</span>
+            </button>
+          </div>
+          <a-alert v-if="submittedTrackingCode" class="tracking-alert" type="success" show-icon message="提问已收到">
+            <template #description>
+              <p>你的追踪码是：</p>
+              <button class="tracking-code" type="button" @click="copyTrackingCode(submittedTrackingCode)">
+                {{ submittedTrackingCode }}
+              </button>
+              <p>这串追踪码只会出现这一次，记得截图或复制保存。</p>
+              <p>之后查询回复，需要用到它。</p>
+            </template>
+          </a-alert>
+        </section>
+
+        <section class="ask-panel blog-glass-panel" v-motion-fade-visible-once>
+          <div class="panel-heading">
+            <span>02</span>
+            <div>
+              <h2>查询回复</h2>
+              <p>输入追踪码，就能查看这条提问的审核状态和回复。</p>
+            </div>
+          </div>
+          <div class="query-row">
+            <a-input v-model:value="queryForm.trackingCode" placeholder="输入你的追踪码，例如 QA8F3K2M9P" @pressEnter="queryQuestion" />
+            <button class="blog-action secondary" type="button" :disabled="queryLoading" @click="queryQuestion">
+              {{ queryLoading ? '查询中...' : '查询' }}
+            </button>
+          </div>
+          <div v-if="queryResult" class="query-result">
+            <div class="result-meta">
+              <a-tag :color="questionStatusColor(queryResult.status)">{{ questionStatusText(queryResult.status) }}</a-tag>
+              <a-tag v-if="queryResult.answer" color="blue">已回复</a-tag>
+              <a-tag v-else color="default">待回复</a-tag>
+              <span>{{ utils.formatDate(queryResult.createTime, true) }}</span>
+            </div>
+            <h3>你的问题</h3>
+            <p class="preserve-text">{{ queryResult.question }}</p>
+            <template v-if="queryResult.answer">
+              <h3>回复</h3>
+              <p class="preserve-text answer-text">{{ queryResult.answer }}</p>
+            </template>
+            <p v-else class="muted-text">暂时还没有回复。如果状态还是“待审核”，这条内容目前也不会出现在公开列表里。</p>
+          </div>
+          <a-alert v-else-if="emptyQueryMessage" class="query-empty" type="info" show-icon :message="emptyQueryMessage" />
+        </section>
+
+        <section class="ask-panel public-panel blog-glass-panel" v-motion-fade-visible-once>
+          <div class="panel-heading">
+            <span>03</span>
+            <div>
+              <h2>最近公开问答</h2>
+              <p>这里只展示已通过审核、允许公开，并且已经回复的问题。</p>
+            </div>
+          </div>
+          <p class="helper-copy">提问前可以先看看这里，也许已经有人问过相似的问题。</p>
+          <RepeatEmptyPlaceholder :dataReady="Boolean(publicQuestions)" :dataShow="publicQuestions.length > 0">
+            <div class="public-list">
+              <article v-for="item in publicQuestions" :key="item.id" class="public-item">
+                <div class="result-meta">
+                  <span>{{ item.nickname || '匿名访客' }}</span>
+                  <span>{{ utils.formatDate(item.answerTime || item.updatedTime, true) }}</span>
+                </div>
+                <div class="qa-block">
+                  <span class="qa-label">问题</span>
+                  <h3>{{ item.question }}</h3>
+                </div>
+                <div class="qa-block">
+                  <span class="qa-label">回复</span>
+                  <p class="preserve-text answer-text">{{ item.answer }}</p>
+                </div>
+              </article>
+            </div>
+            <div v-if="publicQuestions.length < askPublicTotal" class="load-more-row">
+              <button class="blog-action secondary" type="button" :disabled="publicLoading" @click="loadPublicQuestions(askPublicPage + 1, true)">
+                {{ publicLoading ? '加载中...' : '加载更多' }}
+              </button>
+            </div>
+          </RepeatEmptyPlaceholder>
+        </section>
+      </div>
       <a-modal
         v-model:open="messageModelShow"
         class="addMessageModal"
@@ -619,8 +866,153 @@ onBeforeUnmount(() => {
 
     .message-toolbar {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
       padding: 1rem;
+
+      .section-tabs {
+        flex-wrap: wrap;
+      }
+    }
+
+    .ask-shell {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .ask-panel {
+      padding: 2.4rem;
+      color: $main-text-color;
+    }
+
+    .panel-heading {
+      display: flex;
+      gap: 1.4rem;
+      margin-bottom: 2rem;
+
+      > span {
+        color: $secondary-text-color;
+        font-size: 1.3rem;
+        font-weight: 820;
+        letter-spacing: 0.12em;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(2rem, 2.4vw, 3rem);
+        font-weight: 820;
+      }
+
+      p {
+        margin-top: 0.8rem;
+        color: $secondary-text-color;
+        font-size: 1.4rem;
+      }
+    }
+
+    .form-stack {
+      display: grid;
+      gap: 1.4rem;
+
+      label {
+        display: grid;
+        gap: 0.6rem;
+
+        span {
+          color: $secondary-text-color;
+          font-size: 1.3rem;
+        }
+      }
+    }
+
+    .helper-copy {
+      margin-bottom: 1.4rem;
+      color: $secondary-text-color;
+      font-size: 1.35rem;
+      line-height: 1.7;
+    }
+
+    .tracking-alert {
+      margin-top: 1.6rem;
+    }
+
+    .tracking-code {
+      margin: 0.8rem 0;
+      padding: 0.8rem 1.2rem;
+      border: 1px dashed $surface-border;
+      border-radius: 8px;
+      background: $surface-control;
+      color: $main-text-color;
+      font-size: 2rem;
+      font-weight: 820;
+      letter-spacing: 0.08em;
+      cursor: $hover-cursor;
+    }
+
+    .query-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1rem;
+    }
+
+    .query-result,
+    .public-item {
+      margin-top: 1.6rem;
+      padding: 1.6rem;
+      border: 1px solid $surface-border;
+      border-radius: 8px;
+      background: $surface-control;
+    }
+
+    .query-empty {
+      margin-top: 1.6rem;
+    }
+
+    .result-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+      margin-bottom: 1rem;
+      color: $secondary-text-color;
+      font-size: 1.25rem;
+    }
+
+    .preserve-text {
+      white-space: pre-wrap;
+      line-height: 1.8;
+    }
+
+    .answer-text {
+      color: $main-text-color;
+    }
+
+    .muted-text {
+      color: $secondary-text-color;
+    }
+
+    .public-list {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .qa-block + .qa-block {
+      margin-top: 1.4rem;
+    }
+
+    .qa-label {
+      display: inline-block;
+      margin-bottom: 0.6rem;
+      color: $secondary-text-color;
+      font-size: 1.2rem;
+      letter-spacing: 0.08em;
+    }
+
+    .load-more-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.6rem;
     }
 
     .message-card {
