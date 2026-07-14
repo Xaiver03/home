@@ -104,12 +104,14 @@ onUnmounted(() => {
       title="🔖目录"
       placement="left"
     >
-      <MdCatalog
-        v-if="mdCatalogShow"
-        editorId="preview"
-        scrollElement="html"
-        :scrollElementOffsetTop="96"
-      />
+      <ClientOnly>
+        <MdCatalog
+          v-if="mdCatalogShow"
+          editorId="preview"
+          scrollElement="html"
+          :scrollElementOffsetTop="96"
+        />
+      </ClientOnly>
     </a-drawer>
   </div>
 </template>

@@ -402,7 +402,9 @@ onMounted(() => {
     <div class="article-reading-layout">
       <aside v-if="hasArticleCatalog" class="article-outline blog-glass-panel">
         <p class="outline-title">Outline</p>
-        <MdCatalog editorId="preview" scrollElement="html" :scrollElementOffsetTop="96" />
+        <ClientOnly>
+          <MdCatalog editorId="preview" scrollElement="html" :scrollElementOffsetTop="96" />
+        </ClientOnly>
       </aside>
       <div id="log-content" class="blog-glass-panel">
         <RepeatEmptyPlaceholder :data-show="articleData?.mdContent?.length > 0" class="w-full">
