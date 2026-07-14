@@ -23,5 +23,11 @@
         min-height: calc(100dvh - 11rem);
     }
 
+    @media (max-width: 640px) {
+        #content {
+            padding-bottom: calc(7.6rem + env(safe-area-inset-bottom));
+        }
+    }
+
 }
 </style>

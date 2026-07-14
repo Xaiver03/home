@@ -8,6 +8,7 @@ const defaultApiUrl =
   process.env.NUXT_PUBLIC_ENV === 'dev'
     ? 'http://localhost:8086/api'
     : 'https://xiangleideng.site/api';
+const defaultOssUrl = process.env.NUXT_PUBLIC_ENV === 'dev' ? '' : '/uploads';
 
 export default defineNuxtConfig({
   // 局域网其他设备可查看
@@ -34,7 +35,7 @@ export default defineNuxtConfig({
     // 运行时配置项（全局变量）
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || defaultApiUrl, // 后台url
-      ossUrl: process.env.NUXT_PUBLIC_OSS_URL || "", // oss的url
+      ossUrl: process.env.NUXT_PUBLIC_OSS_URL || defaultOssUrl, // 本地存储公开路径或 OSS 域名
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "", // 本站地址
       siteName: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客", // 站点名称
       siteDesc: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考", // 站点描述

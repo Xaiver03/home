@@ -6,6 +6,10 @@ import {
   MenuOutlined,
   BulbOutlined,
   HomeOutlined,
+  BookOutlined,
+  ReadOutlined,
+  UserOutlined,
+  MessageOutlined,
 } from '@ant-design/icons-vue';
 import { createVNode } from 'vue';
 const router = useRouter();
@@ -68,6 +72,13 @@ const primaryLinks = [
   },
 ];
 const naviData = reactive(primaryLinks.map((item) => ({ ...item }))); // 导航数据
+const mobileNavItems = [
+  { ...primaryLinks[0], icon: HomeOutlined },
+  { ...primaryLinks[1], icon: BookOutlined },
+  { ...primaryLinks[2], icon: ReadOutlined },
+  { ...primaryLinks[3], icon: UserOutlined },
+  { ...primaryLinks[4], icon: MessageOutlined },
+];
 let naviDrawer = ref(false);
 const expandedKeys = ref([]);
 const isActive = (path) => {
@@ -321,6 +332,20 @@ onMounted(() => {
         :tree-data="naviData"
       ></a-tree>
     </a-drawer>
+    <nav class="mobile-tab-bar" aria-label="移动端主导航">
+      <button
+        v-for="item in mobileNavItems"
+        :key="`mobile-${item.key}`"
+        class="mobile-tab-item"
+        :class="{ active: !item.external && isActive(item.path) }"
+        type="button"
+        :aria-current="!item.external && isActive(item.path) ? 'page' : undefined"
+        @click="goTo(item.path, item.external)"
+      >
+        <component :is="item.icon" />
+        <span>{{ item.label }}</span>
+      </button>
+    </nav>
   </header>
 </template>
 
@@ -467,6 +492,10 @@ button {
   border-radius: $radius-capsule;
 }
 
+.mobile-tab-bar {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .site-nav-capsule {
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -502,7 +531,7 @@ button {
   }
 
   .entry-switch {
-    gap: 0.15rem;
+    display: none;
   }
 
   .nav-item {
@@ -520,6 +549,64 @@ button {
 
     span {
       display: none;
+    }
+  }
+
+  .site-nav-capsule {
+    grid-template-columns: 1fr auto;
+  }
+
+  .mobile-tab-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $z-sticky;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.65rem 0.8rem calc(0.65rem + env(safe-area-inset-bottom));
+    border-top: 1px solid $surface-border;
+    background: $surface-glass-strong;
+    box-shadow: 0 -0.8rem 2.4rem rgba(35, 44, 38, 0.08);
+    backdrop-filter: blur($surface-blur) saturate(180%);
+  }
+
+  .mobile-tab-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-width: 0;
+    min-height: 5rem;
+    padding: 0.35rem 0.15rem;
+    border: 0;
+    border-radius: $radius-control;
+    background: transparent;
+    color: $secondary-text-color;
+    font-size: 1.05rem;
+    font-weight: 720;
+    line-height: 1.1;
+    -webkit-tap-highlight-color: transparent;
+
+    :deep(.anticon) {
+      font-size: 1.9rem;
+    }
+
+    &.active {
+      background: $surface-hover;
+      color: $main-text-color;
+      box-shadow: $surface-inner-highlight;
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: $focus-ring;
     }
   }
 }
