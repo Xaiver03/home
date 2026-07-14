@@ -120,11 +120,11 @@ export default ({ mode }) =>
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/music/, ''),
         },
-        // 代理博客 API 到 8086 端口
+        // 代理博客 API 到 8085 端口
         '/api': {
           target: process.env.VITE_BLOG_API_PORT
             ? `http://localhost:${process.env.VITE_BLOG_API_PORT}`
-            : 'http://localhost:8086',
+            : 'http://localhost:8085',
           changeOrigin: true,
         },
         // 代理博客管理后台到 8083 端口

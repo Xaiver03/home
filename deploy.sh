@@ -136,7 +136,7 @@ fi
 # ws-gateway (通用 WebSocket 网关)
 export PORT=4010
 export NODE_ENV=pro
-export BLOG_API_BASE_URL=http://127.0.0.1:8086/api
+export BLOG_API_BASE_URL=http://127.0.0.1:8085/api
 export WS_PATH=/ws
 if [ -z "$JWT_SECRET" ]; then
   JWT_SECRET=$(cd "$REPO_DIR/apps/blog-api" && NODE_ENV=pro node -e "const config=require('config'); process.stdout.write(config.get('tokenSecretKey') || '')")
@@ -193,9 +193,9 @@ check_service() {
   fi
 }
 
-check_service "blog-api"       "http://127.0.0.1:8086/api/article/reception/getArticleByTypeId/0/1/5"
+check_service "blog-api"       "http://127.0.0.1:8085/api/article/reception/getArticleByTypeId/0/1/5"
 check_service "blog-frontend"  "http://127.0.0.1:3004/blog/"
-check_service "homepage"       "http://127.0.0.1:8086/admin/"  # /admin 走 blog-api 静态托管
+check_service "homepage"       "http://127.0.0.1:8085/admin/"  # /admin 走 blog-api 静态托管
 check_service "music-api"      "http://127.0.0.1:4000"
 check_service "ws-gateway"     "http://127.0.0.1:4010/health"
 warn "若公网 WebSocket 不可用，请检查 Nginx /ws 是否已配置 Upgrade 反向代理"
