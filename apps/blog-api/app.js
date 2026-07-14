@@ -17,6 +17,7 @@
 var createError = require("http-errors");
 var express = require("express");
 require('express-async-errors')
+var fs = require("fs");
 var path = require("path");
 
 // 增加Node.js HTTP客户端连接池限制
@@ -54,6 +55,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// 文章封面是可选资源：缺失时返回统一占位图，避免浏览器收到鉴权 JSON 或 404。
+const articleCoverDir = path.join(__dirname, "public/uploads/image/articleCover");
+const articleCoverPlaceholder = path.join(__dirname, "public/images/article-cover-placeholder.svg");
+app.get('/uploads/image/articleCover/:id.png', (req, res, next) => {
+  const filePath = path.join(articleCoverDir, `${req.params.id}.png`);
+  if (fs.existsSync(filePath)) return res.sendFile(filePath);
+  return res.sendFile(articleCoverPlaceholder, (error) => {
+    if (error) next(error);
+  });
+});
 
 // 博客前台 Nuxt3 静态文件配置
 app.use('/blog/_nuxt', express.static(path.join(__dirname, '../space-log-nuxt3/app/.output/public/_nuxt')));
