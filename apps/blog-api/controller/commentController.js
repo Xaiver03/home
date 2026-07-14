@@ -66,14 +66,21 @@ module.exports = {
   // 创建评论(用户)
   createComment: async (req, res) => {
     try {
-      // 获取token的userId
-      const tokenData = tokenService.checkToken(
-        req.headers["authorization"]
-      ).data;
-      req.body.userId =
-        tokenData.power == "admin" || utils.isAdminCustomer(tokenData.mail)
-          ? -1
-          : tokenData.id;
+      // 留言允许匿名提交；文章评论仍然必须登录。
+      const authorization = req.headers["authorization"];
+      const hasUsableAuthorization =
+        authorization && !/^Bearer\s+(null|undefined)$/i.test(authorization.trim());
+      if (hasUsableAuthorization) {
+        const tokenData = tokenService.checkToken(authorization).data;
+        req.body.userId =
+          tokenData.power == "admin" || utils.isAdminCustomer(tokenData.mail)
+            ? -1
+            : tokenData.id;
+      } else if (req.body.entityType === "Message") {
+        req.body.userId = 0;
+      } else {
+        throw new Error("评论失败，请先登录");
+      }
       res.json(
         utils.postMessage(
           undefined,

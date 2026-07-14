@@ -57,8 +57,8 @@ const primaryLinks = [
 ];
 const secondaryLinks = [
   {
-    title: '关于',
-    label: '关于',
+    title: '关于我',
+    label: '关于我',
     path: '/about',
     key: '/about',
   },

@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const commentController = require("../controller/commentController");
 var { checkPermissions } = require("../middlewares/auth");
+var { limitCustomerAction } = require("../middlewares/rateLimit");
 
 // 后台
 router.get(`/getAllComment/:currentPage/:pageSize`,checkPermissions(),commentController.getAllComment)
@@ -17,6 +18,13 @@ router.delete(`/deleteComment`,checkPermissions(),commentController.deleteCommen
 router.get(`/reception/customerGetComment/:currentPage/:pageSize`,commentController.customerGetAllComment)
 router.get(`/reception/customerGetSubComment`,commentController.customerGetChildComment)
 router.post(`/reception/likeComment`,commentController.likeComment)
-router.post(`/addComment`,commentController.createComment)
+router.post(
+  `/addComment`,
+  limitCustomerAction(5, 600, "customer_add_comment", {
+    message: "提交过于频繁啦⛔️",
+    description: "请稍后再提交留言",
+  }),
+  commentController.createComment
+)
 
 module.exports = router;

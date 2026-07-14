@@ -290,6 +290,15 @@ let currentMessage = reactive({
 });
 const submitMessage = () => {
   // 提交留言
+  if (utils.isNullOrEmpty(mdEditor.value?.mdContent)) {
+    notification.open({
+      message: '提示💡',
+      description: '先写一点内容再提交吧。',
+      placement: 'top',
+      duration: 3,
+    });
+    return;
+  }
   api
     .addComment({
       content: mdEditor.value.mdContent, // 读取mdEditor组件的输入内容
@@ -302,8 +311,13 @@ const submitMessage = () => {
         currentMessage.parentId = null;
         messageModelShow.value = false;
         uploadUnSaveImagesPath.value = []; // 清空图片暂存
+        getMessageData(true);
       }
     });
+};
+const messageAuthorName = (message) => {
+  if (message.userId === -1) return store.$state.config['my-name']?.content || '站长';
+  return message.user?.name || '匿名访客';
 };
 const pushNewDataInMessageList = async (newData) => {
   // 将新数据添加到list
@@ -546,7 +560,7 @@ onBeforeUnmount(() => {
             <div class="flex flex-row">
               <a-avatar
                 :src="
-                  message.userId == -1
+                  message.userId <= 0
                     ? store.$state.config['my-avatar']?.content
                     : `${config.public.ossUrl}/image/userAvatar/${message.user?.id}.png`
                 "
@@ -564,9 +578,7 @@ onBeforeUnmount(() => {
                   <div class="flex items-center message-text">
                     <h4>
                       {{
-                        message.userId == -1
-                          ? store.$state.config['my-name']?.content
-                          : message.user?.name
+                        messageAuthorName(message)
                       }}
                     </h4>
                     <a-tooltip :title="utils.formatDate(message.createTime, true)">
@@ -635,9 +647,7 @@ onBeforeUnmount(() => {
                   <template #author>
                     <h4 class="username">
                       {{
-                        childMessage.userId == -1
-                          ? store.$state.config['my-name']?.content
-                          : childMessage.user?.name
+                        messageAuthorName(childMessage)
                       }}
                     </h4>
                   </template>
@@ -645,7 +655,7 @@ onBeforeUnmount(() => {
                     <a-avatar
                       class="cursor-default"
                       :src="
-                        childMessage.userId == -1
+                        childMessage.userId <= 0
                           ? store.$state.config['my-avatar']?.content
                           : `${config.public.ossUrl}/image/userAvatar/${childMessage.user?.id}.png`
                       "
@@ -817,7 +827,7 @@ onBeforeUnmount(() => {
         @ok="submitMessage"
       >
         <div class="model-content flex flex-col">
-          <p class="mt-4 mb-4">⚠️限制1500字（Tips:该工具栏可以拖动）</p>
+          <p class="mt-4 mb-4">⚠️限制1500字，支持匿名留言（Tips:工具栏可以拖动）</p>
           <div v-if="currentMessage.parentId" id="replyObj" class="py-2 flex items-center">
             <p>
               回复@{{ currentParentMessageContent.userName }}:{{

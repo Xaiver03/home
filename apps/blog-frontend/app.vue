@@ -81,7 +81,7 @@ const seo = [
   {
     path: '/about',
     title: '关于我',
-    description: '关于Xaiver，这里是Xaiver的简介，记录着我的成长🧩'
+    description: '关于Xaiver本人，这里是Xaiver的简介，记录着我的成长🧩'
   },
   {
     path: '/log/article',
