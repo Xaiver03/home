@@ -3,6 +3,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const {
   bootstrapCompanyContent,
   createCompanyBootstrapDependencies,
+  prepareCompanyProductionDatabase,
 } = require('../scripts/bootstrapCompanyContent');
 
 describe('company content bootstrap', () => {
@@ -44,6 +45,15 @@ describe('company content bootstrap', () => {
     expect(dependencies.Admin.tableName).toBe('admin');
 
     await dependencies.sequelize.close();
+  });
+
+  test('uses Sequelize model sync to prepare a production PostgreSQL database', async () => {
+    expect(prepareCompanyProductionDatabase).toEqual(expect.any(Function));
+    const productionSequelize = { sync: jest.fn().mockResolvedValue(undefined) };
+
+    await prepareCompanyProductionDatabase(productionSequelize);
+
+    expect(productionSequelize.sync).toHaveBeenCalledWith();
   });
 
   test('creates an environment-provided initial admin without overwriting it', async () => {

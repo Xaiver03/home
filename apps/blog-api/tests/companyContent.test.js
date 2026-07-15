@@ -5,6 +5,7 @@ const {
   getCompanyConfigurationDefaults,
   getCompanyFriendLinks,
   getCompanyInitialAdmin,
+  getCompanyProductionDatabaseOptions,
   resolveCompanyDatabasePath,
   usesCompanyDevelopmentDatabase,
 } = require('../config/companyContent');
@@ -34,6 +35,28 @@ describe('company content profile', () => {
     expect(localConfig.comment.entityType).toEqual(['Article', 'Message']);
     expect(localConfig.storage.provider).toBe('minio');
     expect(JSON.stringify(localConfig)).not.toMatch(/xiangleideng|灯下灯|Xaiver/);
+  });
+
+  test('builds an isolated PostgreSQL connection from production environment variables', () => {
+    expect(getCompanyProductionDatabaseOptions).toEqual(expect.any(Function));
+
+    expect(
+      getCompanyProductionDatabaseOptions({
+        DB_DIALECT: 'postgres',
+        DB_HOST: '127.0.0.1',
+        DB_PORT: '5432',
+        DB_NAME: 'xiaoli_company_content',
+        DB_USER: 'xiaoli_company',
+        DB_PASSWORD: 'secret',
+      }),
+    ).toMatchObject({
+      dialect: 'postgres',
+      host: '127.0.0.1',
+      port: 5432,
+      database: 'xiaoli_company_content',
+      username: 'xiaoli_company',
+      password: 'secret',
+    });
   });
 
   test('provides company-owned brand and author defaults', () => {

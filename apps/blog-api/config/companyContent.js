@@ -11,6 +11,27 @@ const resolveCompanyDatabasePath = (environment = process.env) =>
 const usesCompanyDevelopmentDatabase = (nodeEnvironment = process.env.NODE_ENV) =>
   ['dev', 'local'].includes(nodeEnvironment);
 
+const getCompanyProductionDatabaseOptions = (environment = process.env, legacyMysql = {}) => {
+  const dialect = (environment.DB_DIALECT || 'mysql').toLowerCase();
+  const isPostgres = dialect === 'postgres' || dialect === 'postgresql';
+
+  return {
+    dialect: isPostgres ? 'postgres' : 'mysql',
+    host: environment.DB_HOST || legacyMysql.host || '127.0.0.1',
+    port: Number(environment.DB_PORT || legacyMysql.port || (isPostgres ? 5432 : 3306)),
+    database: environment.DB_NAME || environment.MYSQL_DATABASE || legacyMysql.database,
+    username: environment.DB_USER || legacyMysql.user,
+    password: environment.DB_PASSWORD || legacyMysql.password,
+    timezone: '+08:00',
+    logging: false,
+    pool: {
+      max: 20,
+      min: 3,
+      idle: 20000,
+    },
+  };
+};
+
 const getCompanyInitialAdmin = (environment = process.env) => {
   const mail = environment.COMPANY_ADMIN_EMAIL?.trim();
   const password = environment.COMPANY_ADMIN_PASSWORD;
@@ -84,6 +105,7 @@ const getCompanyFriendLinks = (environment = process.env) => [
 module.exports = {
   COMPANY_DATABASE_FILENAME,
   getCompanyInitialAdmin,
+  getCompanyProductionDatabaseOptions,
   getCompanyConfigurationDefaults,
   getCompanyFriendLinks,
   resolveCompanyDatabasePath,

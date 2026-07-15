@@ -9,6 +9,8 @@ const {
 } = require('../config/companyContent');
 const { bootstrapPreviewDatabase } = require('../services/devDatabase');
 
+const prepareCompanyProductionDatabase = (sequelize) => sequelize.sync();
+
 const bootstrapCompanyContent = async ({
   sequelize,
   Configuration,
@@ -71,6 +73,17 @@ const createCompanyBootstrapDependencies = ({ storage = resolveCompanyDatabasePa
   };
 };
 
+const createCompanyProductionBootstrapDependencies = () => {
+  const models = require('../models');
+
+  return {
+    sequelize: models.sequelize,
+    Configuration: models.Configuration,
+    FriendLink: models.FriendLink,
+    Admin: models.Admin,
+  };
+};
+
 const run = async () => {
   const initialAdmin = getCompanyInitialAdmin();
 
@@ -80,7 +93,10 @@ const run = async () => {
     );
   }
 
-  const { sequelize, Configuration, FriendLink, Admin } = createCompanyBootstrapDependencies();
+  const isProduction = process.argv.includes('--production');
+  const { sequelize, Configuration, FriendLink, Admin } = isProduction
+    ? createCompanyProductionBootstrapDependencies()
+    : createCompanyBootstrapDependencies();
 
   try {
     const result = await bootstrapCompanyContent({
@@ -89,6 +105,9 @@ const run = async () => {
       FriendLink,
       Admin,
       initialAdmin,
+      prepareDatabase: isProduction
+        ? prepareCompanyProductionDatabase
+        : bootstrapPreviewDatabase,
     });
     const summary = [
       `新增 ${result.configurationsCreated} 项配置`,
@@ -108,4 +127,9 @@ if (require.main === module) {
   });
 }
 
-module.exports = { bootstrapCompanyContent, createCompanyBootstrapDependencies };
+module.exports = {
+  bootstrapCompanyContent,
+  createCompanyBootstrapDependencies,
+  createCompanyProductionBootstrapDependencies,
+  prepareCompanyProductionDatabase,
+};

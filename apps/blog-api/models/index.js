@@ -3,6 +3,7 @@ const { Sequelize } = require('sequelize');
 const config = require('config');
 const {
   resolveCompanyDatabasePath,
+  getCompanyProductionDatabaseOptions,
   usesCompanyDevelopmentDatabase,
 } = require('../config/companyContent');
 
@@ -21,27 +22,13 @@ if (isDev) {
   });
   console.log(`使用 SQLite 数据库: ${dbPath}`);
 } else {
-  // 生产环境：使用 MySQL
-  const mysqlConfig = config.get('mysql');
-  sequelize = new Sequelize(
-    mysqlConfig.database,
-    mysqlConfig.user,
-    mysqlConfig.password,
-    {
-      host: mysqlConfig.host,
-      dialect: 'mysql',
-      port: 3306,
-      timezone: '+08:00',
-      pool: {
-        max: 20,
-        min: 3,
-        idle: 20000,
-      },
-      define: {
-        charset: 'utf8',
-      },
-    },
-  );
+  // 生产环境默认兼容原 MySQL，也可通过 DB_DIALECT=postgres 使用独立 PostgreSQL。
+  const mysqlConfig = config.has('mysql') ? config.get('mysql') : {};
+  const databaseOptions = getCompanyProductionDatabaseOptions(process.env, mysqlConfig);
+  sequelize = new Sequelize({
+    ...databaseOptions,
+    define: databaseOptions.dialect === 'mysql' ? { charset: 'utf8' } : undefined,
+  });
 }
 
 // 数据库连接提示信息
