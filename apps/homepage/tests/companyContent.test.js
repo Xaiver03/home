@@ -1,12 +1,16 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 import {
   CAPABILITIES,
   getConfiguredQrImage,
-  getInsightLabel,
   NAV_ITEMS,
   PRODUCTS,
   SITE_BRAND,
+  TEAM_VALUES,
 } from '@/lib/companyContent.js';
+
+const appSource = readFileSync(new URL('../src/App.vue', import.meta.url), 'utf8');
 
 describe('company homepage content', () => {
   it('uses Xiaoli Team as the public brand and keeps the legal entity explicit', () => {
@@ -21,7 +25,6 @@ describe('company homepage content', () => {
       '我们做什么',
       '产品',
       '团队',
-      '观点',
       '合作',
     ]);
     expect(NAV_ITEMS.some((item) => item.label.includes('案例'))).toBe(false);
@@ -48,9 +51,15 @@ describe('company homepage content', () => {
     expect(PRODUCTS.every((product) => product.kind !== '客户案例')).toBe(true);
   });
 
-  it('attributes personal blog content without presenting it as a team position', () => {
-    expect(getInsightLabel(0)).toBe('最新文章');
-    expect(getInsightLabel(1)).toBe('创始人手记');
+  it('keeps the company homepage independent from the CEO website', () => {
+    expect(appSource).not.toMatch(
+      /getLatestArticles|\/blog(?:\/|(?=["']))|github\.com\/Xaiver03|CEO|创始人/,
+    );
+    expect(
+      JSON.stringify({ SITE_BRAND, NAV_ITEMS, CAPABILITIES, PRODUCTS, TEAM_VALUES }),
+    ).not.toMatch(
+      /CEO|创始人|\/blog(?:\/|(?=["']))/,
+    );
   });
 
   it('shows a QR contact only when configuration provides a real image URL', () => {

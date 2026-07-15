@@ -15,7 +15,6 @@ export const NAV_ITEMS = Object.freeze([
   { label: '我们做什么', href: '#capabilities' },
   { label: '产品', href: '#products' },
   { label: '团队', href: '#team' },
-  { label: '观点', href: '#insights' },
   { label: '合作', href: '#contact' },
 ]);
 
@@ -89,8 +88,6 @@ export const TEAM_VALUES = Object.freeze([
   { title: '人文关怀', text: '理解真实的人、关系与情绪，再决定技术应该怎样出现。' },
   { title: '成果共享', text: '以项目制跨城市协作，让每一份有效产出被看见、被尊重。' },
 ]);
-
-export const getInsightLabel = (index) => (index === 0 ? '最新文章' : '创始人手记');
 
 const parseConfigList = (value) => {
   if (Array.isArray(value)) return value;

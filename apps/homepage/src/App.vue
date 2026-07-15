@@ -243,12 +243,6 @@
           <p class="manifesto-copy">
             晓黎诞生于 2022 年盛夏。我们从青年文化与真实表达出发，逐渐形成一支跨城市协作的技术产品团队。我们关心系统是否稳定，也关心它是否尊重使用它的人。
           </p>
-          <a
-            href="/blog/about"
-            class="founder-link"
-          >
-            阅读创始人介绍 <span aria-hidden="true">→</span>
-          </a>
         </div>
 
         <div class="team-values">
@@ -264,70 +258,6 @@
             <span>REMOTE · TOGETHER</span>
             <strong>北京 / 昆明 / 更多正在连接的地方</strong>
           </div>
-        </div>
-      </section>
-
-      <section
-        id="insights"
-        class="section insights-section"
-        aria-labelledby="insights-title"
-      >
-        <header class="section-heading insights-heading">
-          <div>
-            <p class="section-kicker">
-              IDEAS & NOTES
-            </p>
-            <h2 id="insights-title">
-              观点与记录
-            </h2>
-          </div>
-          <div class="insight-links">
-            <a href="/blog/">进入内容频道</a>
-            <a href="/blog/log/article">全部文章 ↗</a>
-          </div>
-        </header>
-
-        <div
-          v-if="isLoading"
-          class="article-layout"
-          aria-label="文章加载中"
-        >
-          <div
-            v-for="index in 3"
-            :key="index"
-            class="article-skeleton"
-          ></div>
-        </div>
-
-        <div
-          v-else-if="articles.length"
-          class="article-layout"
-        >
-          <a
-            v-for="(article, index) in articles"
-            :key="article.id"
-            class="article-entry"
-            :class="{ lead: index === 0 }"
-            :href="article.url"
-          >
-            <div class="article-meta">
-              <span>{{ getInsightLabel(index) }}</span>
-              <time :datetime="article.updatedTime || undefined">{{
-                formatArticleDate(article.updatedTime)
-              }}</time>
-            </div>
-            <h3>{{ article.topic }}</h3>
-            <p>{{ article.introduction }}</p>
-            <span class="article-arrow">阅读全文 ↗</span>
-          </a>
-        </div>
-
-        <div
-          v-else
-          class="article-empty"
-        >
-          <p>文章内容正在同步，完整档案仍可正常访问。</p>
-          <a href="/blog/log/article">进入文章档案 ↗</a>
         </div>
       </section>
 
@@ -380,12 +310,6 @@
         </div>
       </div>
       <div class="footer-links">
-        <a href="/blog/">CEO / 团队博客</a>
-        <a
-          href="https://github.com/Xaiver03/"
-          target="_blank"
-          rel="noreferrer"
-        >GitHub</a>
         <a
           href="https://beian.miit.gov.cn"
           target="_blank"
@@ -426,20 +350,16 @@
 </template>
 
 <script setup>
-import { getGlobalConfig, getLatestArticles } from '@/api';
+import { getGlobalConfig } from '@/api';
 import {
   CAPABILITIES,
   getConfiguredQrImage,
-  getInsightLabel,
   NAV_ITEMS,
   PRODUCTS,
   SITE_BRAND,
   TEAM_VALUES,
 } from '@/lib/companyContent';
-import { formatArticleDate, normalizeArticles } from '@/lib/homeContent';
 
-const articles = ref([]);
-const isLoading = ref(true);
 const isScrolled = ref(false);
 const menuOpen = ref(false);
 const qrDialogOpen = ref(false);
@@ -458,21 +378,13 @@ const validateQrImage = (src) => {
 };
 
 const loadCompanyHome = async () => {
-  const [configResult, articleResult] = await Promise.allSettled([
-    getGlobalConfig(),
-    getLatestArticles(),
-  ]);
-
-  if (articleResult.status === 'fulfilled') {
-    articles.value = normalizeArticles(articleResult.value).slice(0, 3);
-  }
-
-  if (configResult.status === 'fulfilled') {
-    const configuredQrImage = getConfiguredQrImage(configResult.value);
+  try {
+    const config = await getGlobalConfig();
+    const configuredQrImage = getConfiguredQrImage(config);
     if (configuredQrImage) validateQrImage(configuredQrImage);
+  } catch {
+    // 联系配置不可用时保留邮件入口，不影响公司官网主体内容。
   }
-
-  isLoading.value = false;
 };
 
 onMounted(() => {
@@ -1178,22 +1090,6 @@ onBeforeUnmount(() => {
   line-height: 1.95;
 }
 
-.founder-link {
-  display: inline-flex;
-  gap: 2rem;
-  align-items: center;
-  margin-top: 2.6rem;
-  padding-bottom: 0.45rem;
-  border-bottom: 1px solid rgb(255 255 255 / 28%);
-  font-size: 0.82rem;
-  font-weight: 700;
-  transition: color 220ms ease;
-}
-
-.founder-link:hover {
-  color: var(--sun-soft);
-}
-
 .team-values {
   border-top: 1px solid rgb(255 255 255 / 16%);
 }
@@ -1247,145 +1143,6 @@ onBeforeUnmount(() => {
 
 .team-cities strong {
   font-size: 0.95rem;
-}
-
-.insights-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 3rem;
-}
-
-.insight-links {
-  display: flex;
-  gap: 1.8rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.insight-links a {
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.article-layout {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 1rem;
-}
-
-.article-entry,
-.article-skeleton {
-  min-height: 17rem;
-  background: #e8e3d8;
-}
-
-.article-entry {
-  display: flex;
-  flex-direction: column;
-  padding: clamp(1.6rem, 3vw, 2.8rem);
-  transition:
-    background 240ms ease,
-    color 240ms ease,
-    transform 240ms ease;
-}
-
-.article-entry.lead {
-  grid-row: 1 / span 2;
-  min-height: 35rem;
-  background:
-    radial-gradient(circle at 90% 10%, rgb(47 99 161 / 65%), transparent 23rem),
-    var(--blue-deep);
-  color: white;
-}
-
-.article-entry:not(.lead):hover {
-  color: white;
-  background: var(--blue);
-  transform: translateX(0.25rem);
-}
-
-.article-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.07em;
-  opacity: 0.55;
-}
-
-.article-entry h3 {
-  max-width: 42rem;
-  margin: auto 0 1.1rem;
-  font-size: clamp(1.55rem, 3.2vw, 3.6rem);
-  font-weight: 590;
-  line-height: 1.15;
-  letter-spacing: -0.045em;
-  text-wrap: balance;
-}
-
-.article-entry:not(.lead) h3 {
-  font-size: clamp(1.3rem, 2vw, 2rem);
-}
-
-.article-entry > p {
-  display: -webkit-box;
-  max-width: 42rem;
-  margin: 0;
-  color: inherit;
-  font-size: 0.86rem;
-  line-height: 1.75;
-  opacity: 0.6;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.article-arrow {
-  align-self: flex-end;
-  margin-top: 1.8rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.article-skeleton {
-  position: relative;
-  overflow: hidden;
-}
-
-.article-skeleton:first-child {
-  grid-row: 1 / span 2;
-  min-height: 35rem;
-}
-
-.article-skeleton::after {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 45%) 48%, transparent 75%);
-  content: '';
-  transform: translateX(-100%);
-  animation: skeleton 1.8s infinite;
-}
-
-.article-empty {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  padding: 2rem;
-  color: var(--muted);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.article-empty p {
-  margin: 0;
-}
-
-.article-empty a {
-  color: var(--blue);
-  font-weight: 700;
 }
 
 .contact-section {
@@ -1559,12 +1316,6 @@ onBeforeUnmount(() => {
   }
   50% {
     transform: translateY(-0.8rem) rotate(1deg);
-  }
-}
-
-@keyframes skeleton {
-  to {
-    transform: translateX(100%);
   }
 }
 
@@ -1821,30 +1572,6 @@ onBeforeUnmount(() => {
 
   .team-cities {
     margin-top: 3rem;
-  }
-
-  .insights-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .insight-links {
-    flex-wrap: wrap;
-  }
-
-  .article-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .article-entry.lead,
-  .article-skeleton:first-child {
-    grid-row: auto;
-    min-height: 27rem;
-  }
-
-  .article-empty {
-    align-items: flex-start;
-    flex-direction: column;
   }
 
   .site-footer {
