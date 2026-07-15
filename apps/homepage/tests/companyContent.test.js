@@ -69,6 +69,7 @@ describe('company homepage content', () => {
   it('uses the company blog functions without presenting CEO content as first-party content', () => {
     expect(appSource).toMatch(/getLatestArticles|\/blog\//);
     expect(appSource).not.toMatch(/github\.com\/Xaiver03|CEO|创始人|灯下灯/);
+    expect(appSource).not.toMatch(/湘ICP备/);
     expect(
       JSON.stringify({ SITE_BRAND, NAV_ITEMS, CAPABILITIES, PRODUCTS, TEAM_VALUES }),
     ).not.toMatch(/CEO|创始人|灯下灯|github\.com\/Xaiver03/);

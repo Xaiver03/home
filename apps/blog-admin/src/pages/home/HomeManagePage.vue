@@ -234,6 +234,7 @@ import dayjs from 'dayjs'
 import {
   COMPANY_HOME_DEFAULTS,
   COMPANY_SITE_LINKS,
+  getPublicSiteOrigin,
   resolvePublicPreviewUrl,
 } from '@/config/companyBrand.mjs'
 
@@ -365,7 +366,11 @@ const handleQrUpload = async (file, index) => {
 
 // 预览主页
 const previewHomePage = () => {
-  window.open(resolvePublicPreviewUrl(import.meta.env.VITE_PUBLIC_SITE_URL, '/'), '_blank')
+  const siteOrigin = getPublicSiteOrigin(
+    import.meta.env.VITE_PUBLIC_SITE_URL,
+    import.meta.env.DEV
+  )
+  window.open(resolvePublicPreviewUrl(siteOrigin, '/'), '_blank')
 }
 
 // 保存配置的辅助函数

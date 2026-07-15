@@ -6,6 +6,7 @@ import {
   COMPANY_ADMIN_BRAND,
   COMPANY_HOME_DEFAULTS,
   COMPANY_ABOUT_DEFAULTS,
+  getPublicSiteOrigin,
   resolvePublicPreviewUrl,
 } from '../src/config/companyBrand.mjs';
 
@@ -34,6 +35,8 @@ test('preview links are environment-driven and preserve company routes', () => {
     resolvePublicPreviewUrl('https://company.example/', '/blog/about'),
     'https://company.example/blog/about',
   );
+  assert.equal(getPublicSiteOrigin('', true), 'http://localhost:3015');
+  assert.equal(getPublicSiteOrigin('', false), '');
 });
 
 test('admin public identity no longer points to the personal site', () => {

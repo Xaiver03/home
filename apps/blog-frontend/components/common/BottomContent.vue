@@ -27,7 +27,6 @@ onMounted(() => {
         <div>Copyright © 2024-2029 <a href="/">{{ COMPANY_BRAND.legalName }}</a></div>
         <span>文章版权以页面声明为准</span>
       </div>
-      <a href="https://beian.miit.gov.cn" target="_blank">湘ICP备2026026942号-1</a>
     </div>
   </div>
 </template>

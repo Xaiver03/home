@@ -290,7 +290,7 @@ function findMarkdownFiles(directory) {
     .sort((left, right) => left.localeCompare(right, 'zh-CN'));
 }
 
-function getImportPlan(sourceDirectory, { includeExternal = false } = {}) {
+function getImportPlan(sourceDirectory, { includeExternal = false, author = '' } = {}) {
   return findMarkdownFiles(sourceDirectory)
     .map((filePath) => {
       const parsed = parseClipping(fs.readFileSync(filePath, 'utf8'), path.basename(filePath));
@@ -300,7 +300,7 @@ function getImportPlan(sourceDirectory, { includeExternal = false } = {}) {
         filePath,
       };
     })
-    .filter((item) => includeExternal || item.author?.includes('灯下灯'));
+    .filter((item) => includeExternal || (author && item.author?.includes(author)));
 }
 
 async function importClippings(sourceDirectory, dependencies, options) {
@@ -393,14 +393,23 @@ async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
   const includeExternal = args.includes('--include-external');
+  const author =
+    args.find((arg) => arg.startsWith('--author='))?.slice('--author='.length).trim() ||
+    process.env.COMPANY_CONTENT_IMPORT_AUTHOR?.trim() ||
+    '';
+  if (!includeExternal && !author) {
+    throw new Error(
+      '公司内容导入必须显式提供 --author=<作者>；如需导入全部外部内容，请使用 --include-external。',
+    );
+  }
   const sourceDirectory = args.find((arg) => !arg.startsWith('--'));
   if (!sourceDirectory) {
     throw new Error(
-      '用法: node scripts/importClippings.js <Clippings目录> [--dry-run] [--include-external]',
+      '用法: node scripts/importClippings.js <Clippings目录> [--author=<作者>] [--dry-run] [--include-external]',
     );
   }
 
-  const options = { includeExternal };
+  const options = { includeExternal, author };
   const plan = getImportPlan(sourceDirectory, options);
   if (dryRun) {
     console.table(

@@ -358,6 +358,7 @@ import {
 } from '@ant-design/icons-vue'
 import {
   COMPANY_ABOUT_DEFAULTS,
+  getPublicSiteOrigin,
   resolvePublicPreviewUrl,
 } from '@/config/companyBrand.mjs'
 
@@ -573,8 +574,12 @@ const moveThoughtDown = (index) => moveItemDown(finalThoughts.value, index)
 
 // 预览About页面
 const previewAboutPage = () => {
+  const siteOrigin = getPublicSiteOrigin(
+    import.meta.env.VITE_PUBLIC_SITE_URL,
+    import.meta.env.DEV
+  )
   window.open(
-    resolvePublicPreviewUrl(import.meta.env.VITE_PUBLIC_SITE_URL, '/blog/about'),
+    resolvePublicPreviewUrl(siteOrigin, '/blog/about'),
     '_blank'
   )
 }

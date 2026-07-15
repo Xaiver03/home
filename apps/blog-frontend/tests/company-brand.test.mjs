@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
@@ -26,6 +26,11 @@ const sourceFiles = [
 test('company brand and navigation are the only first-party identity', () => {
   assert.equal(COMPANY_BRAND.name, '晓黎团队');
   assert.equal(COMPANY_BRAND.blogName, '晓黎团队博客');
+  assert.equal(
+    existsSync(new URL(`../public${COMPANY_BRAND.logo}`, import.meta.url)),
+    true,
+    'company logo must be available when Nuxt runs independently',
+  );
   assert.deepEqual(
     COMPANY_NAV_ITEMS.map(({ label, path }) => ({ label, path })),
     [
@@ -53,6 +58,7 @@ test('public blog sources contain no hard-coded personal-site identity', () => {
 
   assert.doesNotMatch(
     source,
-    /邓湘雷|灯下灯|Xaiver|个人博客|个人写作|关于我(?!们)|关于作者|xiangleideng\.site/,
+    /邓湘雷|灯下灯|Xaiver|个人博客|个人写作|关于我(?!们)|关于作者|xiangleideng\.site|湘ICP备|localhost:3004/,
   );
+  assert.match(source, /Array\.isArray\(arr\)/);
 });

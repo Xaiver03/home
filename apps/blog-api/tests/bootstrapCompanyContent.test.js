@@ -9,11 +9,13 @@ describe('company content bootstrap', () => {
   let sequelize;
   let Configuration;
   let FriendLink;
+  let Admin;
 
   beforeEach(async () => {
     sequelize = new Sequelize({ dialect: 'sqlite', storage: ':memory:', logging: false });
     Configuration = require('../models/configuration')(sequelize, DataTypes);
     FriendLink = require('../models/friendLink')(sequelize, DataTypes);
+    Admin = require('../models/admin')(sequelize, DataTypes);
   });
 
   afterEach(async () => {
@@ -39,8 +41,43 @@ describe('company content bootstrap', () => {
     expect(dependencies.sequelize.getDialect()).toBe('sqlite');
     expect(dependencies.Configuration.tableName).toBe('configuration');
     expect(dependencies.FriendLink.tableName).toBe('friend_link');
+    expect(dependencies.Admin.tableName).toBe('admin');
 
     await dependencies.sequelize.close();
+  });
+
+  test('creates an environment-provided initial admin without overwriting it', async () => {
+    const initialAdmin = {
+      mail: 'admin@company.example',
+      username: 'xiaoli-admin',
+      password: 'local-bootstrap-secret',
+    };
+    const hashPassword = jest.fn().mockResolvedValue('hashed-password');
+
+    const firstRun = await bootstrapCompanyContent({
+      sequelize,
+      Configuration,
+      FriendLink,
+      Admin,
+      initialAdmin,
+      hashPassword,
+    });
+    const secondRun = await bootstrapCompanyContent({
+      sequelize,
+      Configuration,
+      FriendLink,
+      Admin,
+      initialAdmin: { ...initialAdmin, password: 'changed-secret' },
+      hashPassword,
+    });
+
+    expect(firstRun.adminsCreated).toBe(1);
+    expect(secondRun.adminsCreated).toBe(0);
+    expect(await Admin.findOne({ where: { mail: initialAdmin.mail }, raw: true })).toMatchObject({
+      username: 'xiaoli-admin',
+      passwordHash: 'hashed-password',
+    });
+    expect(hashPassword).toHaveBeenCalledTimes(1);
   });
 
   test('is idempotent and never overwrites edited company content', async () => {

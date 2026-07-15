@@ -384,13 +384,6 @@
         </div>
       </div>
       <div class="footer-links">
-        <a
-          href="https://beian.miit.gov.cn"
-          target="_blank"
-          rel="noreferrer"
-        >
-          湘ICP备2026026942号-1
-        </a>
         <a href="#top">回到顶部 ↑</a>
       </div>
     </footer>

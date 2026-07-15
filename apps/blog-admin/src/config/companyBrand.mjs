@@ -52,3 +52,8 @@ export const resolvePublicPreviewUrl = (siteOrigin, path = '/') => {
   if (!siteOrigin) return normalizedPath;
   return new URL(normalizedPath, siteOrigin.endsWith('/') ? siteOrigin : `${siteOrigin}/`).toString();
 };
+
+export const getPublicSiteOrigin = (configuredOrigin, isDevelopment = false) => {
+  if (configuredOrigin) return configuredOrigin;
+  return isDevelopment ? 'http://localhost:3015' : '';
+};

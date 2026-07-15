@@ -8,6 +8,22 @@ const resolveCompanyDatabasePath = (environment = process.env) =>
       path.join(__dirname, '..', COMPANY_DATABASE_FILENAME),
   );
 
+const usesCompanyDevelopmentDatabase = (nodeEnvironment = process.env.NODE_ENV) =>
+  ['dev', 'local'].includes(nodeEnvironment);
+
+const getCompanyInitialAdmin = (environment = process.env) => {
+  const mail = environment.COMPANY_ADMIN_EMAIL?.trim();
+  const password = environment.COMPANY_ADMIN_PASSWORD;
+  const username = environment.COMPANY_ADMIN_USERNAME?.trim() || null;
+
+  if (!mail && !password) return null;
+  if (!mail || !password) {
+    throw new Error('COMPANY_ADMIN_EMAIL 和 COMPANY_ADMIN_PASSWORD 必须同时配置');
+  }
+
+  return { mail, password, username };
+};
+
 const configuration = (label, content, type = 'JSON') => ({ label, content, type });
 
 const getCompanyConfigurationDefaults = () => [
@@ -48,6 +64,11 @@ const getCompanyConfigurationDefaults = () => [
     '技术是手段，人文是目的。我们持续理解真实问题，并为长期价值负责。',
     'STRING',
   ),
+  configuration('final-thoughts', [
+    '技术创造能力，人文定义方向。',
+    '从真实问题出发，把想法做成能够长期使用的产品。',
+  ]),
+  configuration('final-thoughts-hint', '点击切换团队想法', 'STRING'),
 ];
 
 const getCompanyFriendLinks = (environment = process.env) => [
@@ -62,7 +83,9 @@ const getCompanyFriendLinks = (environment = process.env) => [
 
 module.exports = {
   COMPANY_DATABASE_FILENAME,
+  getCompanyInitialAdmin,
   getCompanyConfigurationDefaults,
   getCompanyFriendLinks,
   resolveCompanyDatabasePath,
+  usesCompanyDevelopmentDatabase,
 };

@@ -10,7 +10,7 @@ const defaultApiUrl =
     ? 'http://localhost:8085/api'
     : '/api';
 const defaultStorageUrl = process.env.NUXT_PUBLIC_ENV === 'dev' ? '' : '/uploads';
-const siteOrigin = process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3004';
+const siteOrigin = process.env.NUXT_PUBLIC_BASE_URL?.replace(/\/$/, '');
 
 export default defineNuxtConfig({
   // 局域网其他设备可查看
@@ -71,7 +71,7 @@ export default defineNuxtConfig({
         Disallow: [],
       },
     ],
-    sitemap: `${siteOrigin}/sitemap.xml`,
+    sitemap: siteOrigin ? `${siteOrigin}/sitemap.xml` : undefined,
   },
   css: [
     "@/assets/scss/index.scss", // 引入 SCSS 入口文件

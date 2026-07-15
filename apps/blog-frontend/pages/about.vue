@@ -57,6 +57,10 @@ const finalThoughtsHint = computed(() => {
   return store.$state.config['final-thoughts-hint']?.content || '';
 });
 
+const finalThoughts = computed(() => {
+  return safeParse(store.$state.config['final-thoughts']?.content, []);
+});
+
 const isImageIcon = (value) => /^(https?:\/\/|\/)/i.test(String(value || ''));
 const getIconComponent = (value) => {
   const name = String(value || '').toLowerCase();
@@ -108,6 +112,7 @@ const cloudInit = () => {
 let thoughtsIndex = ref(0);
 let thoughtsInterval = null;
 const getRandomIndex = (arr, excludeIndex, clearIntervalOrNot = false) => {
+  if (!Array.isArray(arr) || arr.length === 0) return null;
   // 取数组的随机索引，除了excludeIndex
   // 创建一个包含所有可能索引的数组（排除 excludeIndex）
   const indices = arr.map((_, i) => i).filter((i) => i !== excludeIndex);
@@ -131,7 +136,7 @@ onMounted(() => {
   cloudInit();
   thoughtsInterval = setInterval(() => {
     thoughtsIndex.value = getRandomIndex(
-      store.$state.config['final-thoughts']?.content,
+      finalThoughts.value,
       thoughtsIndex.value,
     );
   }, 5000);
@@ -316,7 +321,7 @@ onBeforeUnmount(() => {
       class="card my-8 cursor-point blog-glass-panel"
       @click="
         thoughtsIndex = getRandomIndex(
-          store.$state.config['final-thoughts']?.content,
+          finalThoughts,
           thoughtsIndex,
           true,
         )
@@ -325,7 +330,7 @@ onBeforeUnmount(() => {
     >
       <p
         class="card-title mt-4"
-        v-for="(item, index) in store.$state.config['final-thoughts']?.content"
+        v-for="(item, index) in finalThoughts"
         :key="index + 'thoughts'"
         v-motion
         :initial="{ opacity: 0, y: 10 }"
