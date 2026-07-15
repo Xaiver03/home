@@ -1,11 +1,12 @@
 <script setup>
 import { computed } from 'vue';
 import { MdCatalog } from 'md-editor-v3';
+import { COMPANY_BRAND } from '~/composables/companyBrand';
 const router = useRouter();
 const store = useNuxtStore();
 const config = useRuntimeConfig();
 const route = useRoute();
-const articleAuthor = computed(() => store.$state.config['article-author']?.content || '邓湘雷');
+const articleAuthor = computed(() => store.$state.config['article-author']?.content || COMPANY_BRAND.name);
 const articleCatalog = ref([]);
 const hasArticleCatalog = computed(() => articleCatalog.value.length > 0);
 const coverImageVisible = ref(false);
@@ -57,7 +58,7 @@ const { data: articleData, error: articleError } = await useAsyncData(
 );
 watch(() => articleData.value?.id, probeCoverImage, { immediate: true });
 useHead({
-  title: `${articleData.value?.topic} 【 邓湘雷的博客 】`,
+  title: `${articleData.value?.topic || '文章'}｜${COMPANY_BRAND.blogName}`,
   meta: [
     {
       name: 'description',
@@ -643,7 +644,7 @@ onMounted(() => {
                             </a-comment>
                         </template>
                     </a-comment>
-                    <div class="text-center my-16 text-3xl">- 这是我的底线了 -</div>
+                    <div class="text-center my-16 text-3xl">- 感谢阅读 -</div>
                 </div>
             </RepeatEmptyPlaceholder>
             <!== 新增评论 ==>

@@ -5,7 +5,7 @@
             <div class="rotate-box rounded-full overflow-hidden ">
             <img v-if="avatarSrc" class="h-[120px] w-[120px] " :src="avatarSrc" @error="handleAvatarError">
             </div>
-            <p class="my-[10px] text-[20px]">欢迎来到Xaiver的空间</p>
+            <p class="my-[10px] text-[20px]">欢迎来到晓黎团队博客</p>
             <p class="text-[10px]">加载中...</p>
         </div>
     </Transition>

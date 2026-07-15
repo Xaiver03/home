@@ -16,6 +16,7 @@
     "build:pro": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=1 NUXT_PUBLIC_ENV=pro nuxt build",
     "start": "cross-env NUXT_PUBLIC_ENV=pro PORT=3001 node .output/server/index.mjs",
     "start:pro": "cross-env NUXT_PUBLIC_ENV=pro PORT=3001 node .output/server/index.mjs",
+    "test": "node --test tests/*.test.mjs",
     "clean": "rm -rf .nuxt .output dist"
   },
   "dependencies": {
@@ -42,9 +43,5 @@
     "sass": "^1.77.8",
     "sass-loader": "^14.2.1"
   },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Xaiver03/home.git"
-  }
+  "license": "MIT"
 }

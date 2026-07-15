@@ -39,7 +39,7 @@ const submitFriendMsg = () => {
         <span class="blog-eyebrow">Friends</span>
         <h1>朋友们</h1>
       </div>
-      <p>从这里通向其他仍在认真写作、创造和维护个人空间的人。</p>
+      <p>从这里通向持续写作、创造和建设的朋友、团队与机构。</p>
     </header>
     <section class="card blog-glass-panel" v-motion-fade-visible-once>
       <div class="card-header">
@@ -84,7 +84,7 @@ const submitFriendMsg = () => {
         <a-alert class="my-4 w-full" message="友链申请说明" type="info" show-icon>
           <template #description>
             <p class="py-1">🔒 请确保全站使用https</p>
-            <p class="py-1">在友链中添加了灯下灯</p>
+            <p class="py-1">建议在友链中添加晓黎团队</p>
             <p class="py-1">🔖 原创的博客内容</p>
           </template>
           <template #icon>
@@ -96,7 +96,7 @@ const submitFriendMsg = () => {
     <section class="card blog-glass-panel" v-motion-fade-visible-once>
       <div class="card-title">失效友链</div>
       <a-collapse v-model:activeKey="collapseInactiveKey" ghost>
-        <a-collapse-panel key="1" header="这些友链已经失效，如果恢复了请留言联系我⚠️">
+        <a-collapse-panel key="1" header="这些友链暂时失效，恢复后欢迎留言联系我们⚠️">
           <div class="active-box">
             <div v-for="item in linkData?.inactive" :key="item.id + 'activeLink'">
               <div class="cursor-default active-item">
@@ -165,11 +165,11 @@ const submitFriendMsg = () => {
             />
           </div>
         </div>
-        <a-alert class="my-4 w-full" message="我的网站信息" type="info" show-icon>
+        <a-alert class="my-4 w-full" message="晓黎团队网站信息" type="info" show-icon>
           <template #description>
-            <p class="py-1">名称：灯下灯</p>
-            <p class="py-1">简介：留下自己的痕迹</p>
-            <p class="py-1">🔗链接：https://bokey.space/</p>
+            <p class="py-1">名称：晓黎团队</p>
+            <p class="py-1">简介：AI 技术产品团队，以文创与人文为差异化底色</p>
+            <p class="py-1">🔗链接：本站首页</p>
             <p class="py-1">📌头像：{{ store.$state.config['my-avatar']?.content || '未设置' }}</p>
           </template>
           <template #icon>

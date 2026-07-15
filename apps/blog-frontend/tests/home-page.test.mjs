@@ -18,15 +18,16 @@ const aboutPage = readFileSync(
 test("homepage has a production API fallback", () => {
   assert.match(
     nuxtConfig,
-    /apiUrl:\s*process\.env\.NUXT_PUBLIC_API_URL\s*\|\|\s*"https:\/\/xiangleideng\.site\/api"/,
+    /apiUrl:\s*process\.env\.NUXT_PUBLIC_API_URL\s*\|\|\s*defaultApiUrl/,
   );
+  assert.doesNotMatch(nuxtConfig, /xiangleideng\.site/);
 });
 
 test("homepage settles failed or malformed collections into empty data", () => {
   assert.match(homePage, /Array\.isArray\(res\?\.rows\)/);
   assert.match(
     homePage,
-    /default:\s*\(\)\s*=>\s*\(\{\s*hottestArticle:\s*null,\s*hotArticleList:\s*\[\]/s,
+    /default:\s*\(\)\s*=>\s*\(\{\s*leadArticle:\s*null,\s*articleList:\s*\[\]/s,
   );
   assert.match(homePage, /default:\s*\(\)\s*=>\s*\[\]/);
 });

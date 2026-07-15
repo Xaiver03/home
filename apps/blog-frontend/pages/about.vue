@@ -144,8 +144,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div id="about-page" class="content-box blog-page-shell overflow-hidden">
-    <!-- xaiver bar -->
-    <a-card hoverable id="xaiver" class="relative blog-glass-panel">
+    <a-card hoverable id="team-profile" class="relative blog-glass-panel">
       <img
         v-if="profileAvatarSrc"
         class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2"
@@ -197,10 +196,9 @@ onBeforeUnmount(() => {
       </RepeatParallaxSlide>
     </a-card>
 
-    <!-- about me -->
     <h1>
-      {{ pageTexts.aboutMeTitle || '关于我'
-      }}<span>{{ pageTexts.aboutMeSubtitle || 'About Me' }}</span>
+      {{ pageTexts.aboutMeTitle || '关于我们'
+      }}<span>{{ pageTexts.aboutMeSubtitle || 'About the Team' }}</span>
     </h1>
     <!-- 渐变bar -->
     <a-card
@@ -209,7 +207,7 @@ onBeforeUnmount(() => {
       v-motion-slide-visible-top
     >
       <span class="card-title absolute top-8">Hi👏🏻</span>
-      <div class="card-text">{{ basicInfo.welcomeText || '🎉欢迎来到我的空间🎉' }}</div>
+      <div class="card-text">{{ basicInfo.welcomeText || '欢迎认识晓黎团队' }}</div>
       <div class="card-text">
         {{ basicInfo.introduction || '' }}<BulbOutlined v-if="basicInfo.introduction || basicInfo.profession" class="about-inline-icon mx-4" />{{ basicInfo.profession || '' }}
       </div>

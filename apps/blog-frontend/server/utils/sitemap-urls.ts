@@ -19,7 +19,7 @@ export async function http(path: string, options: HttpOptions = {}) {
       process.env.NUXT_PUBLIC_API_URL ||
       (process.env.NUXT_PUBLIC_ENV === "dev"
         ? "http://localhost:8086/api"
-        : "https://xiangleideng.site/api");
+        : "http://localhost:8085/api");
     const {
       method = "GET",
       headers = {
