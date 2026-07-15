@@ -571,20 +571,6 @@ const removeFinalThought = (index) => {
 const moveThoughtUp = (index) => moveItemUp(finalThoughts.value, index)
 const moveThoughtDown = (index) => moveItemDown(finalThoughts.value, index)
 
-// 图标预览
-const getIconPreview = (iconName) => {
-  const iconMap = {
-    'Blog': '📝',
-    'Cloud': '☁️',
-    'CompactDisc': '💿',
-    'Compass': '🧭',
-    'Book': '📚',
-    'Fire': '🔥',
-    'LaptopCode': '💻'
-  }
-  return iconMap[iconName] || '❓'
-}
-
 // 预览About页面
 const previewAboutPage = () => {
   window.open(

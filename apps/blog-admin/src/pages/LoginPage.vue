@@ -162,7 +162,6 @@ import {
   BarChartOutlined,
   MailOutlined,
   SafetyOutlined,
-  UserOutlined,
   LockOutlined,
 } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
