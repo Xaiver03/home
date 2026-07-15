@@ -1,9 +1,9 @@
 export const DEFAULT_HOME_TEXT = Object.freeze({
-  siteName: '灯下灯',
-  siteUrl: 'xiangleideng.site',
-  helloText: '灯下灯 / Xaiver',
-  descText: '把生活、技术与思考，留在一处可以慢慢阅读的地方。',
-  siteAuthor: 'Xaiver / 灯下灯',
+  siteName: '晓黎团队',
+  siteUrl: '',
+  helloText: 'AI products, made human.',
+  descText: '以 AI 技术产品为主体，以文创与人文为差异化底色。',
+  siteAuthor: '晓黎团队',
 });
 
 const getText = (value, fallback) => {

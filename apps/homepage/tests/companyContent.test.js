@@ -14,6 +14,9 @@ import {
 const appSource = readFileSync(new URL('../src/App.vue', import.meta.url), 'utf8');
 const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const packageMetadata = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const rootPackageMetadata = JSON.parse(
+  readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
+);
 
 describe('company homepage content', () => {
   it('uses Xiaoli Team as the public brand and keeps the legal entity explicit', () => {
@@ -69,7 +72,7 @@ describe('company homepage content', () => {
     expect(
       JSON.stringify({ SITE_BRAND, NAV_ITEMS, CAPABILITIES, PRODUCTS, TEAM_VALUES }),
     ).not.toMatch(/CEO|创始人|灯下灯|github\.com\/Xaiver03/);
-    expect(`${indexSource}\n${JSON.stringify(packageMetadata)}`).not.toMatch(
+    expect(`${indexSource}\n${JSON.stringify(packageMetadata)}\n${JSON.stringify(rootPackageMetadata)}`).not.toMatch(
       /xiangleideng\.site|github\.com\/Xaiver03/,
     );
   });

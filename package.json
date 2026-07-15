@@ -5,11 +5,6 @@
   "description": "晓黎团队官网与数字产品 Monorepo",
   "author": "晓黎团队",
   "license": "MIT",
-  "homepage": "https://xiangleideng.site",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Xaiver03/home.git"
-  },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
