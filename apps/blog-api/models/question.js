@@ -86,12 +86,6 @@ module.exports = function (sequelize, DataTypes) {
       updatedAt: "updatedTime",
       indexes: [
         {
-          name: "PRIMARY",
-          unique: true,
-          using: "BTREE",
-          fields: [{ name: "id" }],
-        },
-        {
           name: "idxTrackingCode",
           unique: true,
           using: "BTREE",

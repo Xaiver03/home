@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'development';
+
 const { Sequelize, DataTypes } = require('sequelize');
 
 const {
@@ -54,6 +56,25 @@ describe('company content bootstrap', () => {
     await prepareCompanyProductionDatabase(productionSequelize);
 
     expect(productionSequelize.sync).toHaveBeenCalledWith();
+  });
+
+  test('does not declare MySQL-only PRIMARY indexes that collide in PostgreSQL', () => {
+    const modelNames = [
+      'article',
+      'articleType',
+      'comment',
+      'configuration',
+      'friendLink',
+      'question',
+      'user',
+      'admin',
+    ];
+    const indexNames = modelNames.flatMap((modelName) => {
+      const model = require(`../models/${modelName}`)(sequelize, DataTypes);
+      return model.options.indexes.map((index) => index.name);
+    });
+
+    expect(indexNames).not.toContain('PRIMARY');
   });
 
   test('creates an environment-provided initial admin without overwriting it', async () => {

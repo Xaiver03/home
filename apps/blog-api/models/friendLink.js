@@ -52,14 +52,6 @@ module.exports = function (sequelize, DataTypes) {
       timestamps: true,
       createdAt: "createTime",
       updatedAt: "updatedTime",
-      indexes: [
-        {
-          name: "PRIMARY",
-          unique: true,
-          using: "BTREE",
-          fields: [{ name: "id" }],
-        },
-      ],
       hooks: {
         // 创建前，设置状态为待审核
         beforeCreate: async (friendLink) => {

@@ -40,14 +40,6 @@ module.exports = function (sequelize, DataTypes) {
       timestamps: true,
       createdAt: "createTime",
       updatedAt: "updatedTime",
-      indexes: [
-        {
-          name: "PRIMARY",
-          unique: true,
-          using: "BTREE",
-          fields: [{ name: "id" }],
-        },
-      ],
     }
   );
 };
