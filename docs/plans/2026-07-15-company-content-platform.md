@@ -173,4 +173,3 @@ Review requirements: independent company data, preserved functionality, capsule 
 **Step 5: Integrate**
 
 Resolve review findings, re-run verification, merge the feature branch into `dev`, push `origin/dev`, and do not deploy.
-

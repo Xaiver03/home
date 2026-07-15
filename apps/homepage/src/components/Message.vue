@@ -40,7 +40,7 @@ const store = mainStore();
 
 // 站点配置数据
 const siteLogo = ref(import.meta.env.VITE_SITE_MAIN_LOGO);
-const siteUrl = ref("xiangleideng.site".split("."));
+const siteUrl = ref(['晓黎团队', '']);
 
 // 简介区域文字
 const descriptionText = reactive({

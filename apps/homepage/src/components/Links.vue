@@ -65,8 +65,7 @@ const defaultSiteLinks = [
   { "icon": "Cloud", "name": "理想国文学网", "link": "https://litopia.space" },
   { "icon": "Fire", "name": "创业OS", "link": "https://finlaw.cloud" },
   { "icon": "CompactDisc", "name": "音乐", "link": "/" },
-  { "icon": "Compass", "name": "GitHub", "link": "https://github.com/Xaiver03/" },
-  { "icon": "Book", "name": "关于我", "link": "/about" },
+  { "icon": "Book", "name": "关于我们", "link": "/about" },
   { "icon": "LaptopCode", "name": "公众号", "link": "#wechat-qr" }
 ];
 
