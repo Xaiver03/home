@@ -180,8 +180,8 @@
                 </a-col>
               </a-row>
 
-              <a-form-item label="个人简介">
-                <a-textarea v-model:value="homeTexts.descText" placeholder="显示在主页的个人简介" :rows="3" />
+              <a-form-item label="团队简介">
+                <a-textarea v-model:value="homeTexts.descText" placeholder="显示在主页的团队简介" :rows="3" />
               </a-form-item>
 
               <a-form-item label="备用简介">
@@ -196,7 +196,7 @@
                 </a-col>
                 <a-col :span="12">
                   <a-form-item label="ICP备案号">
-                    <a-input v-model:value="homeTexts.siteIcp" placeholder="如：湘ICP备2026026942号-1" />
+                    <a-input v-model:value="homeTexts.siteIcp" placeholder="请输入公司官网备案号" />
                   </a-form-item>
                 </a-col>
               </a-row>

@@ -46,6 +46,6 @@ test('admin public identity no longer points to the personal site', () => {
 
   assert.doesNotMatch(
     source,
-    /邓湘雷|灯下灯|Xaiver|关于我(?!们)|个人头像|个人基本信息|个人标语|自我介绍|xiangleideng\.site|bokey\.space/,
+    /邓湘雷|灯下灯|Xaiver|关于我(?!们)|个人头像|个人基本信息|个人标语|个人简介|自我介绍|湘ICP备2026026942号-1|xiangleideng\.site|bokey\.space/,
   );
 });

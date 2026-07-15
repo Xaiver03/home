@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 
 const {
@@ -17,6 +18,22 @@ describe('company content profile', () => {
     expect(usesCompanyDevelopmentDatabase('dev')).toBe(true);
     expect(usesCompanyDevelopmentDatabase('local')).toBe(true);
     expect(usesCompanyDevelopmentDatabase('pro')).toBe(false);
+  });
+
+  test('bootstraps preview tables for every company development environment', () => {
+    const serverSource = fs.readFileSync(path.join(__dirname, '../bin/www'), 'utf8');
+
+    expect(serverSource).toMatch(/usesCompanyDevelopmentDatabase\(\)/);
+    expect(serverSource).not.toMatch(/NODE_ENV\s*===\s*['"]dev['"]/);
+  });
+
+  test('ships a non-secret configuration for a fresh local checkout', () => {
+    const localConfig = require('../config/local');
+
+    expect(localConfig.author.name).toBe('晓黎团队');
+    expect(localConfig.comment.entityType).toEqual(['Article', 'Message']);
+    expect(localConfig.storage.provider).toBe('minio');
+    expect(JSON.stringify(localConfig)).not.toMatch(/xiangleideng|灯下灯|Xaiver/);
   });
 
   test('provides company-owned brand and author defaults', () => {
