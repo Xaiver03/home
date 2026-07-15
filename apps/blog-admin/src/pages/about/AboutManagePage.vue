@@ -1,12 +1,12 @@
 <template>
   <div class="about-manage-page">
-    <a-card title="About Me 页面管理" class="mb-4">
+    <a-card title="关于我们页面管理" class="mb-4">
       <a-alert message="提示" description="所有内容都可以自由配置，修改后需要点击保存按钮才会生效。" type="info" show-icon class="mb-4" />
 
       <a-tabs v-model:activeKey="activeTab" type="card">
         <!-- 基本信息 -->
         <a-tab-pane key="basic" tab="基本信息">
-          <a-card title="个人头像" size="small" class="mb-4">
+          <a-card title="团队标识" size="small" class="mb-4">
             <div class="flex items-center gap-4">
               <a-avatar size="large" :src="configs['my-avatar']?.content">
                 <template #icon><UserOutlined /></template>
@@ -26,28 +26,28 @@
             </div>
           </a-card>
 
-          <a-card title="个人基本信息" size="small" class="mb-4">
+          <a-card title="团队基本信息" size="small" class="mb-4">
             <a-form layout="vertical">
-              <a-form-item label="姓名/昵称">
-                <a-input v-model:value="basicInfo.name" placeholder="显示在About页面的姓名" />
+              <a-form-item label="团队名称">
+                <a-input v-model:value="basicInfo.name" placeholder="显示在关于我们页面的团队名称" />
               </a-form-item>
-              <a-form-item label="个人标语">
-                <a-input v-model:value="basicInfo.tagline" placeholder="显示在头像下方的个人标语" />
+              <a-form-item label="团队标语">
+                <a-input v-model:value="basicInfo.tagline" placeholder="显示在团队标识下方的定位" />
               </a-form-item>
               <a-form-item label="职业描述">
                 <a-input v-model:value="basicInfo.profession" placeholder="职业或身份描述" />
               </a-form-item>
-              <a-form-item label="性格类型">
-                <a-input v-model:value="basicInfo.personality" placeholder="如：INFJ、ENTP等" />
+              <a-form-item label="差异化关键词">
+                <a-input v-model:value="basicInfo.personality" placeholder="如：AI × Culture" />
               </a-form-item>
-              <a-form-item label="性格类型描述">
-                <a-input v-model:value="basicInfo.personalityDesc" placeholder="性格类型的中文描述，如：提倡者" />
+              <a-form-item label="关键词描述">
+                <a-input v-model:value="basicInfo.personalityDesc" placeholder="团队定位的补充描述" />
               </a-form-item>
               <a-form-item label="欢迎文案">
                 <a-textarea v-model:value="basicInfo.welcomeText" placeholder="显示在渐变卡片中的欢迎文案" :rows="3" />
               </a-form-item>
-              <a-form-item label="自我介绍">
-                <a-textarea v-model:value="basicInfo.introduction" placeholder="详细的自我介绍" :rows="3" />
+              <a-form-item label="团队介绍">
+                <a-textarea v-model:value="basicInfo.introduction" placeholder="团队的业务、方法与价值主张" :rows="3" />
               </a-form-item>
             </a-form>
           </a-card>
@@ -304,11 +304,11 @@
               <a-form-item label="关于本站 - 副标题">
                 <a-input v-model:value="pageTexts.aboutWebSubtitle" placeholder="About Web📍" />
               </a-form-item>
-              <a-form-item label="关于我 - 标题">
-                <a-input v-model:value="pageTexts.aboutMeTitle" placeholder="关于我" />
+              <a-form-item label="关于我们 - 标题">
+                <a-input v-model:value="pageTexts.aboutMeTitle" placeholder="关于我们" />
               </a-form-item>
-              <a-form-item label="关于我 - 副标题">
-                <a-input v-model:value="pageTexts.aboutMeSubtitle" placeholder="About Me❓" />
+              <a-form-item label="关于我们 - 副标题">
+                <a-input v-model:value="pageTexts.aboutMeSubtitle" placeholder="About the Team" />
               </a-form-item>
               <a-form-item label="技能 - 标题">
                 <a-input v-model:value="pageTexts.skillTitle" placeholder="技能" />
@@ -356,6 +356,10 @@ import {
   ReloadOutlined,
   EyeOutlined
 } from '@ant-design/icons-vue'
+import {
+  COMPANY_ABOUT_DEFAULTS,
+  resolvePublicPreviewUrl,
+} from '@/config/companyBrand.mjs'
 
 const { proxy } = getCurrentInstance()
 
@@ -583,7 +587,10 @@ const getIconPreview = (iconName) => {
 
 // 预览About页面
 const previewAboutPage = () => {
-  window.open('https://xiangleideng.site/blog/about', '_blank')
+  window.open(
+    resolvePublicPreviewUrl(import.meta.env.VITE_PUBLIC_SITE_URL, '/blog/about'),
+    '_blank'
+  )
 }
 
 // 安全解析配置内容（数据库JSON列已自动反序列化）
@@ -733,43 +740,22 @@ const loadConfigurations = async () => {
 const initializeDefaults = () => {
   // 基本信息默认值
   if (!basicInfo.value.name) {
-    basicInfo.value = {
-      name: '',
-      tagline: '',
-      profession: '',
-      personality: '',
-      personalityDesc: '',
-      welcomeText: '',
-      introduction: ''
-    }
+    basicInfo.value = { ...COMPANY_ABOUT_DEFAULTS.basicInfo }
   }
 
   // 社交链接默认值
   if (socialLinks.value.length === 0) {
-    socialLinks.value = [
-      { name: 'GitHub', url: 'https://github.com/Xaiver03', icon: 'icon-github' },
-      { name: '公众号', url: '#wechat-qr', icon: 'icon-wechat' },
-    ]
+    socialLinks.value = [...COMPANY_ABOUT_DEFAULTS.socialLinks]
   }
 
   // 页面文案默认值
   if (!pageTexts.value.aboutWebTitle) {
-    pageTexts.value = {
-      aboutWebTitle: '关于本站',
-      aboutWebSubtitle: 'About Web📍',
-      aboutMeTitle: '关于我',
-      aboutMeSubtitle: 'About Me❓',
-      skillTitle: '技能',
-      careerTitle: '生涯',
-      keywordTitle: '关键词🔑',
-      finalThoughtsTitle: '写在最后',
-      finalThoughtsSubtitle: 'Final Thoughts💐'
-    }
+    pageTexts.value = { ...COMPANY_ABOUT_DEFAULTS.pageTexts }
   }
 
   // 其他默认值
   if (!keywordDescription.value) {
-    keywordDescription.value = '我的构成元素，对自己的探索希望能越来越多'
+    keywordDescription.value = '从产品、工程与人文三个维度理解晓黎团队'
   }
 
   if (!finalThoughtsHint.value) {

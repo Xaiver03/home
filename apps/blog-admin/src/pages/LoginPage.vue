@@ -6,8 +6,8 @@
         <div class="brand-logo">
           <DashboardOutlined class="logo-icon" />
         </div>
-        <h1 class="brand-title">灯下灯</h1>
-        <p class="brand-subtitle">博客管理后台</p>
+        <h1 class="brand-title">{{ COMPANY_ADMIN_BRAND.name }}</h1>
+        <p class="brand-subtitle">公司内容管理后台</p>
         <div class="feature-list">
           <div class="feature-item">
             <div class="feature-icon">
@@ -166,6 +166,7 @@ import {
   LockOutlined,
 } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
+import { COMPANY_ADMIN_BRAND } from '@/config/companyBrand.mjs'
 
 const { proxy } = getCurrentInstance()
 const router = useRouter()

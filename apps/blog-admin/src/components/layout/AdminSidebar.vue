@@ -8,14 +8,14 @@
   >
     <!-- 品牌区 —— 完全对齐 SSOS SidebarHeader -->
     <div class="sidebar-header">
-      <a-tooltip :title="collapsed ? '灯下灯' : ''" placement="right">
+      <a-tooltip :title="collapsed ? COMPANY_ADMIN_BRAND.name : ''" placement="right">
         <div class="brand-btn" @click="router.push('/')">
           <div class="brand-logo">
             <DashboardOutlined />
           </div>
           <div v-if="!collapsed" class="brand-info">
-            <span class="brand-name">灯下灯</span>
-            <span class="brand-desc">博客管理</span>
+            <span class="brand-name">{{ COMPANY_ADMIN_BRAND.name }}</span>
+            <span class="brand-desc">内容管理</span>
           </div>
         </div>
       </a-tooltip>
@@ -74,6 +74,7 @@
 import { ref, computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import { COMPANY_ADMIN_BRAND } from '@/config/companyBrand.mjs';
 import {
   DashboardOutlined,
   FileTextOutlined,
