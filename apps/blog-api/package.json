@@ -19,6 +19,7 @@
     "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
     "db:seed": "sequelize-cli db:seed:all",
     "db:seed:undo": "sequelize-cli db:seed:undo:all",
+    "db:bootstrap:company": "cross-env NODE_ENV=dev node scripts/bootstrapCompanyContent.js",
     "storage:migrate-local": "node scripts/migrateLocalStorageToMinio.js",
     "storage:upload-avatar": "node scripts/uploadProfileAvatar.js",
     "migration:generate": "sequelize-cli migration:generate --name"
