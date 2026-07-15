@@ -1,7 +1,7 @@
 // sequelize 入口文件
 const { Sequelize } = require("sequelize");
 const config = require("config");
-const path = require("path");
+const { resolveCompanyDatabasePath } = require("../config/companyContent");
 
 // 开发环境使用 SQLite，生产环境使用 MySQL
 const isDev = process.env.NODE_ENV === 'dev';
@@ -9,8 +9,8 @@ const isDev = process.env.NODE_ENV === 'dev';
 let sequelize;
 
 if (isDev) {
-  // 开发环境：使用 SQLite
-  const dbPath = path.join(__dirname, '../database.dev.db');
+  // 公司内容开发环境：使用独立 SQLite，避免读取个人站开发数据。
+  const dbPath = resolveCompanyDatabasePath();
   sequelize = new Sequelize({
     dialect: "sqlite",
     storage: dbPath,
