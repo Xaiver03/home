@@ -1,8 +1,6 @@
 {
   "name": "homepage",
   "author": "晓黎团队",
-  "github": "https://github.com/Xaiver03",
-  "home": "https://xiangleideng.site",
   "private": true,
   "version": "5.0.0",
   "type": "module",

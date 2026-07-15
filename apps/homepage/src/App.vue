@@ -45,6 +45,7 @@
           v-for="item in NAV_ITEMS"
           :key="item.href"
           :href="item.href"
+          :class="{ active: item.href === '#top' }"
           @click="menuOpen = false"
         >
           {{ item.label }}
@@ -262,6 +263,79 @@
       </section>
 
       <section
+        id="insights"
+        class="section insights-section"
+        aria-labelledby="insights-title"
+      >
+        <header class="section-heading insights-heading">
+          <div>
+            <p class="section-kicker">
+              XIAOLI JOURNAL
+            </p>
+            <h2 id="insights-title">
+              团队文章与实践记录
+            </h2>
+          </div>
+          <div class="insight-links">
+            <a href="/blog/">进入公司博客</a>
+            <a href="/blog/log/article">全部文章 ↗</a>
+          </div>
+        </header>
+
+        <div
+          v-if="isLoading"
+          class="article-layout"
+          aria-label="公司文章加载中"
+        >
+          <div
+            v-for="index in 3"
+            :key="index"
+            class="article-skeleton"
+          ></div>
+        </div>
+
+        <div
+          v-else-if="articles.length"
+          class="article-layout"
+        >
+          <a
+            v-for="(article, index) in articles"
+            :key="article.id"
+            class="article-entry"
+            :class="{ lead: index === 0 }"
+            :href="article.url"
+          >
+            <div class="article-meta">
+              <span>{{ getInsightLabel(index) }}</span>
+              <time :datetime="article.updatedTime || undefined">{{
+                formatArticleDate(article.updatedTime)
+              }}</time>
+            </div>
+            <h3>{{ article.topic }}</h3>
+            <p>{{ article.introduction }}</p>
+            <span class="article-arrow">阅读全文 ↗</span>
+          </a>
+        </div>
+
+        <div
+          v-else
+          class="article-empty"
+        >
+          <div>
+            <strong>{{ articleLoadFailed ? '暂时无法连接内容服务' : '公司内容正在筹备中' }}</strong>
+            <p>
+              {{
+                articleLoadFailed
+                  ? '官网其他内容仍可正常浏览，稍后可从公司博客重试。'
+                  : '第一批关于 AI 产品、工程实践与人文创意的文章将在这里发布。'
+              }}
+            </p>
+          </div>
+          <a href="/blog/">前往公司博客 ↗</a>
+        </div>
+      </section>
+
+      <section
         id="contact"
         class="contact-section"
         aria-labelledby="contact-title"
@@ -350,16 +424,21 @@
 </template>
 
 <script setup>
-import { getGlobalConfig } from '@/api';
+import { getGlobalConfig, getLatestArticles } from '@/api';
 import {
   CAPABILITIES,
   getConfiguredQrImage,
+  getInsightLabel,
   NAV_ITEMS,
   PRODUCTS,
   SITE_BRAND,
   TEAM_VALUES,
 } from '@/lib/companyContent';
+import { formatArticleDate, normalizeArticles } from '@/lib/homeContent';
 
+const articles = ref([]);
+const isLoading = ref(true);
+const articleLoadFailed = ref(false);
 const isScrolled = ref(false);
 const menuOpen = ref(false);
 const qrDialogOpen = ref(false);
@@ -378,13 +457,23 @@ const validateQrImage = (src) => {
 };
 
 const loadCompanyHome = async () => {
-  try {
-    const config = await getGlobalConfig();
-    const configuredQrImage = getConfiguredQrImage(config);
+  const [configResult, articleResult] = await Promise.allSettled([
+    getGlobalConfig(),
+    getLatestArticles(),
+  ]);
+
+  if (configResult.status === 'fulfilled') {
+    const configuredQrImage = getConfiguredQrImage(configResult.value);
     if (configuredQrImage) validateQrImage(configuredQrImage);
-  } catch {
-    // 联系配置不可用时保留邮件入口，不影响公司官网主体内容。
   }
+
+  if (articleResult.status === 'fulfilled') {
+    articles.value = normalizeArticles(articleResult.value).slice(0, 3);
+  } else {
+    articleLoadFailed.value = true;
+  }
+
+  isLoading.value = false;
 };
 
 onMounted(() => {
@@ -447,36 +536,53 @@ onBeforeUnmount(() => {
 .site-header {
   position: fixed;
   z-index: 30;
-  top: 0;
-  right: 0;
-  left: 0;
-  display: flex;
+  top: 1.2rem;
+  left: 50%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  min-height: 5.75rem;
-  padding: 0 4vw;
-  color: white;
-  border-bottom: 1px solid rgb(255 255 255 / 13%);
+  gap: 0.7rem;
+  width: min(84rem, calc(100vw - 2.4rem));
+  min-height: 5.6rem;
+  padding: 0.55rem;
+  color: var(--ink);
+  background: rgb(246 247 241 / 90%);
+  border: 1px solid rgb(16 23 34 / 12%);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 75%),
+    0 1.1rem 3rem rgb(7 27 57 / 12%);
+  transform: translateX(-50%);
   transition:
     min-height 240ms ease,
-    background 240ms ease,
-    color 240ms ease,
+    top 240ms ease,
     box-shadow 240ms ease;
+  backdrop-filter: blur(20px) saturate(180%);
 }
 
 .site-header.is-scrolled {
-  min-height: 4.6rem;
-  color: var(--ink);
-  background: rgb(243 240 232 / 90%);
-  border-bottom-color: var(--line);
-  box-shadow: 0 0.8rem 2rem rgb(7 27 57 / 8%);
-  backdrop-filter: blur(18px);
+  top: 0.7rem;
+  min-height: 5rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 85%),
+    0 0.8rem 2.2rem rgb(7 27 57 / 15%);
 }
 
 .brand-lockup {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
+  min-height: 4.4rem;
+  padding: 0 1.25rem 0 0.7rem;
+  border-radius: 999px 1.4rem 1.4rem 999px;
+  transition:
+    background 220ms ease,
+    transform 220ms ease;
+}
+
+.brand-lockup:hover {
+  background: rgb(16 23 34 / 6%);
+  transform: translateY(-1px);
 }
 
 .brand-lockup img {
@@ -512,40 +618,51 @@ onBeforeUnmount(() => {
 .site-navigation {
   display: flex;
   align-items: center;
-  gap: clamp(1.3rem, 2.5vw, 2.7rem);
-  font-size: 0.86rem;
-  font-weight: 600;
+  justify-self: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: rgb(16 23 34 / 5%);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 4px rgb(7 27 57 / 7%);
+  font-size: 0.82rem;
+  font-weight: 680;
 }
 
 .site-navigation a {
-  position: relative;
-  padding: 0.5rem 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.9rem;
+  padding: 0 1.15rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition:
+    background 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
 }
 
-.site-navigation a::after {
-  position: absolute;
-  right: 0;
-  bottom: 0.18rem;
-  left: 0;
-  height: 1px;
-  background: currentColor;
-  content: '';
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 220ms ease;
+.site-navigation a:hover,
+.site-navigation a.active {
+  background: rgb(255 255 255 / 74%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 85%),
+    0 0.35rem 1rem rgb(7 27 57 / 8%);
 }
 
-.site-navigation a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+.site-navigation a:active {
+  transform: scale(0.98);
 }
 
 .menu-toggle {
   display: none;
-  padding: 0.55rem 0;
+  min-width: 4.1rem;
+  min-height: 4.1rem;
+  padding: 0.55rem;
   color: inherit;
-  background: transparent;
+  background: rgb(16 23 34 / 5%);
   border: 0;
+  border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -1145,6 +1262,157 @@ onBeforeUnmount(() => {
   font-size: 0.95rem;
 }
 
+.insights-section {
+  background: #fcfaf5;
+}
+
+.insights-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.insight-links {
+  display: flex;
+  gap: 1.8rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.insight-links a {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.article-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+}
+
+.article-entry,
+.article-skeleton {
+  min-height: 17rem;
+  background: #e8e3d8;
+}
+
+.article-entry {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.6rem, 3vw, 2.8rem);
+  transition:
+    background 240ms ease,
+    color 240ms ease,
+    transform 240ms ease;
+}
+
+.article-entry.lead {
+  grid-row: 1 / span 2;
+  min-height: 35rem;
+  color: white;
+  background:
+    radial-gradient(circle at 90% 10%, rgb(47 99 161 / 65%), transparent 23rem),
+    var(--blue-deep);
+}
+
+.article-entry:not(.lead):hover {
+  color: white;
+  background: var(--blue);
+  transform: translateX(0.25rem);
+}
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
+  opacity: 0.55;
+}
+
+.article-entry h3 {
+  max-width: 42rem;
+  margin: auto 0 1.1rem;
+  font-size: clamp(1.55rem, 3.2vw, 3.6rem);
+  font-weight: 590;
+  line-height: 1.15;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.article-entry:not(.lead) h3 {
+  font-size: clamp(1.3rem, 2vw, 2rem);
+}
+
+.article-entry > p {
+  display: -webkit-box;
+  max-width: 42rem;
+  margin: 0;
+  color: inherit;
+  font-size: 0.86rem;
+  line-height: 1.75;
+  opacity: 0.6;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.article-arrow {
+  align-self: flex-end;
+  margin-top: 1.8rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.article-skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.article-skeleton:first-child {
+  grid-row: 1 / span 2;
+  min-height: 35rem;
+}
+
+.article-skeleton::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 45%) 48%, transparent 75%);
+  content: '';
+  transform: translateX(-100%);
+  animation: skeleton 1.8s infinite;
+}
+
+.article-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.article-empty strong {
+  color: var(--ink);
+  font-size: 1.15rem;
+}
+
+.article-empty p {
+  max-width: 46rem;
+  margin: 0.55rem 0 0;
+  line-height: 1.7;
+}
+
+.article-empty a {
+  flex: 0 0 auto;
+  color: var(--blue);
+  font-weight: 700;
+}
+
 .contact-section {
   display: grid;
   grid-template-columns: 1fr 0.82fr;
@@ -1319,6 +1587,12 @@ onBeforeUnmount(() => {
   }
 }
 
+@keyframes skeleton {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @media (max-width: 960px) {
   .hero-layout,
   .split-heading,
@@ -1374,18 +1648,27 @@ onBeforeUnmount(() => {
 
 @media (max-width: 720px) {
   .site-header {
-    min-height: 4.8rem;
-    padding-right: 1.2rem;
-    padding-left: 1.2rem;
+    top: calc(0.7rem + env(safe-area-inset-top));
+    grid-template-columns: 1fr auto;
+    width: calc(100vw - 1.2rem);
+    min-height: 5rem;
+    padding: 0.42rem;
   }
 
   .site-header.is-scrolled {
-    min-height: 4.4rem;
+    top: calc(0.45rem + env(safe-area-inset-top));
+    min-height: 4.7rem;
+  }
+
+  .brand-lockup {
+    justify-self: start;
+    min-height: 4rem;
+    padding-right: 0.9rem;
   }
 
   .brand-lockup img {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.65rem;
+    height: 2.65rem;
   }
 
   .brand-lockup strong {
@@ -1398,15 +1681,16 @@ onBeforeUnmount(() => {
 
   .site-navigation {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 0.55rem);
     right: 0;
     left: 0;
     display: grid;
     gap: 0;
-    padding: 0 1.2rem;
+    padding: 0.55rem 1rem;
     color: var(--ink);
     background: rgb(243 240 232 / 97%);
-    border-bottom: 1px solid var(--line);
+    border: 1px solid var(--line);
+    border-radius: 1.4rem;
     box-shadow: 0 1.2rem 2.5rem rgb(7 27 57 / 13%);
     opacity: 0;
     pointer-events: none;
@@ -1427,7 +1711,9 @@ onBeforeUnmount(() => {
   }
 
   .site-navigation a {
-    padding: 1rem 0;
+    min-height: 3.5rem;
+    padding: 0.85rem 0;
+    border-radius: 0;
     border-bottom: 1px solid var(--line);
   }
 
@@ -1572,6 +1858,30 @@ onBeforeUnmount(() => {
 
   .team-cities {
     margin-top: 3rem;
+  }
+
+  .insights-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .insight-links {
+    flex-wrap: wrap;
+  }
+
+  .article-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .article-entry.lead,
+  .article-skeleton:first-child {
+    grid-row: auto;
+    min-height: 27rem;
+  }
+
+  .article-empty {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .site-footer {
