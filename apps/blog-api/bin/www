@@ -4,26 +4,25 @@
  * Module dependencies.
  */
 
-const app = require('../app');
-const debug = require('debug')('express:server');
-const http = require('http');
+var app = require('../app');
+var debug = require('debug')('express:server');
+var http = require('http');
 const config = require('config'); // 获取config的配置
 const { sequelize } = require('../models');
-const { usesCompanyDevelopmentDatabase } = require('../config/companyContent');
 const { bootstrapPreviewDatabase } = require('../services/devDatabase');
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(config.get('port') || '3000');
+var port = normalizePort(config.get('port') || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+var server = http.createServer(app);
 
 // 增加服务器连接处理能力
 server.maxConnections = 200;
@@ -36,7 +35,7 @@ server.headersTimeout = 66000; // Headers超时
  */
 
 async function startServer() {
-  if (usesCompanyDevelopmentDatabase()) {
+  if (process.env.NODE_ENV === 'dev') {
     await bootstrapPreviewDatabase(sequelize);
   }
 
@@ -55,7 +54,7 @@ startServer().catch((error) => {
  */
 
 function normalizePort(val) {
-  const port = parseInt(val, 10);
+  var port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -79,7 +78,7 @@ function onError(error) {
     throw error;
   }
 
-  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -101,7 +100,7 @@ function onError(error) {
  */
 
 function onListening() {
-  const addr = server.address();
-  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  var addr = server.address();
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }

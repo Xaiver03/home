@@ -2,11 +2,11 @@ import { config } from 'dotenv'
 
 console.log('config',process.env.NUXT_PUBLIC_ENV);
 
-config({ path: `../.env.${process.env.NUXT_PUBLIC_ENV}` })
+config({ path: `../../.env.${process.env.NUXT_PUBLIC_ENV}` })
 
 const defaultApiUrl =
   process.env.NUXT_PUBLIC_ENV === 'dev'
-    ? 'http://localhost:8085/api'
+    ? 'http://localhost:8086/api'
     : 'https://xiangleideng.site/api';
 const defaultStorageUrl = process.env.NUXT_PUBLIC_ENV === 'dev' ? '' : '/uploads';
 
