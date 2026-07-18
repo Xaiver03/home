@@ -37,6 +37,8 @@
         class="hero"
         aria-labelledby="hero-title"
         :style="{ '--parallax-y': `${heroParallax}px` }"
+        @pointermove="handleHeroPointerMove"
+        @pointerleave="resetHeroPointer"
       >
         <Background class="hero-bg" />
         <div class="hero-shade"></div>
@@ -362,6 +364,25 @@ const resetInteractiveEffect = (event) => {
   element.style.setProperty('--tilt-y', '0deg');
 };
 
+const handleHeroPointerMove = (event) => {
+  if (
+    (event.pointerType && event.pointerType !== 'mouse') ||
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return;
+  }
+
+  const hero = event.currentTarget;
+  const { x, y } = getPointerEffect(event, hero.getBoundingClientRect(), 0);
+  hero.style.setProperty('--hero-pointer-x', `${x.toFixed(2)}%`);
+  hero.style.setProperty('--hero-pointer-y', `${y.toFixed(2)}%`);
+};
+
+const resetHeroPointer = (event) => {
+  event.currentTarget.style.setProperty('--hero-pointer-x', '50%');
+  event.currentTarget.style.setProperty('--hero-pointer-y', '46%');
+};
+
 const parseProfileData = (config) => {
   if (!config || typeof config !== 'object') return;
 
@@ -409,11 +430,13 @@ const loadHome = async () => {
   articles.value = normalizeArticles(latest);
   categories.value = Array.isArray(categoryList)
     ? categoryList
-      .filter((item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章')
-      .map((item) => ({
-        id: String(item.id),
-        theme: String(item.theme).trim(),
-      }))
+        .filter(
+          (item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章',
+        )
+        .map((item) => ({
+          id: String(item.id),
+          theme: String(item.theme).trim(),
+        }))
     : [];
 
   isLoading.value = false;
@@ -648,6 +671,30 @@ onBeforeUnmount(() => {
   inset: 0;
   z-index: -1;
   background: rgb(9 24 20 / 48%);
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    background: rgb(3 13 10 / 46%);
+    -webkit-mask-image: radial-gradient(
+      circle clamp(12rem, 24vw, 24rem) at var(--hero-pointer-x, 50%) var(--hero-pointer-y, 46%),
+      transparent 0,
+      rgb(0 0 0 / 18%) 48%,
+      #000 100%
+    );
+    mask-image: radial-gradient(
+      circle clamp(12rem, 24vw, 24rem) at var(--hero-pointer-x, 50%) var(--hero-pointer-y, 46%),
+      transparent 0,
+      rgb(0 0 0 / 18%) 48%,
+      #000 100%
+    );
+    opacity: 0.82;
+    transition:
+      -webkit-mask-position 120ms linear,
+      mask-position 120ms linear;
+  }
 }
 
 .hero-content {
@@ -1459,6 +1506,7 @@ onBeforeUnmount(() => {
   }
 
   .hero-bg,
+  .hero-shade::after,
   .hero-animate,
   .social-link,
   .legacy-glass-action,
