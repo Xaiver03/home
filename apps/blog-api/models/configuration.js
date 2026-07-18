@@ -29,6 +29,14 @@ module.exports = function (sequelize, DataTypes) {
             sequelize,
             tableName: "configuration",
             timestamps: false, // 禁用时间戳
+            indexes: [
+                {
+                  name: "PRIMARY",
+                  unique: true,
+                  using: "BTREE",
+                  fields: [{ name: "id" }],
+                },
+              ],
         }
     )
 }

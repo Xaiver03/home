@@ -30,6 +30,14 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: "article_type",
       timestamps: false,
+      indexes: [
+        {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [{ name: "id" }],
+        },
+      ],
       hooks: {
         // 文章类目删除钩子，删除oss封面以及类目下的其他文章
         beforeBulkDestroy: async (articleType, options) => {

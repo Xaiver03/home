@@ -146,7 +146,7 @@
                 </a-col>
                 <a-col :span="8">
                   <a-form-item label="站点URL">
-                    <a-input v-model:value="homeTexts.siteUrl" placeholder="公司官网域名或完整 URL" />
+                    <a-input v-model:value="homeTexts.siteUrl" placeholder="如：xiangleideng.site" />
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -180,8 +180,8 @@
                 </a-col>
               </a-row>
 
-              <a-form-item label="团队简介">
-                <a-textarea v-model:value="homeTexts.descText" placeholder="显示在主页的团队简介" :rows="3" />
+              <a-form-item label="个人简介">
+                <a-textarea v-model:value="homeTexts.descText" placeholder="显示在主页的个人简介" :rows="3" />
               </a-form-item>
 
               <a-form-item label="备用简介">
@@ -196,7 +196,7 @@
                 </a-col>
                 <a-col :span="12">
                   <a-form-item label="ICP备案号">
-                    <a-input v-model:value="homeTexts.siteIcp" placeholder="请输入公司官网备案号" />
+                    <a-input v-model:value="homeTexts.siteIcp" placeholder="如：湘ICP备2026026942号-1" />
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -231,12 +231,6 @@ import {
   EyeOutlined
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import {
-  COMPANY_HOME_DEFAULTS,
-  COMPANY_SITE_LINKS,
-  getPublicSiteOrigin,
-  resolvePublicPreviewUrl,
-} from '@/config/companyBrand.mjs'
 
 const { proxy } = getCurrentInstance()
 
@@ -366,11 +360,7 @@ const handleQrUpload = async (file, index) => {
 
 // 预览主页
 const previewHomePage = () => {
-  const siteOrigin = getPublicSiteOrigin(
-    import.meta.env.VITE_PUBLIC_SITE_URL,
-    import.meta.env.DEV
-  )
-  window.open(resolvePublicPreviewUrl(siteOrigin, '/'), '_blank')
+  window.open('https://xiangleideng.site/', '_blank')
 }
 
 // 保存配置的辅助函数
@@ -469,17 +459,33 @@ const loadConfigurations = async () => {
 const initializeDefaults = () => {
   // 网站链接默认值
   if (siteLinks.value.length === 0) {
-    siteLinks.value = COMPANY_SITE_LINKS.map(link => ({ ...link }))
+    siteLinks.value = [
+      { name: '理想国文学网', link: 'https://litopia.space', icon: 'Cloud' },
+      { name: '创业OS', link: 'https://finlaw.cloud', icon: 'Fire' },
+      { name: 'GitHub', link: 'https://github.com/Xaiver03/', icon: 'Compass' },
+      { name: '公众号', link: '#wechat-qr', type: 'qr', icon: 'LaptopCode' },
+    ]
   }
 
   // 社交链接默认值
   if (socialLinks.value.length === 0) {
-    socialLinks.value = []
+    socialLinks.value = [
+      { name: 'GitHub', url: 'https://github.com/Xaiver03', icon: '/images/social/github.png', tip: '我的 GitHub' },
+    ]
   }
 
   // 主页文案默认值
   if (!homeTexts.value.siteName) {
-    homeTexts.value = { ...COMPANY_HOME_DEFAULTS }
+    homeTexts.value = {
+      siteName: '灯下灯',
+      siteAuthor: 'Xaiver/灯下灯',
+      helloText: 'Hello World !',
+      helloOther: 'Oops !',
+      descText: '把生活和思考，留在能慢慢阅读的地方。',
+      descTextOther: '哎呀，这都被你发现了（ 再点击一次可关闭 ）',
+      siteStart: dayjs('2024-07-06'),
+      siteIcp: '湘ICP备2026026942号-1'
+    }
   }
 }
 

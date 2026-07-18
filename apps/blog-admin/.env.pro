@@ -1,5 +1,4 @@
 VITE_BASE_URL=/api
-VITE_PUBLIC_SITE_URL=http://x-creative.team
-VITE_WS_BASE_URL=ws://x-creative.team/ws
+VITE_WS_BASE_URL=wss://xiangleideng.site/ws
 VUE_APP_STORAGE_IMAGE_BASE_URL=
 VUE_APP_STORAGE_BASE_DIR=/uploads

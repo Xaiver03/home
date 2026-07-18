@@ -10,10 +10,8 @@ import {
   ReadOutlined,
   UserOutlined,
   MessageOutlined,
-  LinkOutlined,
 } from '@ant-design/icons-vue';
 import { createVNode } from 'vue';
-import { COMPANY_BRAND, COMPANY_NAV_ITEMS, toBlogRoute } from '~/composables/companyBrand';
 const router = useRouter();
 const route = useRoute();
 const store = useNuxtStore();
@@ -40,20 +38,46 @@ const getLocalTheme = () => {
   }
 };
 // --导航模块--
-const primaryLinks = COMPANY_NAV_ITEMS.map((item, index) => ({
-  title: item.label,
-  label: item.label,
-  path: index === 0 || item.path === '/#contact' ? item.path : toBlogRoute(item.path),
-  key: index === 0 ? 'homepage' : item.path,
-  external: index === 0 || item.path === '/#contact',
-}));
+const primaryLinks = [
+  {
+    title: '首页',
+    label: '首页',
+    path: 'https://xiangleideng.site/#top',
+    key: 'homepage',
+    external: true,
+  },
+  {
+    title: '博客',
+    label: '博客',
+    path: '/',
+    key: '/',
+  },
+  {
+    title: '文章',
+    label: '文章',
+    path: '/log/article',
+    key: '/log/article',
+  },
+  {
+    title: '关于我',
+    label: '关于我',
+    path: '/about',
+    key: '/about',
+  },
+  {
+    title: '留言板',
+    label: '留言板',
+    path: '/message',
+    key: '/message',
+  },
+];
 const naviData = reactive(primaryLinks.map((item) => ({ ...item }))); // 导航数据
 const mobileNavItems = [
   { ...primaryLinks[0], icon: HomeOutlined },
   { ...primaryLinks[1], icon: BookOutlined },
   { ...primaryLinks[2], icon: ReadOutlined },
   { ...primaryLinks[3], icon: UserOutlined },
-  { ...primaryLinks[5], icon: MessageOutlined },
+  { ...primaryLinks[4], icon: MessageOutlined },
 ];
 let naviDrawer = ref(false);
 const expandedKeys = ref([]);
@@ -258,7 +282,7 @@ onMounted(() => {
         @click="goTo('/')"
         :aria-current="isActive('/') ? 'page' : undefined"
       >
-        <span>{{ COMPANY_BRAND.name }}</span>
+        <span>灯下灯</span>
       </button>
 
       <div class="entry-switch" role="list" aria-label="博客入口切换">
@@ -298,7 +322,7 @@ onMounted(() => {
     <a-drawer
       v-model:open="naviDrawer"
       class="navi-top-drawer"
-      :title="COMPANY_BRAND.name"
+      title="灯下灯"
       placement="top"
       height="auto"
     >

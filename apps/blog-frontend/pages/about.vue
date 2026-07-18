@@ -57,10 +57,6 @@ const finalThoughtsHint = computed(() => {
   return store.$state.config['final-thoughts-hint']?.content || '';
 });
 
-const finalThoughts = computed(() => {
-  return safeParse(store.$state.config['final-thoughts']?.content, []);
-});
-
 const isImageIcon = (value) => /^(https?:\/\/|\/)/i.test(String(value || ''));
 const getIconComponent = (value) => {
   const name = String(value || '').toLowerCase();
@@ -112,7 +108,6 @@ const cloudInit = () => {
 let thoughtsIndex = ref(0);
 let thoughtsInterval = null;
 const getRandomIndex = (arr, excludeIndex, clearIntervalOrNot = false) => {
-  if (!Array.isArray(arr) || arr.length === 0) return null;
   // 取数组的随机索引，除了excludeIndex
   // 创建一个包含所有可能索引的数组（排除 excludeIndex）
   const indices = arr.map((_, i) => i).filter((i) => i !== excludeIndex);
@@ -136,7 +131,7 @@ onMounted(() => {
   cloudInit();
   thoughtsInterval = setInterval(() => {
     thoughtsIndex.value = getRandomIndex(
-      finalThoughts.value,
+      store.$state.config['final-thoughts']?.content,
       thoughtsIndex.value,
     );
   }, 5000);
@@ -149,7 +144,8 @@ onBeforeUnmount(() => {
 
 <template>
   <div id="about-page" class="content-box blog-page-shell overflow-hidden">
-    <a-card hoverable id="team-profile" class="relative blog-glass-panel">
+    <!-- xaiver bar -->
+    <a-card hoverable id="xaiver" class="relative blog-glass-panel">
       <img
         v-if="profileAvatarSrc"
         class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2"
@@ -201,9 +197,10 @@ onBeforeUnmount(() => {
       </RepeatParallaxSlide>
     </a-card>
 
+    <!-- about me -->
     <h1>
-      {{ pageTexts.aboutMeTitle || '关于我们'
-      }}<span>{{ pageTexts.aboutMeSubtitle || 'About the Team' }}</span>
+      {{ pageTexts.aboutMeTitle || '关于我'
+      }}<span>{{ pageTexts.aboutMeSubtitle || 'About Me' }}</span>
     </h1>
     <!-- 渐变bar -->
     <a-card
@@ -212,7 +209,7 @@ onBeforeUnmount(() => {
       v-motion-slide-visible-top
     >
       <span class="card-title absolute top-8">Hi👏🏻</span>
-      <div class="card-text">{{ basicInfo.welcomeText || '欢迎认识晓黎团队' }}</div>
+      <div class="card-text">{{ basicInfo.welcomeText || '🎉欢迎来到我的空间🎉' }}</div>
       <div class="card-text">
         {{ basicInfo.introduction || '' }}<BulbOutlined v-if="basicInfo.introduction || basicInfo.profession" class="about-inline-icon mx-4" />{{ basicInfo.profession || '' }}
       </div>
@@ -321,7 +318,7 @@ onBeforeUnmount(() => {
       class="card my-8 cursor-point blog-glass-panel"
       @click="
         thoughtsIndex = getRandomIndex(
-          finalThoughts,
+          store.$state.config['final-thoughts']?.content,
           thoughtsIndex,
           true,
         )
@@ -330,7 +327,7 @@ onBeforeUnmount(() => {
     >
       <p
         class="card-title mt-4"
-        v-for="(item, index) in finalThoughts"
+        v-for="(item, index) in store.$state.config['final-thoughts']?.content"
         :key="index + 'thoughts'"
         v-motion
         :initial="{ opacity: 0, y: 10 }"

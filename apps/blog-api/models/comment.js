@@ -92,6 +92,12 @@ module.exports = function (sequelize, DataTypes) {
       updatedAt: false, // 禁用更新时间字段
       indexes: [
         {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [{ name: "id" }],
+        },
+        {
           name: "idxEntity",
           using: "BTREE",
           fields: [{ name: "entityType" }, { name: "entityId" }],

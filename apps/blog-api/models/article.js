@@ -59,6 +59,14 @@ module.exports = function (sequelize, DataTypes) {
       timestamps: true,
       createdAt: "createTime",
       updatedAt: "updatedTime",
+      indexes: [
+        {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [{ name: "id" }],
+        },
+      ],
       hooks: {
         // 文章的删除钩子，删除该文章的oss文件内容以及文章下的评论
         beforeBulkDestroy: async (article) => {

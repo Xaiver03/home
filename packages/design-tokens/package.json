@@ -1,7 +1,7 @@
 {
   "name": "@xld/design-tokens",
   "version": "1.0.0",
-  "description": "Shared design tokens for the Xiaoli Team website and content platform",
+  "description": "Shared design tokens for Xaiver blog frontend and admin",
   "type": "module",
   "main": "./src/index.js",
   "exports": {
@@ -17,6 +17,6 @@
     "shared",
     "monorepo"
   ],
-  "author": "晓黎团队",
+  "author": "灯下灯/Xaiver",
   "license": "MIT"
 }

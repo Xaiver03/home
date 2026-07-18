@@ -1,5 +1,4 @@
 <script setup>
-import { COMPANY_BRAND } from '~/composables/companyBrand';
 const router = useRouter();
 const store = useNuxtStore();
 const profileAvatarSrc = ref('');
@@ -37,7 +36,7 @@ const profileSocialLinks = computed(() => {
 // 从 config 读取名字和头像
 const profileName = computed(() => {
   const info = safeParse(store.$state.config['about-basic-info']?.content, {});
-  return info.name || COMPANY_BRAND.name;
+  return info.name || '灯下灯';
 });
 
 definePageMeta({
@@ -58,20 +57,16 @@ const { data: articleData, error: articleError } = await useAsyncData(
         pageSize: 7,
       })
       .then((res) => {
-        const rows = Array.isArray(res?.rows) ? [...res.rows] : [];
-        for (let row of rows) {
+        for (let row of res.rows) {
           row.createTime = utils.formatDate(row.createTime);
         }
-        const leadArticle = rows.shift() || null;
-        const articleList = rows;
+        const leadArticle = res.rows.shift();
+        const articleList = res.rows;
         return {
           leadArticle,
           articleList,
         };
       }),
-  {
-    default: () => ({ leadArticle: null, articleList: [] }),
-  },
 );
 // 获取热门留言数据
 const { data: hottestMessageList, error: hottestMessageError } = await useAsyncData(
@@ -84,10 +79,9 @@ const { data: hottestMessageList, error: hottestMessageError } = await useAsyncD
         userId: -1,
         order: '[["createTime", "DESC"]]',
       })
-      .then((res) => (Array.isArray(res?.rows) ? res.rows : [])),
-  {
-    default: () => [],
-  },
+      .then((res) => {
+        return res.rows;
+      }),
 );
 const likeMessage = (message) => {
   // 喜欢评论
@@ -101,19 +95,19 @@ const likeMessage = (message) => {
 
 <template>
   <main id="home" class="content-box blog-page-shell">
-    <section id="team-profile" class="blog-glass-panel archive-hero" @click="router.push('/about')">
+    <section id="xaiver" class="blog-glass-panel archive-hero" @click="router.push('/about')">
       <div class="hero-copy">
         <span class="blog-eyebrow">Public archive</span>
-        <h1>{{ COMPANY_BRAND.blogName }}</h1>
+        <h1>灯下灯的博客</h1>
         <p>
-          记录 AI 产品、工程实践与创意研究。技术是我们解决问题的主体，人文是判断价值与方向的底色。
+          这里继续展开文章列表、留言和作者信息。阅读文章、查看主题、认识作者，都从同一个入口进入。
         </p>
         <div class="hero-actions">
           <button class="blog-action" type="button" @click.stop="router.push('/log/article')">
             进入文章档案 <span aria-hidden="true">→</span>
           </button>
           <button class="blog-action secondary" type="button" @click.stop="router.push('/about')">
-            关于团队 <span aria-hidden="true">↗</span>
+            关于作者 <span aria-hidden="true">↗</span>
           </button>
         </div>
       </div>
@@ -122,7 +116,7 @@ const likeMessage = (message) => {
           v-if="profileAvatarSrc"
           :src="profileAvatarSrc"
           @error="handleProfileAvatarError"
-          alt="晓黎团队标识"
+          alt="灯下灯头像"
           v-motion-pop-visible-once
         />
         <div>

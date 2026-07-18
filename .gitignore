@@ -42,7 +42,6 @@ apps/blog-api/config/local.json
 .env.pro
 .env.beta
 apps/blog-api/database.dev.db
-apps/blog-api/database.company.dev.db
 apps/blog-api/public/uploads/
 
 # Credentials and sensitive information

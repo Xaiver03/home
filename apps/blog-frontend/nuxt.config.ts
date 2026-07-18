@@ -1,5 +1,4 @@
 import { config } from 'dotenv'
-import { COMPANY_BRAND } from './composables/companyBrand.js'
 
 console.log('config',process.env.NUXT_PUBLIC_ENV);
 
@@ -8,9 +7,8 @@ config({ path: `../.env.${process.env.NUXT_PUBLIC_ENV}` })
 const defaultApiUrl =
   process.env.NUXT_PUBLIC_ENV === 'dev'
     ? 'http://localhost:8085/api'
-    : '/api';
+    : 'https://xiangleideng.site/api';
 const defaultStorageUrl = process.env.NUXT_PUBLIC_ENV === 'dev' ? '' : '/uploads';
-const siteOrigin = process.env.NUXT_PUBLIC_BASE_URL?.replace(/\/$/, '');
 
 export default defineNuxtConfig({
   // 局域网其他设备可查看
@@ -23,11 +21,11 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/blog/',
     head: {
-      title: process.env.NUXT_PUBLIC_SITE_NAME || COMPANY_BRAND.blogName,
+      title: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客",
       meta: [
         {
           name: "description",
-          content: process.env.NUXT_PUBLIC_SITE_DESC || COMPANY_BRAND.description,
+          content: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考",
         },
       ],
     },
@@ -39,8 +37,8 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_PUBLIC_API_URL || defaultApiUrl, // 后台url
       storageUrl: process.env.NUXT_PUBLIC_STORAGE_URL || defaultStorageUrl,
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "", // 本站地址
-      siteName: process.env.NUXT_PUBLIC_SITE_NAME || COMPANY_BRAND.blogName, // 站点名称
-      siteDesc: process.env.NUXT_PUBLIC_SITE_DESC || COMPANY_BRAND.description, // 站点描述
+      siteName: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客", // 站点名称
+      siteDesc: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考", // 站点描述
     },
   },
   modules: [
@@ -52,7 +50,7 @@ export default defineNuxtConfig({
     "@vueuse/motion/nuxt",
   ],
   sitemap: {
-    siteUrl: siteOrigin,
+    siteUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://xiangleideng.site",
     defaults: {
       changefreq: "weekly",
       priority: 0.7,
@@ -71,7 +69,7 @@ export default defineNuxtConfig({
         Disallow: [],
       },
     ],
-    sitemap: siteOrigin ? `${siteOrigin}/sitemap.xml` : undefined,
+    sitemap: `${process.env.NUXT_PUBLIC_BASE_URL}/sitemap.xml`,
   },
   css: [
     "@/assets/scss/index.scss", // 引入 SCSS 入口文件

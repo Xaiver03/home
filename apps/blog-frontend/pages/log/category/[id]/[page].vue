@@ -1,5 +1,4 @@
 <script setup>
-import { COMPANY_BRAND } from '~/composables/companyBrand';
 const route = useRoute();
 definePageMeta({
   layout: 'classics',
@@ -32,9 +31,7 @@ const { data: category, error: getCategoryError } = await useAsyncData(
     }),
 );
 useHead({
-  title: category.value
-    ? `${category.value?.theme}类文章｜${COMPANY_BRAND.blogName}`
-    : `文章类目｜${COMPANY_BRAND.blogName}`,
+  title: category.value ? `${category.value?.theme}类文章 【 灯下灯 】` : '文章类目【 灯下灯 】',
 });
 const getArticleByTypeId = () => {
   // 通过typeId获取该类别下的文章

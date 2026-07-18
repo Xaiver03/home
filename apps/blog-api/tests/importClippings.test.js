@@ -118,14 +118,12 @@ author:
     fs.writeFileSync(path.join(directory, '真实文章.md'), article);
     fs.writeFileSync(path.join(directory, '._真实文章.md'), 'sidecar');
 
-    expect(getImportPlan(directory, { author: '灯下灯' }).map((item) => item.title)).toEqual([
-      '真实文章',
-    ]);
+    expect(getImportPlan(directory).map((item) => item.title)).toEqual(['真实文章']);
 
     fs.rmSync(directory, { recursive: true, force: true });
   });
 
-  it('imports no personal content by default and requires an explicit author filter', () => {
+  it('includes only clippings authored by 灯下灯 unless external content is explicitly requested', () => {
     const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'clippings-'));
     fs.writeFileSync(
       path.join(directory, '自己的文章.md'),
@@ -146,10 +144,7 @@ author:
 正文。`,
     );
 
-    expect(getImportPlan(directory).map((item) => item.title)).toEqual([]);
-    expect(getImportPlan(directory, { author: '灯下灯' }).map((item) => item.title)).toEqual([
-      '自己的文章',
-    ]);
+    expect(getImportPlan(directory).map((item) => item.title)).toEqual(['自己的文章']);
     expect(getImportPlan(directory, { includeExternal: true }).map((item) => item.title)).toEqual([
       '外部文章',
       '自己的文章',
@@ -269,9 +264,7 @@ author:
       },
     };
 
-    await expect(
-      importClippings(directory, dependencies, { includeExternal: true }),
-    ).rejects.toThrow('database write failed');
+    await expect(importClippings(directory, dependencies)).rejects.toThrow('database write failed');
     expect(transaction.rollback).toHaveBeenCalledTimes(1);
     expect(dependencies.sequelize.close).toHaveBeenCalledTimes(1);
 
