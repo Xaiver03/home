@@ -12,13 +12,13 @@ describe('home content helpers', () => {
     const result = getHomeText({
       'home-texts': {
         content: {
-          siteName: '晓黎团队',
+          siteName: '灯下灯',
           descText: '把生活和思考留下来。',
         },
       },
     });
 
-    expect(result.siteName).toBe('晓黎团队');
+    expect(result.siteName).toBe('灯下灯');
     expect(result.descText).toBe('把生活和思考留下来。');
     expect(result.helloText).toBe(DEFAULT_HOME_TEXT.helloText);
   });
@@ -56,9 +56,9 @@ describe('home content helpers', () => {
       external: false,
     });
     expect(
-      normalizeSiteLink({ name: 'GitHub', link: 'https://github.com/example' }),
+      normalizeSiteLink({ name: 'GitHub', link: 'https://github.com/Xaiver03' }),
     ).toMatchObject({
-      href: 'https://github.com/example',
+      href: 'https://github.com/Xaiver03',
       external: true,
     });
     expect(normalizeSiteLink({ name: '公众号', link: '#wechat-qr' })).toMatchObject({
@@ -81,8 +81,8 @@ describe('home content helpers', () => {
       from: '林清玄',
     });
     expect(normalizeQuote()).toEqual({
-      text: '以 AI 技术产品为主体，以文创与人文为差异化底色。',
-      from: '晓黎团队',
+      text: '把生活、技术与思考，留在一处可以慢慢阅读的地方。',
+      from: '灯下灯',
     });
   });
 });

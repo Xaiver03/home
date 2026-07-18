@@ -55,7 +55,7 @@ const siteConfig = ref({});
 const startYear = ref(null);
 const siteIcp = ref(null);
 const siteAuthor = ref(null);
-const siteUrl = ref('/');
+const siteUrl = ref("https://xiangleideng.site");
 
 // 初始化配置
 const initConfig = async () => {

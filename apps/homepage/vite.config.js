@@ -78,21 +78,20 @@ export default ({ mode }) =>
 
         manifest: {
           name: loadEnv(mode, process.cwd()).VITE_SITE_NAME,
-          short_name: "晓黎团队",
+          short_name: loadEnv(mode, process.cwd()).VITE_SITE_NAME,
           description: loadEnv(mode, process.cwd()).VITE_SITE_DES,
-          lang: "zh-CN",
           start_url: "/",
           display: "standalone",
-          background_color: "#f3f0e8",
-          theme_color: "#071b39",
+          background_color: "#424242",
+          theme_color: "#424242",
           icons: [
             {
-              src: "/images/brand/xiaoli-icon-192.png",
+              src: "/images/icon/192.png",
               sizes: "192x192",
               type: "image/png",
             },
             {
-              src: "/images/brand/xiaoli-icon-512.png",
+              src: "/images/icon/512.png",
               sizes: "512x512",
               type: "image/png",
             },

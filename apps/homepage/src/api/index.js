@@ -35,10 +35,10 @@ export const getGlobalConfig = async () => {
 };
 
 export const getLatestArticles = async () => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
-
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const res = await fetch('/api/article/reception/searchArticle', {
       method: 'POST',
       signal: controller.signal,
@@ -54,6 +54,8 @@ export const getLatestArticles = async () => {
       }),
     });
 
+    clearTimeout(timeoutId);
+
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
@@ -61,9 +63,10 @@ export const getLatestArticles = async () => {
     return await res.json();
   } catch (error) {
     console.warn('最新文章加载失败:', error.message);
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+    return {
+      count: 0,
+      rows: [],
+    };
   }
 };
 

@@ -9,7 +9,7 @@
         target="_blank"
         @click.prevent="item.url === '#wechat-qr' ? showWechatQr = true : null"
         @mouseenter="socialTip = item.tip"
-        @mouseleave="socialTip = '通过这里联系团队'"
+        @mouseleave="socialTip = '通过这里联系我吧'"
       >
         <img class="icon" :src="item.icon" height="24" />
       </a>
@@ -20,7 +20,7 @@
     <el-dialog v-model="showWechatQr" title="关注公众号" width="320px" :align-center="true" destroy-on-close>
       <div style="text-align:center">
         <img :src="'/uploads/wechat-qr.jpg'" alt="公众号二维码" style="width:240px;height:240px;border-radius:8px" />
-        <p style="margin-top:12px;color:#888;font-size:13px">扫码关注「晓黎团队」</p>
+        <p style="margin-top:12px;color:#888;font-size:13px">扫码关注「灯下灯」</p>
       </div>
     </el-dialog>
   </div>
@@ -32,7 +32,7 @@ import { getGlobalConfig } from "@/api";
 
 // 响应式数据 - 初始化为默认数据，确保组件始终有内容显示
 const socialLinks = ref([...socialLinksDefault]);
-const socialTip = ref('通过这里联系团队');
+const socialTip = ref("通过这里联系我吧");
 const showWechatQr = ref(false);
 
 // 加载社交链接配置
