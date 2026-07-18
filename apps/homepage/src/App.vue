@@ -31,7 +31,7 @@
       </nav>
     </header>
 
-    <main>
+    <main class="homepage-mobile-content-spacer">
       <section
         id="top"
         class="hero"
@@ -242,6 +242,44 @@
         </div>
       </section>
     </main>
+
+    <nav class="mobile-tab-bar homepage-mobile-tab-bar" aria-label="移动端主导航">
+      <a class="mobile-tab-item active" href="#top" aria-current="page" @click="menuOpen = false">
+        <svg class="mobile-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m3 10.8 9-7.3 9 7.3v8.1a1.6 1.6 0 0 1-1.6 1.6H4.6A1.6 1.6 0 0 1 3 18.9z" />
+          <path d="M9.2 20.5v-5.8h5.6v5.8" />
+        </svg>
+        <span>首页</span>
+      </a>
+      <a class="mobile-tab-item" href="/blog/" @click="menuOpen = false">
+        <svg class="mobile-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5.2A2.2 2.2 0 0 1 6.2 3H20v15.8H6.2A2.2 2.2 0 0 0 4 21z" />
+          <path d="M4 5.2v15.6M8 7h8M8 10.5h8" />
+        </svg>
+        <span>博客</span>
+      </a>
+      <a class="mobile-tab-item" href="/blog/log/article" @click="menuOpen = false">
+        <svg class="mobile-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 3.5h9.5L19 7v13.5H6z" />
+          <path d="M15.5 3.5V7H19M9 11h7M9 14.5h7M9 18h4" />
+        </svg>
+        <span>文章</span>
+      </a>
+      <a class="mobile-tab-item" href="/blog/about" @click="menuOpen = false">
+        <svg class="mobile-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5 20.5a7 7 0 0 1 14 0" />
+        </svg>
+        <span>关于我</span>
+      </a>
+      <a class="mobile-tab-item" href="/blog/message" @click="menuOpen = false">
+        <svg class="mobile-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5.5h16v11H9l-5 3z" />
+          <path d="M8 10h8M8 13.5h5" />
+        </svg>
+        <span>留言板</span>
+      </a>
+    </nav>
 
     <div v-if="qrDialogOpen" class="qr-dialog-backdrop" @click.self="qrDialogOpen = false">
       <section class="qr-dialog" role="dialog" aria-modal="true" aria-label="公众号二维码">
@@ -614,6 +652,10 @@ onBeforeUnmount(() => {
       opacity: 0.64;
     }
   }
+}
+
+.homepage-mobile-tab-bar {
+  display: none;
 }
 
 .menu-toggle {
@@ -1484,6 +1526,75 @@ onBeforeUnmount(() => {
   .route-visual {
     width: 2.8rem;
     height: 2.8rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .homepage-mobile-content-spacer {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+
+  .homepage-mobile-tab-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.65rem 0.8rem calc(0.65rem + env(safe-area-inset-bottom));
+    border-top: 1px solid rgb(23 27 26 / 14%);
+    background: rgb(246 247 241 / 90%);
+    box-shadow: 0 -0.8rem 2.4rem rgb(35 44 38 / 8%);
+    backdrop-filter: blur(1rem) saturate(180%);
+  }
+
+  .mobile-tab-item {
+    display: grid;
+    min-width: 0;
+    min-height: 4.65rem;
+    padding: 0.55rem 0.25rem 0.45rem;
+    place-items: center;
+    align-content: center;
+    gap: 0.28rem;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    border-radius: 0.9rem;
+    transition:
+      color 180ms ease,
+      background 180ms ease,
+      transform 180ms ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--ink);
+      background: rgb(255 255 255 / 72%);
+      outline: none;
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &.active {
+      color: #f6f9ed;
+      background: var(--forest);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%);
+    }
+  }
+
+  .mobile-tab-icon {
+    width: 1.22rem;
+    height: 1.22rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
   }
 }
 
