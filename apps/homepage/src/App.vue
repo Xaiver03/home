@@ -2,7 +2,10 @@
   <a class="skip-link" href="#articles">跳到文章列表</a>
 
   <div class="site-shell">
-    <header class="site-header" :class="{ 'is-scrolled': isScrolled }">
+    <header
+      class="site-header"
+      :class="{ 'is-scrolled': isScrolled, 'is-hidden': isHeaderHidden && !menuOpen }"
+    >
       <a class="wordmark" href="#top" aria-label="回到站点顶部">
         <span>灯下灯</span>
         <small>XAIVER</small>
@@ -29,7 +32,12 @@
     </header>
 
     <main>
-      <section id="top" class="hero" aria-labelledby="hero-title">
+      <section
+        id="top"
+        class="hero"
+        aria-labelledby="hero-title"
+        :style="{ '--parallax-y': `${heroParallax}px` }"
+      >
         <Background class="hero-bg" />
         <div class="hero-shade"></div>
 
@@ -37,19 +45,29 @@
           <div class="profile-card">
             <img
               v-if="profileAvatar"
-              class="profile-avatar"
+              class="profile-avatar hero-animate"
               :src="profileAvatar"
               alt="头像"
+              style="--delay: 0ms"
             />
             <div class="profile-identity">
-              <p class="eyebrow">{{ homeText.helloText }}</p>
-              <h1 id="hero-title">{{ profileName || '灯下灯' }}</h1>
-              <p v-if="profileTagline" class="profile-tagline">
-                {{ profileProfession }}<span v-if="profilePersonality"> · {{ profilePersonality }}</span>
+              <p class="eyebrow hero-animate" style="--delay: 100ms">{{ homeText.helloText }}</p>
+              <h1 id="hero-title" class="hero-animate" style="--delay: 200ms">
+                {{ profileName || '灯下灯' }}
+              </h1>
+              <p v-if="profileTagline" class="profile-tagline hero-animate" style="--delay: 300ms">
+                {{ profileProfession
+                }}<span v-if="profilePersonality"> · {{ profilePersonality }}</span>
               </p>
-              <p v-if="profileIntro" class="profile-intro">{{ profileIntro }}</p>
+              <p v-if="profileIntro" class="profile-intro hero-animate" style="--delay: 400ms">
+                {{ profileIntro }}
+              </p>
 
-              <div v-if="socialLinks.length" class="profile-links">
+              <div
+                v-if="socialLinks.length"
+                class="profile-links hero-animate"
+                style="--delay: 500ms"
+              >
                 <a
                   v-for="link in socialLinks"
                   :key="link.name"
@@ -58,6 +76,8 @@
                   :title="link.name"
                   :target="link.url.startsWith('http') ? '_blank' : undefined"
                   :rel="link.url.startsWith('http') ? 'noreferrer' : undefined"
+                  @pointermove="handleMagneticMove"
+                  @pointerleave="resetInteractiveEffect"
                 >
                   <img
                     v-if="link.icon && link.icon.startsWith('http')"
@@ -70,16 +90,24 @@
                     class="social-svg"
                     viewBox="0 0 24 24"
                     v-html="getSocialIcon(link.iconClass || link.name)"
-                  ></svg>
+                  />
                   <span v-else>{{ link.name }}</span>
                 </a>
               </div>
 
-              <div class="hero-actions">
-                <a class="primary-action legacy-glass-action" href="#articles"
+              <div class="hero-actions hero-animate" style="--delay: 600ms">
+                <a
+                  class="primary-action legacy-glass-action"
+                  href="#articles"
+                  @pointermove="handleMagneticMove"
+                  @pointerleave="resetInteractiveEffect"
                   >阅读文章列表 <span aria-hidden="true">↓</span></a
                 >
-                <a class="secondary-action legacy-glass-action" href="/blog/about"
+                <a
+                  class="secondary-action legacy-glass-action"
+                  href="/blog/about"
+                  @pointermove="handleMagneticMove"
+                  @pointerleave="resetInteractiveEffect"
                   >认识作者 <span aria-hidden="true">→</span></a
                 >
               </div>
@@ -87,7 +115,7 @@
           </div>
         </div>
 
-        <aside class="hero-status" aria-label="站点状态">
+        <aside class="hero-status hero-animate" aria-label="站点状态" style="--delay: 800ms">
           <span>BLOG ARCHIVE</span>
           <strong>{{ articleCountLabel }}</strong>
           <p>
@@ -118,20 +146,22 @@
             :target="link.external ? '_blank' : undefined"
             :rel="link.external ? 'noreferrer' : undefined"
             @click="handleRouteClick(link, $event)"
+            @pointermove="handleTiltMove"
+            @pointerleave="resetInteractiveEffect"
           >
             <span class="route-visual" :class="{ 'has-logo': link.logo }" aria-hidden="true">
               <img
                 v-if="link.logo"
                 :src="link.logo"
                 :alt="`${link.name} logo`"
-                @error="$event.target.style.display='none'"
+                @error="$event.target.style.display = 'none'"
               />
               <svg
                 v-if="getRouteSvg(link.name) && !link.logo"
                 class="route-svg"
                 viewBox="0 0 24 24"
                 v-html="getRouteSvg(link.name)"
-              ></svg>
+              />
               <span v-if="!getRouteSvg(link.name) && !link.logo">{{ getSiteIcon(link.icon) }}</span>
             </span>
             <span class="route-copy">
@@ -201,7 +231,11 @@
         </div>
 
         <div v-else class="article-empty">
-          <p>{{ selectedCategoryId === 'all' ? '文章列表正在同步。' : '这个分类下暂时没有公开文章。' }}</p>
+          <p>
+            {{
+              selectedCategoryId === 'all' ? '文章列表正在同步。' : '这个分类下暂时没有公开文章。'
+            }}
+          </p>
           <a href="/blog/log/article">进入文章档案 <span aria-hidden="true">→</span></a>
         </div>
       </section>
@@ -209,7 +243,12 @@
 
     <div v-if="qrDialogOpen" class="qr-dialog-backdrop" @click.self="qrDialogOpen = false">
       <section class="qr-dialog" role="dialog" aria-modal="true" aria-label="公众号二维码">
-        <button class="qr-close" type="button" aria-label="关闭二维码" @click="qrDialogOpen = false">
+        <button
+          class="qr-close"
+          type="button"
+          aria-label="关闭二维码"
+          @click="qrDialogOpen = false"
+        >
           ×
         </button>
         <img :src="qrImage" alt="公众号二维码" />
@@ -239,6 +278,7 @@ import {
   normalizeArticles,
   normalizeSiteLink,
 } from '@/lib/homeContent';
+import { getHeaderScrollState, getMagneticOffset, getPointerEffect } from '@/lib/interaction';
 import defaultSiteLinks from '@/assets/siteLinks.json';
 import Background from '@/components/Background.vue';
 
@@ -251,6 +291,8 @@ const totalArticleCount = ref(0);
 const isLoading = ref(true);
 const isFilterLoading = ref(false);
 const isScrolled = ref(false);
+const isHeaderHidden = ref(false);
+const heroParallax = ref(0);
 const menuOpen = ref(false);
 const siteLinks = ref(defaultSiteLinks.map(normalizeSiteLink));
 const qrDialogOpen = ref(false);
@@ -280,8 +322,44 @@ const selectedCategoryName = computed(() => {
   return categories.value.find((item) => item.id === selectedCategoryId.value)?.theme || '分类文章';
 });
 
+let lastScrollY = 0;
+
 const updateScrollState = () => {
-  isScrolled.value = window.scrollY > 24;
+  const scrollState = getHeaderScrollState(window.scrollY, lastScrollY, 120, menuOpen.value);
+  isScrolled.value = scrollState.scrolled;
+  isHeaderHidden.value = scrollState.hidden;
+  heroParallax.value = Math.max(-56, Math.min(0, -window.scrollY * 0.08));
+  lastScrollY = window.scrollY;
+};
+
+const handleMagneticMove = (event) => {
+  if (event.pointerType && event.pointerType !== 'mouse') return;
+
+  const element = event.currentTarget;
+  const offset = getMagneticOffset(event, element.getBoundingClientRect());
+  element.style.setProperty('--magnetic-x', `${offset.x.toFixed(2)}px`);
+  element.style.setProperty('--magnetic-y', `${offset.y.toFixed(2)}px`);
+};
+
+const handleTiltMove = (event) => {
+  if (event.pointerType && event.pointerType !== 'mouse') return;
+
+  const element = event.currentTarget;
+  const effect = getPointerEffect(event, element.getBoundingClientRect());
+  element.style.setProperty('--spotlight-x', `${effect.x.toFixed(2)}%`);
+  element.style.setProperty('--spotlight-y', `${effect.y.toFixed(2)}%`);
+  element.style.setProperty('--tilt-x', `${effect.tiltX.toFixed(2)}deg`);
+  element.style.setProperty('--tilt-y', `${effect.tiltY.toFixed(2)}deg`);
+};
+
+const resetInteractiveEffect = (event) => {
+  const element = event.currentTarget;
+  element.style.setProperty('--magnetic-x', '0px');
+  element.style.setProperty('--magnetic-y', '0px');
+  element.style.setProperty('--spotlight-x', '50%');
+  element.style.setProperty('--spotlight-y', '50%');
+  element.style.setProperty('--tilt-x', '0deg');
+  element.style.setProperty('--tilt-y', '0deg');
 };
 
 const parseProfileData = (config) => {
@@ -331,11 +409,11 @@ const loadHome = async () => {
   articles.value = normalizeArticles(latest);
   categories.value = Array.isArray(categoryList)
     ? categoryList
-        .filter((item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章')
-        .map((item) => ({
-          id: String(item.id),
-          theme: String(item.theme).trim(),
-        }))
+      .filter((item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章')
+      .map((item) => ({
+        id: String(item.id),
+        theme: String(item.theme).trim(),
+      }))
     : [];
 
   isLoading.value = false;
@@ -376,9 +454,11 @@ const updateFavicon = (url) => {
 
 const getSocialIcon = (name) => {
   const icons = {
-    GitHub: '<path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z" fill="currentColor"/>',
+    GitHub:
+      '<path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z" fill="currentColor"/>',
     微信: '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
-    公众号: '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
+    公众号:
+      '<path d="M8.69 3.46C3.88 3.46 0 6.47 0 10.18c0 2.04 1.08 3.87 2.76 5.11l-.55 1.65 1.92-1.05c.88.26 1.81.39 2.75.39.31 0 .62-.02.92-.06-.2-.64-.3-1.3-.3-1.98 0-3.7 3.34-6.72 7.45-6.72.22 0 .43.01.64.03C14.95 5.08 11.97 3.46 8.69 3.46zM5.18 7.3c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.32-.72.72-.72zm4.3 0c.4 0 .72.32.72.72s-.32.72-.72.72a.72.72 0 01-.72-.72c0-.4.33-.72.72-.72z" fill="currentColor"/><path d="M16.5 7.3c-3.58 0-6.5 2.6-6.5 5.8 0 3.2 2.92 5.8 6.5 5.8.8 0 1.58-.14 2.3-.38l1.7.93-.5-1.53c1.4-1.1 2.3-2.57 2.3-4.22 0-3.2-2.92-5.8-6.5-5.8h.2c.3 0 0 0 0 0zm-2.5 2.6c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53zm4.5 0c.3 0 .55.24.55.53 0 .29-.25.53-.55.53-.3 0-.55-.24-.55-.53 0-.29.25-.53.55-.53z" fill="currentColor"/>',
   };
   return icons[name] || null;
 };
@@ -466,7 +546,12 @@ onBeforeUnmount(() => {
   transform: translateX(-50%);
   transition:
     background 240ms ease,
-    box-shadow 240ms ease;
+    box-shadow 240ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.is-hidden {
+    transform: translate(-50%, calc(-100% - 1.5rem));
+  }
 
   &.is-scrolled {
     color: var(--ink);
@@ -533,12 +618,29 @@ onBeforeUnmount(() => {
   overflow: hidden;
   color: #f7f9f0;
   isolation: isolate;
+
+  &::before {
+    position: absolute;
+    inset: -24%;
+    z-index: -1;
+    pointer-events: none;
+    content: '';
+    background:
+      radial-gradient(circle at 76% 18%, rgb(111 208 173 / 30%), transparent 28%),
+      radial-gradient(circle at 18% 78%, rgb(38 108 87 / 30%), transparent 34%);
+    filter: blur(1.5rem);
+    opacity: 0.82;
+    animation: aurora-drift 16s ease-in-out infinite alternate;
+  }
 }
 
 .hero-bg {
   position: absolute;
   inset: 0;
   z-index: -2;
+  transform: translate3d(0, var(--parallax-y, 0px), 0) scale(1.06);
+  transition: transform 100ms linear;
+  will-change: transform;
 }
 
 .hero-shade {
@@ -569,6 +671,14 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   border: 3px solid rgb(255 255 255 / 30%);
   box-shadow: 0 1.4rem 4rem rgb(4 17 13 / 28%);
+}
+
+.hero-animate {
+  opacity: 0;
+  transform: translate3d(0, 1.15rem, 0) scale(0.98);
+  animation: hero-item-in 760ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+  will-change: opacity, transform;
 }
 
 .profile-identity {
@@ -629,13 +739,15 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: rgb(255 255 255 / 12%);
   backdrop-filter: blur(0.5rem);
+  transform: translate3d(var(--magnetic-x, 0px), var(--magnetic-y, 0px), 0);
   transition:
     background 180ms ease,
-    transform 180ms ease;
+    box-shadow 180ms ease,
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
     background: rgb(255 255 255 / 24%);
-    transform: translateY(-0.12rem);
+    box-shadow: 0 0.75rem 1.5rem rgb(4 17 13 / 18%);
   }
 
   span {
@@ -688,17 +800,20 @@ onBeforeUnmount(() => {
     inset 0 1px 0 rgb(255 255 255 / 45%),
     0 0.7rem 1.5rem rgb(4 17 13 / 14%);
   backdrop-filter: blur(0.7rem) saturate(120%);
+  transform: translate3d(var(--magnetic-x, 0px), var(--magnetic-y, 0px), 0);
   transition:
     background 180ms ease,
     box-shadow 180ms ease,
-    transform 180ms ease;
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
-    transform: translateY(-0.12rem);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 56%),
+      0 1rem 2rem rgb(4 17 13 / 20%);
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: translate3d(var(--magnetic-x, 0px), var(--magnetic-y, 0px), 0) scale(0.98);
   }
 }
 
@@ -979,25 +1094,54 @@ onBeforeUnmount(() => {
     inset 0 1px 0 rgb(255 255 255 / 86%),
     0 1.2rem 3rem rgb(23 32 29 / 8%);
   backdrop-filter: blur(1rem) saturate(145%);
+  transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
+  transform-style: preserve-3d;
   transition:
     color 180ms ease,
     background 180ms ease,
     box-shadow 180ms ease,
-    transform 180ms ease;
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    border: 1px solid rgb(90 187 153 / 72%);
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+      rgb(103 209 168 / 24%),
+      transparent 34%
+    );
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   &:hover,
   &:focus-visible {
-    transform: translateY(-0.12rem);
+    transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg))
+      translate3d(0, -0.12rem, 0);
     color: var(--forest);
     background: rgb(255 255 255 / 86%);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 92%),
       0 1.6rem 3.6rem rgb(23 32 29 / 12%);
     outline: none;
+
+    &::before {
+      opacity: 1;
+    }
   }
 
   &:active {
-    transform: scale(0.99);
+    transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg))
+      translate3d(0, 0, 0) scale(0.99);
   }
 }
 
@@ -1157,6 +1301,33 @@ onBeforeUnmount(() => {
   }
 }
 
+@keyframes hero-item-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 1.15rem, 0) scale(0.98);
+    filter: blur(0.35rem);
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(0, -0.18rem, 0) scale(1.005);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-2%, 1%, 0) rotate(-2deg) scale(1);
+  }
+  to {
+    transform: translate3d(2%, -2%, 0) rotate(2deg) scale(1.08);
+  }
+}
+
 @keyframes shimmer {
   from {
     background-position: 100% 0;
@@ -1277,6 +1448,27 @@ onBeforeUnmount(() => {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+  }
+
+  .site-header.is-hidden {
+    transform: translateX(-50%);
+  }
+
+  .hero::before {
+    animation: none;
+  }
+
+  .hero-bg,
+  .hero-animate,
+  .social-link,
+  .legacy-glass-action,
+  .route-link {
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .hero-animate {
+    opacity: 1;
   }
 }
 </style>
