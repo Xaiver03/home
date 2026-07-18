@@ -2,11 +2,13 @@
   {
     "icon": "Cloud",
     "name": "理想国文学网",
+    "logo": "/images/site/litopia-logo.png",
     "link": "https://litopia.space"
   },
   {
     "icon": "Fire",
     "name": "创业OS",
+    "logo": "/images/site/finlaw-logo.webp",
     "link": "https://finlaw.cloud"
   },
   {
