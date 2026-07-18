@@ -158,7 +158,7 @@ const likeMessage = (message) => {
       <p>按发布时间整理公开文章。完整归档继续保留搜索和分页，方便连续阅读。</p>
     </header>
     <RepeatEmptyPlaceholder
-      :dataReady="Boolean(articleData)"
+      :dataReady="Boolean(articleData || articleError)"
       :dataShow="!utils.isNullOrEmpty(articleData?.leadArticle)"
     >
       <RepeatDataCard
@@ -223,7 +223,7 @@ const likeMessage = (message) => {
       <p>留言和短内容保留在同一条公开时间线里，作为文章之外的补充。</p>
     </header>
     <RepeatEmptyPlaceholder
-      :dataReady="Boolean(hottestMessageList)"
+      :dataReady="Boolean(hottestMessageList || hottestMessageError)"
       :dataShow="hottestMessageList?.length > 0"
     >
       <div class="message-grid">

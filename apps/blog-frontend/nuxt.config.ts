@@ -1,4 +1,5 @@
 import { config } from 'dotenv'
+import { normalizeApiUrl } from './utils/api-url.js'
 
 console.log('config',process.env.NUXT_PUBLIC_ENV);
 
@@ -34,7 +35,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // 运行时配置项（全局变量）
     public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || defaultApiUrl, // 后台url
+      apiUrl: normalizeApiUrl(process.env.NUXT_PUBLIC_API_URL, defaultApiUrl), // 后台url
       storageUrl: process.env.NUXT_PUBLIC_STORAGE_URL || defaultStorageUrl,
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "", // 本站地址
       siteName: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客", // 站点名称
