@@ -11,6 +11,24 @@ const app = createApp(App);
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
+app.directive('reveal', {
+  mounted(el) {
+    el.classList.add('reveal-item');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 },
+    );
+    observer.observe(el);
+  },
+});
+
 app.use(pinia);
 app.mount("#app");
 
