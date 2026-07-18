@@ -19,10 +19,6 @@
   color: $main-text-color !important;
   border-color: $main-color !important;
 }
-.ant-input-search
-  > .ant-input-group
-  > .ant-input-group-addon:last-child
-  .ant-input-search-button:not(.ant-btn-primary),
 .ant-input::placeholder,
 .ant-btn-default.ant-btn-background-ghost {
   color: $main-text-color;
@@ -53,7 +49,7 @@
   > .ant-input-group
   > .ant-input-group-addon:last-child
   .ant-input-search-button:not(.ant-btn-primary):hover {
-  color: $main-text-color;
+  color: $color-text-inverse !important;
 }
 .ant-btn-default:not(:disabled):hover,
 .ant-input-search .ant-input:hover,

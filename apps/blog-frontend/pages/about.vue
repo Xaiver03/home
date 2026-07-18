@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
 <template>
   <div id="about-page" class="content-box blog-page-shell overflow-hidden">
     <!-- xaiver bar -->
-    <a-card hoverable id="xaiver" class="relative blog-glass-panel">
+    <a-card hoverable id="xaiver" class="relative blog-glass-panel" data-pointer-surface="panel">
       <img
         v-if="profileAvatarSrc"
         class="w-80 h-80 rounded-full mx-auto mb-6 mt-12 p-2"
@@ -179,6 +179,7 @@ onBeforeUnmount(() => {
     </h1>
     <a-card
       class="card about-web-card overflow-hidden relative my-8 blog-glass-panel"
+      data-pointer-surface="panel"
       v-motion-fade-visible-once
     >
       <RepeatParallaxSlide :containerClass="'describe-card'">
@@ -206,6 +207,7 @@ onBeforeUnmount(() => {
     <a-card
       id="gradient-card"
       class="card my-8 p-8 relative blog-glass-panel"
+      data-pointer-surface="panel"
       v-motion-slide-visible-top
     >
       <span class="card-title absolute top-8">Hi👏🏻</span>
@@ -226,6 +228,7 @@ onBeforeUnmount(() => {
       <div class="w-full lg:w-1/2 pr-0 lg:pr-4 my-4">
         <a-card
           class="w-full card overflow-hidden flex blog-glass-panel"
+          data-pointer-surface="panel"
           style="height: 60rem"
           v-motion-slide-visible-left
         >
@@ -259,6 +262,7 @@ onBeforeUnmount(() => {
       <div class="w-full lg:w-1/2 pl-0 lg:pl-4 my-4">
         <a-card
           class="w-full card overflow-hidden flex blog-glass-panel"
+          data-pointer-surface="panel"
           style="height: 60rem"
           v-motion-slide-visible-right
         >
@@ -294,7 +298,7 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- 词云cloud -->
-    <a-card class="card relative my-8 blog-glass-panel" v-motion-slide-visible-top>
+    <a-card class="card relative my-8 blog-glass-panel" data-pointer-surface="panel" v-motion-slide-visible-top>
       <span class="card-title">{{ pageTexts.keywordTitle || '关键词' }}</span>
       <div id="word-cloud">
         <div class="flex justify-center items-center">
@@ -316,6 +320,7 @@ onBeforeUnmount(() => {
     </h1>
     <a-card
       class="card my-8 cursor-point blog-glass-panel"
+      data-pointer-surface="panel"
       @click="
         thoughtsIndex = getRandomIndex(
           store.$state.config['final-thoughts']?.content,
@@ -350,7 +355,7 @@ onBeforeUnmount(() => {
 #about-page {
   max-width: min(112rem, calc(100vw - 3.2rem));
   padding-top: clamp(2.4rem, 5vw, 6.4rem);
-  color: #26332c;
+  color: $main-text-color;
 
   // xaiver bar
   #xaiver {
@@ -490,7 +495,7 @@ onBeforeUnmount(() => {
     .card-text {
       text-align: left;
       opacity: 1;
-      color: rgba(38, 51, 44, 0.84);
+      color: color-mix(in srgb, $main-text-color 84%, transparent);
       font-size: clamp(1.6rem, 2vw, 2rem);
       line-height: 1.8;
     }
@@ -564,7 +569,7 @@ onBeforeUnmount(() => {
       }
 
       p {
-        color: rgba(38, 51, 44, 0.76);
+        color: color-mix(in srgb, $main-text-color 76%, transparent);
         font-size: clamp(1.5rem, 2vw, 1.8rem);
         margin: 1rem auto;
       }
@@ -577,14 +582,14 @@ onBeforeUnmount(() => {
   }
 
   .card-title {
-    color: #26332c;
+    color: $main-text-color;
     font-size: clamp(1.8rem, 2vw, 2.4rem);
     font-weight: 600;
     transition: color 0.25s ease;
   }
 
   .card {
-    color: #26332c;
+    color: $main-text-color;
     border-radius: 8px;
 
     :deep(.ant-card-body) {
@@ -605,7 +610,7 @@ onBeforeUnmount(() => {
     }
 
     &:hover .card-title {
-      color: #3f5946;
+      color: $color-accent-primary;
     }
 
     // 生涯item
@@ -623,12 +628,12 @@ onBeforeUnmount(() => {
       }
 
       .line-info {
-        color: rgba(38, 51, 44, 0.74);
+        color: color-mix(in srgb, $main-text-color 74%, transparent);
         font-size: 1.3rem;
         width: 90%;
 
         .time {
-          color: #26332c;
+          color: $main-text-color;
           font-size: 1.35rem;
           transition: font-weight 0.3s;
         }
@@ -636,7 +641,7 @@ onBeforeUnmount(() => {
     }
 
     .small-tips {
-      color: rgba(55, 72, 62, 0.58);
+      color: color-mix(in srgb, $secondary-text-color 78%, transparent);
     }
   }
 

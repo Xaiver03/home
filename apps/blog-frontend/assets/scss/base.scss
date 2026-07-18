@@ -195,9 +195,61 @@ select {
 }
 
 .blog-search .ant-btn {
-  border-color: $main-color;
-  background: $main-color;
-  color: #fff;
+  border-color: $color-accent-primary;
+  background: $color-accent-primary;
+  color: $color-text-inverse !important;
+  transition:
+    transform $motion-fast,
+    background $motion-fast,
+    border-color $motion-fast,
+    color $motion-fast;
+}
+
+.blog-search .ant-input-search-button:hover,
+.blog-search .ant-input-search-button:focus-visible {
+  border-color: $color-accent-secondary !important;
+  background: $color-accent-secondary !important;
+  color: $color-text-inverse !important;
+}
+
+.blog-search .ant-input-search-button:active {
+  transform: scale(0.98);
+}
+
+[data-pointer-surface] {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  position: relative;
+  isolation: isolate;
+}
+
+[data-pointer-surface]::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    18rem circle at var(--pointer-x) var(--pointer-y),
+    color-mix(in srgb, $color-accent-primary 15%, transparent),
+    transparent 68%
+  );
+  content: '';
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+[data-pointer-surface] > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-pointer-surface]:hover::after {
+  opacity: 1;
+}
+
+.article-reading-layout [data-pointer-surface]::after {
+  display: none;
 }
 
 @media (max-width: 768px) {
@@ -218,5 +270,20 @@ select {
   .blog-section-head h1,
   .blog-section-head h2 {
     font-size: clamp(2.7rem, 12vw, 4.2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pointer-surface]::after {
+    display: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

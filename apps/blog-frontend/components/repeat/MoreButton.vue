@@ -14,7 +14,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <button class="more blog-action" type="button" @click="props.clickEvent">
+  <button class="more blog-action" data-pointer-surface="action" type="button" @click="props.clickEvent">
     <span>{{ props.text }}</span>
     <span aria-hidden="true">→</span>
   </button>

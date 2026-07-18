@@ -41,7 +41,7 @@ const submitFriendMsg = () => {
       </div>
       <p>从这里通向其他仍在认真写作、创造和维护个人空间的人。</p>
     </header>
-    <section class="card blog-glass-panel" v-motion-fade-visible-once>
+    <section class="card blog-glass-panel" data-pointer-surface="panel" v-motion-fade-visible-once>
       <div class="card-header">
         <div>
           <div class="card-title">友链</div>
@@ -58,7 +58,7 @@ const submitFriendMsg = () => {
         <div class="active-box">
           <div v-for="item in linkData?.active" :key="item.id + 'activeLink'">
             <nuxt-link :to="item.url" target="_blank">
-              <div class="active-item">
+              <div class="active-item" data-pointer-surface="card">
                 <client-only>
                   <a-avatar :src="item.coverLink" :alt="item.id + '头像'" :size="64">
                     <template #icon>
@@ -93,7 +93,7 @@ const submitFriendMsg = () => {
         </a-alert>
       </div>
     </section>
-    <section class="card blog-glass-panel" v-motion-fade-visible-once>
+    <section class="card blog-glass-panel" data-pointer-surface="panel" v-motion-fade-visible-once>
       <div class="card-title">失效友链</div>
       <a-collapse v-model:activeKey="collapseInactiveKey" ghost>
         <a-collapse-panel key="1" header="这些友链已经失效，如果恢复了请留言联系我⚠️">

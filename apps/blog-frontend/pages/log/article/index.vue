@@ -149,17 +149,19 @@ const getMore = () => {
     <div v-if="categories.length" class="category-filter">
       <button
         class="category-chip"
+        data-pointer-surface="filter"
         :class="{ active: selectedCategoryId === 'all' }"
         type="button"
         @click="selectCategory('all')"
       >
         全部
       </button>
-      <button
-        v-for="cat in categories"
-        :key="cat.id"
-        class="category-chip"
-        :class="{ active: selectedCategoryId === String(cat.id) }"
+        <button
+          v-for="cat in categories"
+          :key="cat.id"
+          class="category-chip"
+          data-pointer-surface="filter"
+          :class="{ active: selectedCategoryId === String(cat.id) }"
         type="button"
         @click="selectCategory(String(cat.id))"
       >

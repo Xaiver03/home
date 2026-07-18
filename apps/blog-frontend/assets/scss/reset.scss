@@ -4,7 +4,7 @@ ul {
 }
 a {
     text-decoration: none; // 去除a标签下划线
-    color: black; // 更改a标签的默认颜色(蓝色)为全局变量的 $color-text
+    color: $main-text-color;
 }
 html {
     font-size: 16px;

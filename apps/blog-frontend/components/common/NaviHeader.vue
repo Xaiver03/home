@@ -278,6 +278,7 @@ onMounted(() => {
     <nav class="site-nav-capsule" aria-label="主导航">
       <button
         class="brand-mark"
+        data-pointer-surface="nav"
         type="button"
         @click="goTo('/')"
         :aria-current="isActive('/') ? 'page' : undefined"
@@ -290,6 +291,7 @@ onMounted(() => {
           v-for="item in primaryLinks"
           :key="item.key"
           class="nav-item primary"
+          data-pointer-surface="nav"
           :class="{ active: !item.external && isActive(item.path) }"
           type="button"
           role="listitem"
@@ -302,6 +304,7 @@ onMounted(() => {
       <div class="nav-tools">
         <button
           class="tool-button"
+          data-pointer-surface="nav"
           type="button"
           @click="toggleTheme"
           :title="`切换到 ${colorTheme[currentThemeIndex ? 0 : 1]}`"
@@ -311,6 +314,7 @@ onMounted(() => {
         </button>
         <button
           class="tool-button menu-button"
+          data-pointer-surface="nav"
           type="button"
           @click="naviDrawer = !naviDrawer"
           title="打开导航"
@@ -337,6 +341,7 @@ onMounted(() => {
         v-for="item in mobileNavItems"
         :key="`mobile-${item.key}`"
         class="mobile-tab-item"
+        data-pointer-surface="nav"
         :class="{ active: !item.external && isActive(item.path) }"
         type="button"
         :aria-current="!item.external && isActive(item.path) ? 'page' : undefined"

@@ -95,7 +95,7 @@ const likeMessage = (message) => {
 
 <template>
   <main id="home" class="content-box blog-page-shell">
-    <section id="xaiver" class="blog-glass-panel archive-hero" @click="router.push('/about')">
+    <section id="xaiver" class="blog-glass-panel archive-hero" data-pointer-surface="panel" @click="router.push('/about')">
       <div class="hero-copy">
         <span class="blog-eyebrow">Public archive</span>
         <h1>灯下灯的博客</h1>
@@ -231,6 +231,7 @@ const likeMessage = (message) => {
           v-for="item in hottestMessageList"
           :key="item.id + 'massage'"
           class="massage-box blog-glass-panel"
+          data-pointer-surface="panel"
           v-motion
           :initial="{ opacity: 0, y: 18 }"
           :visibleOnce="{

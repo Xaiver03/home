@@ -80,6 +80,7 @@ watch(
 <template>
   <article
     class="article-card"
+    data-pointer-surface="card"
     :class="{
       column: props.column || phoneOrNot,
       'with-image': showImage,
