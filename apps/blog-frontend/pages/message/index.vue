@@ -925,20 +925,21 @@ onBeforeUnmount(() => {
       > span {
         color: $secondary-text-color;
         font-size: 1.3rem;
-        font-weight: 820;
+        font-weight: 600;
         letter-spacing: 0.12em;
       }
 
       h2 {
         margin: 0;
         font-size: clamp(2rem, 2.4vw, 3rem);
-        font-weight: 820;
+        font-weight: 600;
       }
 
       p {
         margin-top: 0.8rem;
         color: $secondary-text-color;
         font-size: 1.4rem;
+        line-height: 1.75;
       }
     }
 
@@ -976,7 +977,7 @@ onBeforeUnmount(() => {
       background: $surface-control;
       color: $main-text-color;
       font-size: 2rem;
-      font-weight: 820;
+      font-weight: 600;
       letter-spacing: 0.08em;
       cursor: $hover-cursor;
     }
@@ -1082,7 +1083,7 @@ onBeforeUnmount(() => {
         .message-text {
           h4 {
             font-size: 1.6rem;
-            font-weight: 820;
+            font-weight: 600;
           }
 
           p {

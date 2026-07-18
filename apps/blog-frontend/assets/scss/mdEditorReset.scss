@@ -3,7 +3,7 @@
 .md-editor {
     background-color: $main-car-color !important;
     --md-color: $main-text-color !important;
-    font-family: 'MyCustomFont', sans-serif !important;
+    font-family: $font-body !important;
 
     // reset
     h1 {
@@ -46,7 +46,7 @@
 .md-editor-catalog-link >span:hover {
     color: $main-color !important;
     font-size: $small-font-size;
-    font-weight: $large-font-weight;
+    font-weight: 600;
 }
 // 图片
 .md-editor-preview figure {

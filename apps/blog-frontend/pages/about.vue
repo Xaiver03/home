@@ -454,14 +454,14 @@ onBeforeUnmount(() => {
     color: $main-text-color;
     font-family: $font-display;
     font-size: clamp(2.8rem, 4vw, 5rem);
-    font-weight: 650;
+    font-weight: 400;
     line-height: 1.04;
 
     span {
       color: $secondary-text-color;
       font-family: $font-display;
       font-size: 1.2rem;
-      font-weight: 700;
+      font-weight: 600;
       letter-spacing: 0.08em;
       margin-left: 1rem;
       text-transform: uppercase;
@@ -530,7 +530,7 @@ onBeforeUnmount(() => {
   }
 
   .about-web-card {
-    font-weight: 650;
+    font-weight: 400;
 
     .describe-card {
       height: 40rem;
@@ -579,7 +579,7 @@ onBeforeUnmount(() => {
   .card-title {
     color: #26332c;
     font-size: clamp(1.8rem, 2vw, 2.4rem);
-    font-weight: 720;
+    font-weight: 600;
     transition: color 0.25s ease;
   }
 

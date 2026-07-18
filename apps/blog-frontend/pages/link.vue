@@ -190,7 +190,7 @@ const submitFriendMsg = () => {
     .card-title {
       font-size: clamp(2.2rem, 3vw, 3.4rem);
       line-height: 1.15;
-      font-weight: 820;
+      font-weight: 600;
       letter-spacing: 0;
     }
   }
@@ -206,6 +206,7 @@ const submitFriendMsg = () => {
       margin-top: 0.8rem;
       color: $secondary-text-color;
       font-size: 1.45rem;
+      line-height: 1.75;
     }
   }
 
@@ -237,7 +238,7 @@ const submitFriendMsg = () => {
       h3 {
         margin: 0;
         font-size: 1.7rem;
-        font-weight: 820;
+        font-weight: 600;
       }
 
       *:not(.img) {
@@ -280,6 +281,8 @@ const submitFriendMsg = () => {
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 1.4rem;
+        line-height: 1.65;
       }
     }
   }

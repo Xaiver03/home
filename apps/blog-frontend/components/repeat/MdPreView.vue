@@ -40,35 +40,57 @@ const props = defineProps({
 :deep(#preview) {
   color: $main-text-color;
   background: transparent;
-  font-family: $font-body;
+  font-family: $font-reading;
+  font-size: 1.7rem;
+  line-height: 1.9;
 }
 
 :deep(#preview h1),
 :deep(#preview h2),
 :deep(#preview h3) {
   color: $main-text-color;
-  font-weight: 820;
+  font-family: $font-serif;
+  font-weight: 600;
+  line-height: 1.35;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
-:deep(#preview p),
-:deep(#preview li),
-:deep(#preview blockquote),
-:deep(#preview span) {
-  font-size: 1.75rem;
-  line-height: 1.8;
+:deep(#preview h1) {
+  font-size: 2.8rem;
+}
+
+:deep(#preview h2) {
+  font-size: 2.25rem;
+}
+
+:deep(#preview h3) {
+  font-size: 1.9rem;
 }
 
 :deep(#preview p) {
-  margin: 1.15em 0;
+  margin: 0 0 1.5em;
+  font-size: 1.7rem;
+  line-height: 1.9;
+}
+
+:deep(#preview li),
+:deep(#preview blockquote) {
+  font-size: 1.7rem;
+  line-height: 1.9;
 }
 
 :deep(#preview h1),
 :deep(#preview h2),
 :deep(#preview h3) {
-  margin-top: 2.2em;
+  margin-top: 2.5em;
   margin-bottom: 0.8em;
+}
+
+:deep(#preview h1:first-child),
+:deep(#preview h2:first-child),
+:deep(#preview h3:first-child) {
+  margin-top: 0;
 }
 
 :deep(#preview p),
@@ -79,12 +101,22 @@ const props = defineProps({
 }
 
 :deep(#preview blockquote) {
-  margin: 2rem 0;
+  margin: 2.2rem 0;
   padding: 1.2rem 1.6rem;
   border-left: 4px solid $main-color;
   background: $surface-control;
   border-radius: 0 8px 8px 0;
   color: $secondary-text-color;
+}
+
+:deep(#preview ul),
+:deep(#preview ol) {
+  padding-left: 2.4rem;
+  margin: 0 0 1.5em;
+}
+
+:deep(#preview li + li) {
+  margin-top: 0.45em;
 }
 
 :deep(#preview figure) {
@@ -110,5 +142,24 @@ const props = defineProps({
 :deep(#preview pre),
 :deep(#preview code) {
   border-radius: 8px;
+  font-family: $font-mono;
+}
+
+@media (max-width: 768px) {
+  :deep(#preview),
+  :deep(#preview p),
+  :deep(#preview li),
+  :deep(#preview blockquote) {
+    font-size: 1.65rem;
+    line-height: 1.85;
+  }
+
+  :deep(#preview h1) {
+    font-size: 2.4rem;
+  }
+
+  :deep(#preview h2) {
+    font-size: 2rem;
+  }
 }
 </style>

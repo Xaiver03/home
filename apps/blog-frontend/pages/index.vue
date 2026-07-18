@@ -279,8 +279,8 @@ const likeMessage = (message) => {
     max-width: 72rem;
     margin: 0;
     font-size: clamp(4rem, 8vw, 8.4rem);
-    line-height: 0.98;
-    font-weight: 880;
+    line-height: 1.08;
+    font-weight: 600;
     letter-spacing: 0;
     text-wrap: balance;
   }
@@ -290,7 +290,7 @@ const likeMessage = (message) => {
     margin: 2rem 0 0;
     color: $secondary-text-color;
     font-size: 1.65rem;
-    line-height: 1.8;
+    line-height: 1.85;
   }
 
   .hero-actions {
@@ -323,7 +323,7 @@ const likeMessage = (message) => {
     margin: 0 0 1rem;
     color: $main-text-color;
     font-size: 1.5rem;
-    font-weight: 760;
+    font-weight: 500;
     text-align: right;
   }
 
@@ -363,7 +363,7 @@ const likeMessage = (message) => {
 
     span {
       font-size: 1.2rem;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     &:hover {
@@ -390,7 +390,7 @@ const likeMessage = (message) => {
   .message-time {
     color: $secondary-text-color;
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 500;
   }
 
   .message-actions {

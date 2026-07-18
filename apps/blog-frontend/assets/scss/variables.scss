@@ -15,22 +15,25 @@ $color-border-strong: var(--color-border-strong,#ccd3c8);
 $color-accent-primary: var(--color-accent-primary,#1d4d40);
 $color-accent-secondary: var(--color-accent-secondary,#5b796a);
 // --文本粗--
-$large-font-weight: var(--large-font-weight,900); // 主要文本粗细
+$large-font-weight: var(--large-font-weight,650); // 主要文本粗细
 $medium-font-weight: var(--secondary-font-weight,400); // 次要文本粗细
-$small-font-weight: var(--secondary-font-weight,100); // 次要文本粗细
+$small-font-weight: var(--secondary-font-weight,400); // 次要文本粗细
 // --文本大小--
-$x-large-font-size: var(--x-large-font-size,5rem); // 主要文本粗细
-$large-font-size: var(--large-font-size,4rem); // 次要文本粗细
-$medium-font-size: var(--medium-font-size,3rem); // 次要文本粗细
-$small-font-size: var(--small-font-size,2.5rem); // 次要文本粗细
-$x-small-font-size: var(--x-small-font-size,2rem); // 次要文本粗细
-$xx-small-font-size: var(--x-small-font-size,1.5rem); // 次要文本粗细
+$x-large-font-size: var(--x-large-font-size,3.6rem); // 页面主标题
+$large-font-size: var(--large-font-size,3rem); // 区块标题
+$medium-font-size: var(--medium-font-size,2rem); // 重点正文/图标
+$small-font-size: var(--small-font-size,1.6rem); // 正文
+$x-small-font-size: var(--x-small-font-size,1.4rem); // 辅助文字
+$xx-small-font-size: var(--x-small-font-size,1.2rem); // 元数据
 // --交互--
 $main-color: var(--success-color,#1d4d40);
 $secondary-color: var(--info-color,#5b796a);
 // --排版 / 容器 / 材质--
-$font-body: var(--font-body,-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);
-$font-display: var(--font-display,-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);
+$font-body: var(--font-body,var(--font-sans));
+$font-display: var(--font-display,var(--font-sans));
+$font-reading: var(--font-reading,var(--font-sans));
+$font-serif: var(--font-serif,var(--font-serif));
+$font-mono: var(--font-mono,var(--font-mono));
 $content-max-width: var(--content-max-width,1248px);
 $content-wide-width: var(--content-wide-width,1400px);
 $page-gutter: var(--page-gutter,clamp(1.6rem,4vw,5.6rem));

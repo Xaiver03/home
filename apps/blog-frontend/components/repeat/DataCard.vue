@@ -163,7 +163,7 @@ watch(
       color: $main-text-color;
       font-size: clamp(2.2rem, 3vw, 3.5rem);
       line-height: 1.12;
-      font-weight: 820;
+      font-weight: 600;
       letter-spacing: 0;
       text-wrap: balance;
       font-family: $font-display;
@@ -173,7 +173,7 @@ watch(
       margin: 1.4rem 0 0;
       color: $secondary-text-color;
       font-size: 1.55rem;
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
     .card-meta {
@@ -183,7 +183,7 @@ watch(
       gap: 0.8rem;
       color: $secondary-text-color;
       font-size: 1.3rem;
-      font-weight: 700;
+      font-weight: 500;
       text-align: right;
 
       span {

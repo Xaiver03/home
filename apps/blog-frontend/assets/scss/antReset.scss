@@ -238,7 +238,7 @@ a:hover {
 }
 // comment
 .ant-comment {
-  font-family: 'MyCustomFont', sans-serif;
+  font-family: $font-body;
   .ant-comment-content-author-name > * {
     color: $main-text-color;
 
@@ -340,7 +340,7 @@ a:hover {
 
 // collapse
 .ant-collapse {
-  font-family: 'MyCustomFont', sans-serif;
+  font-family: $font-body;
 
   & > .ant-collapse-item > .ant-collapse-header {
     color: $main-text-color;
@@ -360,7 +360,7 @@ a:hover {
 .ant-alert-info {
   background-color: $secondary-car-color;
   color: $main-text-color;
-  font-family: 'MyCustomFont', sans-serif;
+  font-family: $font-body;
   border-color: $main-color;
 
   .ant-alert-icon {

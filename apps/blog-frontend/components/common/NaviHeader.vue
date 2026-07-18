@@ -420,7 +420,7 @@ button {
   color: $main-text-color;
   font-family: $font-display;
   font-size: 1.72rem;
-  font-weight: 680;
+  font-weight: 600;
   white-space: nowrap;
 
   &[aria-current='page'] {
@@ -450,7 +450,7 @@ button {
   padding: 0 1.4rem;
   border-radius: $radius-capsule;
   font-size: 1.42rem;
-  font-weight: 680;
+  font-weight: 600;
   white-space: nowrap;
 
   &.primary {
@@ -479,7 +479,7 @@ button {
   padding: 0 1.3rem;
   border-radius: $radius-panel $radius-capsule $radius-capsule $radius-panel;
   font-size: 1.28rem;
-  font-weight: 720;
+  font-weight: 500;
 
   :deep(.anticon) {
     font-size: 1.55rem;
@@ -588,7 +588,7 @@ button {
     background: transparent;
     color: $secondary-text-color;
     font-size: 1.05rem;
-    font-weight: 720;
+    font-weight: 500;
     line-height: 1.1;
     -webkit-tap-highlight-color: transparent;
 

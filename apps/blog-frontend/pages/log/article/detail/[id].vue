@@ -718,7 +718,7 @@ onMounted(() => {
         gap: 1rem 1.6rem;
         color: $secondary-text-color;
         font-size: 1.25rem;
-        font-weight: 760;
+        font-weight: 500;
       }
 
       .topic,
@@ -735,8 +735,9 @@ onMounted(() => {
         opacity: 1;
         height: auto;
         font-size: clamp(3.6rem, 7vw, 7.8rem);
-        line-height: 1.02;
-        font-weight: 880;
+        line-height: 1.12;
+        font-family: $font-serif;
+        font-weight: 600;
         letter-spacing: 0;
       }
 
@@ -745,8 +746,8 @@ onMounted(() => {
         height: 0;
         color: $secondary-text-color;
         font-size: clamp(2.2rem, 4vw, 4rem);
-        line-height: 1.35;
-        font-weight: 720;
+        line-height: 1.55;
+        font-weight: 500;
       }
     }
 
@@ -788,7 +789,7 @@ onMounted(() => {
     margin: 0 0 1.2rem;
     color: $secondary-text-color;
     font-size: 1.2rem;
-    font-weight: 820;
+    font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -828,7 +829,7 @@ onMounted(() => {
     .statement-title {
       margin-bottom: 1.6rem;
       font-size: 1.8rem;
-      font-weight: 800;
+      font-weight: 600;
     }
 
     ul {
@@ -844,7 +845,7 @@ onMounted(() => {
     li p:first-child {
       margin-bottom: 0.4rem;
       color: $main-text-color;
-      font-weight: 800;
+      font-weight: 600;
     }
 
     #copyright {
@@ -889,7 +890,7 @@ onMounted(() => {
 
       span {
         font-size: 1.2rem;
-        font-weight: 680;
+        font-weight: 500;
       }
     }
 

@@ -231,7 +231,7 @@ const getMore = () => {
     color: $secondary-text-color;
     font: inherit;
     font-size: 1.3rem;
-    font-weight: 700;
+    font-weight: 500;
     background: transparent;
     border: 0;
     border-radius: $radius-control;

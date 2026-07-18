@@ -671,7 +671,7 @@ onBeforeUnmount(() => {
         .message-text {
           h4 {
             font-size: 1.6rem;
-            font-weight: 820;
+            font-weight: 600;
           }
 
           p {
