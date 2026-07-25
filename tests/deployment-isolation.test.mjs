@@ -14,11 +14,16 @@ test('personal-site deploy scripts are locked to /opt/home', async () => {
   assert.match(localDeploy, /DEPLOY_SITE_ID="personal-home"/);
   assert.match(localDeploy, /EXPECTED_REMOTE_DIR="\/opt\/home"/);
   assert.match(localDeploy, /verify_remote_target/);
+  assert.match(localDeploy, /deploy\.sh --skip-build/);
 
   for (const contents of serverDeploys) {
     assert.match(contents, /DEPLOY_SITE_ID="personal-home"/);
     assert.match(contents, /REPO_DIR="\/opt\/home"/);
     assert.match(contents, /verify_deploy_target/);
+    const skipBuildIndex = contents.indexOf('if [ "$SKIP_BUILD" = true ]; then');
+    const fetchIndex = contents.indexOf('git fetch origin --quiet');
+    assert.ok(skipBuildIndex >= 0 && skipBuildIndex < fetchIndex, '本地上传模式必须在 Git 拉取前直接进入跳过分支');
+    assert.match(contents, /跳过 Git 同步和构建步骤/);
     assert.doesNotMatch(contents, /\/opt\/x-creative-team/);
   }
 

@@ -56,26 +56,32 @@ done
 echo "" | tee -a "$LOG_FILE"
 log "========== CI/CD 自动部署开始 =========="
 
-# ---- Step 1: 拉取最新代码 ----
-step "Step 1/6: 拉取最新代码"
-cd "$REPO_DIR"
-git fetch origin --quiet
-LOCAL=$(git rev-parse HEAD)
-REMOTE=$(git rev-parse origin/dev)
-
-if [ "$LOCAL" = "$REMOTE" ] && [ "$SKIP_BUILD" = false ]; then
-  warn "代码无变化 ($(git rev-parse --short HEAD))，跳过部署"
-  log "========== 无需部署 =========="
-  exit 0
-fi
-
-# 强制对齐远程（丢弃本地修改，确保部署一致性）
-git reset --hard origin/dev 2>&1 | tail -3
-log "代码已更新: $(git rev-parse --short HEAD) — $(git log -1 --pretty='%s')"
-
 if [ "$SKIP_BUILD" = true ]; then
-  log "跳过构建步骤 (--skip-build)"
+  log "跳过 Git 同步和构建步骤 (--skip-build，使用本地上传的文件)"
+  if [ -d "$REPO_DIR/apps/blog-admin/dist" ]; then
+    mkdir -p "$REPO_DIR/apps/blog-api/public/admin"
+    rm -rf "$REPO_DIR/apps/blog-api/public/admin/"*
+    cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/admin/"
+    log "已同步本地 blog-admin 构建产物"
+  fi
 else
+  # ---- Step 1: 拉取最新代码 ----
+  step "Step 1/6: 拉取最新代码"
+  cd "$REPO_DIR"
+  git fetch origin --quiet
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git rev-parse origin/dev)
+
+  if [ "$LOCAL" = "$REMOTE" ]; then
+    warn "代码无变化 ($(git rev-parse --short HEAD))，跳过部署"
+    log "========== 无需部署 =========="
+    exit 0
+  fi
+
+  # 强制对齐远程（丢弃本地修改，确保部署一致性）
+  git reset --hard origin/dev 2>&1 | tail -3
+  log "代码已更新: $(git rev-parse --short HEAD) — $(git log -1 --pretty='%s')"
+
   # ---- Step 2: 安装依赖 ----
   step "Step 2/6: 安装依赖"
   export npm_config_registry=https://registry.npmmirror.com
@@ -117,12 +123,20 @@ else
   fi
 fi
 
+# 将生产对象存储等运行时变量注入当前部署进程和 PM2。
+if [ -f "$REPO_DIR/.env.pro" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . "$REPO_DIR/.env.pro"
+  set +a
+fi
+
 # ---- Step 4: 重启后端服务 ----
 step "Step 4/6: 重启后端服务"
 
 # blog-api (spaceP_pro)
 if pm2 list | grep -q "spaceP_pro"; then
-  pm2 restart spaceP_pro 2>&1 | tail -3
+  pm2 restart spaceP_pro --update-env 2>&1 | tail -3
 else
   cd "$REPO_DIR/apps/blog-api"
   pm2 start ecosystem.config.js --env pro 2>&1 | tail -5
