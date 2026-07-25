@@ -96,7 +96,7 @@ apps/blog-api/
 
 - `apps/homepage/src/`：按视图（`views/`）、组件（`components/`）、库（`lib/`）、API（`api/`）、Store（`store/`）组织。
 - `apps/blog-admin/src/`：按页面（`views/`）、组件（`components/`）、路由（`router/`）、状态（`store/`）组织。
-- `apps/blog-frontend/`：Nuxt 3 约定式目录；`composables/` 提供 `api.js`、`companyBrand.js` 等全局可组合函数；`server/` 存放 Nitro 服务端中间件与 Sitemap 工具。
+- `apps/blog-frontend/`：Nuxt 3 约定式目录；`composables/` 提供 `api.js` 等全局可组合函数；`server/` 存放 Nitro 服务端中间件与 Sitemap 工具。
 
 ### 3.3 共享包
 
