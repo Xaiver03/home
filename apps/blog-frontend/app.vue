@@ -13,132 +13,198 @@
   =============================================================================
 -->
 
-
 <script setup>
 import { watch } from 'vue';
-import { applyThemeVars, normalizeThemeMode, persistTheme } from '@xld/design-tokens'
-const router = useRouter()
-const store = useNuxtStore()
+import { applyThemeVars, normalizeThemeMode, persistTheme } from '@xld/design-tokens';
+const router = useRouter();
+const route = useRoute();
+const config = useRuntimeConfig();
+const store = useNuxtStore();
 // --rem设置--
 // 重新设置根元素font-size
 const reScreenSize = () => {
-  const root = document.documentElement
+  const root = document.documentElement;
   let w = root.clientWidth; // 获取设备的宽度
   if (w <= 786) {
-    root.style.fontSize = '6.4px'
-    return
+    root.style.fontSize = '6.4px';
+    return;
   }
-  let n =
-    10 * (w / 1920) > 40
-      ? 40
-      : 10 * (w / 1920) >= 7.4
-        ? 10 * (w / 1920)
-        : 7.4;
+  let n = 10 * (w / 1920) > 40 ? 40 : 10 * (w / 1920) >= 7.4 ? 10 * (w / 1920) : 7.4;
   root.style.fontSize = n + 'px';
-  store.setRem(n)
+  store.setRem(n);
 };
-const resizeEvent = () => { // 窗口变化回调
-  store.setWindowSize(window.innerWidth, window.innerHeight)
-  reScreenSize()
-}
+const resizeEvent = () => {
+  // 窗口变化回调
+  store.setWindowSize(window.innerWidth, window.innerHeight);
+  reScreenSize();
+};
 
 // --主题/配置设置--
-const setThemeMode = () => { // 获取缓存设置主题
-  const theme = localStorage.getItem('theme')
-  if (theme) store.setThemeMode(normalizeThemeMode(theme))
-}
+const setThemeMode = () => {
+  // 获取缓存设置主题
+  const theme = localStorage.getItem('theme');
+  if (theme) store.setThemeMode(normalizeThemeMode(theme));
+};
 const applyTheme = (newVal) => {
-  applyThemeVars(persistTheme(newVal))
-}
-watch(() => store.themeMode, applyTheme)
+  applyThemeVars(persistTheme(newVal));
+};
+watch(() => store.themeMode, applyTheme);
 
 // 动态 favicon
-const faviconUrl = computed(() => store.$state.config['my-avatar']?.content || '/favicon.ico')
-useHead({
-  link: () => [{ rel: 'icon', href: faviconUrl.value }],
-})
+const faviconUrl = computed(() => store.$state.config['my-avatar']?.content || '/favicon.ico');
 
-const getGlobalCOnfig = async () => { // 获取并设置全局配置
-  await api.getGlobalConfig().then(res => {
-    store.setConfig(res)
+const getGlobalCOnfig = async () => {
+  // 获取并设置全局配置
+  await api.getGlobalConfig().then((res) => {
+    store.setConfig(res);
     // 加载icon
     if (store.$state.config['icon-href']) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = store.$state.config['icon-href'].content
+      link.href = store.$state.config['icon-href'].content;
       document.head.appendChild(link);
     }
-  })
-}
+  });
+};
 
 // --基础SEO设置--
 const seo = [
   {
     path: '/',
     title: '灯下灯',
-    description: '灯下灯的个人写作，记录生活、技术与思考。'
+    description: '灯下灯的个人写作，记录生活、技术与思考。',
   },
   {
     path: '/about',
     title: '关于我',
-    description: '关于Xaiver本人，这里是Xaiver的简介，记录着我的成长🧩'
-  },
-  {
-    path: '/log/article',
-    title: '灯下灯的文章',
-    description: '灯下灯的文章详情。'
+    description: '关于Xaiver本人，这里是Xaiver的简介，记录着我的成长🧩',
   },
   {
     path: '/link',
     title: 'Xaiver的朋友们',
-    description: 'Xaiver的友链，我们通过这种方式和世界链接，在浩瀚宇宙里，很高兴遇见你🪄'
+    description: 'Xaiver的友链，我们通过这种方式和世界链接，在浩瀚宇宙里，很高兴遇见你🪄',
   },
   {
     path: '/log/category',
     title: 'Xaiver的文章类目列表',
-    description: 'Xaiver的文章类目，每个类下都是崭新的篇章📖'
+    description: 'Xaiver的文章类目，每个类下都是崭新的篇章📖',
   },
   {
     path: '/log/article',
     title: 'Xaiver的文章列表',
-    description: 'Xaiver的文章列表，每一篇都是我的成长⭐️'
+    description: 'Xaiver的文章列表，每一篇都是我的成长⭐️',
   },
   {
     path: '/message',
     title: '留言板',
-    description: '留下想说的话，也可以在匿名树洞里写下问题。'
+    description: '留下想说的话，也可以在匿名树洞里写下问题。',
   },
   {
     path: '/ask',
     title: '匿名树洞',
-    description: '匿名写下问题，保存追踪码，等待审核与答复。'
-  }
-]
-watch(() => router.currentRoute.value.path, (newVal) => {
-  const seoItem = seo.find(item => item.path == newVal)
-  if (seoItem) {
-    const header = {
-      title: seoItem.title,
-      meta: []
+    description: '匿名写下问题，保存追踪码，等待审核与答复。',
+  },
+];
+const defaultSeo = {
+  title: '邓湘雷の博客',
+  description: '邓湘雷（Xaiver）的个人博客，记录全栈开发、AI 工具、旅行、生活与长期思考。',
+};
+const currentSeo = computed(() => seo.find((item) => item.path === route.path) || defaultSeo);
+const siteOrigin = computed(() =>
+  String(config.public.baseUrl || 'https://xiangleideng.site').replace(/\/+$/, ''),
+);
+const canonicalUrl = computed(() => {
+  const path = route.path === '/' ? '/' : route.path.replace(/\/+$/, '');
+  return `${siteOrigin.value}/blog${path}`;
+});
+const socialImage = computed(() => `${siteOrigin.value}/uploads/image/profile/avatar.jpg`);
+const noindexPaths = new Set(['/ask', '/reward', '/reward/docking']);
+
+useHead(() => ({
+  link: [
+    { rel: 'icon', href: faviconUrl.value },
+    { rel: 'canonical', href: canonicalUrl.value },
+  ],
+  script: [
+    {
+      key: 'blog-structured-data',
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Blog',
+            '@id': `${siteOrigin.value}/blog/#blog`,
+            url: `${siteOrigin.value}/blog/`,
+            name: '灯下灯',
+            description: defaultSeo.description,
+            inLanguage: 'zh-CN',
+            author: { '@id': `${siteOrigin.value}/#person` },
+          },
+          {
+            '@type': 'Person',
+            '@id': `${siteOrigin.value}/#person`,
+            name: '邓湘雷',
+            alternateName: ['Xaiver', '灯下灯'],
+            url: `${siteOrigin.value}/`,
+            image: socialImage.value,
+            sameAs: ['https://github.com/Xaiver03'],
+          },
+        ],
+      }),
+    },
+  ],
+}));
+
+useSeoMeta({
+  description: () => currentSeo.value.description,
+  robots: () =>
+    noindexPaths.has(route.path)
+      ? 'noindex, nofollow'
+      : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+  ogType: 'website',
+  ogLocale: 'zh_CN',
+  ogSiteName: '灯下灯',
+  ogTitle: () => currentSeo.value.title,
+  ogDescription: () => currentSeo.value.description,
+  ogUrl: () => canonicalUrl.value,
+  ogImage: () => socialImage.value,
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => currentSeo.value.title,
+  twitterDescription: () => currentSeo.value.description,
+  twitterImage: () => socialImage.value,
+});
+
+watch(
+  () => router.currentRoute.value.path,
+  (newVal) => {
+    const seoItem = seo.find((item) => item.path == newVal);
+    if (seoItem) {
+      const header = {
+        title: seoItem.title,
+        meta: [],
+      };
+      if (seoItem.description)
+        header.meta.push({
+          name: 'description',
+          content: seoItem.description,
+        });
+      useHead(header);
     }
-    if (seoItem.description) header.meta.push({
-      name: 'description',
-      content: seoItem.description
-    })
-    useHead(header)
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+);
 
 onMounted(async () => {
-  window.addEventListener('resize', resizeEvent)
-  resizeEvent()
-  setThemeMode()
-  applyTheme(store.themeMode)
-  await getGlobalCOnfig()
-})
+  window.addEventListener('resize', resizeEvent);
+  resizeEvent();
+  setThemeMode();
+  applyTheme(store.themeMode);
+  await getGlobalCOnfig();
+});
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', resizeEvent)
-})
+  window.removeEventListener('resize', resizeEvent);
+});
 </script>
 
 <template>

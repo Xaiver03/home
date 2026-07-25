@@ -12,14 +12,59 @@
     <meta name="description" content="%VITE_SITE_DES%" />
     <meta name="keywords" content="%VITE_SITE_KEYWORDS%" />
     <meta name="author" content="%VITE_SITE_AUTHOR%" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta name="google-site-verification" content="6fOPJwGm9uWhzNU60xVfJe1eSQjs9gz9dJlChZMKJ0Y" />
+    <meta name="baidu-site-verification" content="codeva-yGfzYFWEH3" />
     <meta name="theme-color" content="#424242" />
+    <link rel="canonical" href="https://xiangleideng.site/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="灯下灯" />
+    <meta property="og:title" content="%VITE_SITE_NAME%" />
+    <meta property="og:description" content="%VITE_SITE_DES%" />
+    <meta property="og:url" content="https://xiangleideng.site/" />
+    <meta property="og:image" content="https://xiangleideng.site/images/icon/512.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="%VITE_SITE_NAME%" />
+    <meta name="twitter:description" content="%VITE_SITE_DES%" />
+    <meta name="twitter:image" content="https://xiangleideng.site/images/icon/512.png" />
 
     <!-- PWA 缓存控制 -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
     <title>%VITE_SITE_NAME%</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://xiangleideng.site/#website",
+            "url": "https://xiangleideng.site/",
+            "name": "灯下灯",
+            "alternateName": "邓湘雷的个人主页",
+            "description": "%VITE_SITE_DES%",
+            "inLanguage": "zh-CN",
+            "publisher": { "@id": "https://xiangleideng.site/#person" }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://xiangleideng.site/#person",
+            "name": "邓湘雷",
+            "alternateName": ["Xaiver", "灯下灯"],
+            "url": "https://xiangleideng.site/",
+            "image": "https://xiangleideng.site/uploads/image/profile/avatar.jpg",
+            "sameAs": ["https://github.com/Xaiver03"]
+          }
+        ]
+      }
+    </script>
     <!-- HarmonyOS Sans -->
     <!-- 本站 CDN 已开启防盗链，非本站域名不可访问，请更改链接为下方内容，否则自定义字体将失效 -->
     <link rel="stylesheet" href="https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css" />
@@ -49,7 +94,20 @@
 
   <body>
     <!-- 主体内容 -->
-    <div id="app"></div>
+    <div id="app">
+      <main id="seo-fallback">
+        <header>
+          <p>灯下灯 / Xaiver</p>
+          <h1>邓湘雷的个人主页与博客</h1>
+          <p>记录全栈开发、AI 工具、旅行、生活与长期思考。</p>
+        </header>
+        <nav aria-label="主要内容">
+          <a href="/blog/">进入博客</a>
+          <a href="/blog/log/article">浏览文章</a>
+          <a href="/blog/about">关于邓湘雷</a>
+        </nav>
+      </main>
+    </div>
     <!-- noscript -->
     <noscript>
       <div style="text-align: center">请开启 JavaScript</div>

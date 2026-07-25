@@ -1,9 +1,9 @@
-import { config } from 'dotenv'
-import { normalizeApiUrl } from './utils/api-url.js'
+import { config } from 'dotenv';
+import { normalizeApiUrl } from './utils/api-url.js';
 
-console.log('config',process.env.NUXT_PUBLIC_ENV);
+console.log('config', process.env.NUXT_PUBLIC_ENV);
 
-config({ path: `../../.env.${process.env.NUXT_PUBLIC_ENV}` })
+config({ path: `../../.env.${process.env.NUXT_PUBLIC_ENV}` });
 
 const defaultApiUrl =
   process.env.NUXT_PUBLIC_ENV === 'dev'
@@ -14,19 +14,19 @@ const defaultStorageUrl = process.env.NUXT_PUBLIC_ENV === 'dev' ? '' : '/uploads
 export default defineNuxtConfig({
   // 局域网其他设备可查看
   devServer: {
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     // port: 8500
   },
   ssr: true,
-  compatibilityDate: "2025-10-06",
+  compatibilityDate: '2025-10-06',
   app: {
     baseURL: '/blog/',
     head: {
-      title: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客",
+      title: process.env.NUXT_PUBLIC_SITE_NAME || '邓湘雷の博客',
       meta: [
         {
-          name: "description",
-          content: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考",
+          name: 'description',
+          content: process.env.NUXT_PUBLIC_SITE_DESC || '邓湘雷的个人博客，分享技术、生活与思考',
         },
       ],
     },
@@ -37,48 +37,46 @@ export default defineNuxtConfig({
     public: {
       apiUrl: normalizeApiUrl(process.env.NUXT_PUBLIC_API_URL, defaultApiUrl), // 后台url
       storageUrl: process.env.NUXT_PUBLIC_STORAGE_URL || defaultStorageUrl,
-      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || "", // 本站地址
-      siteName: process.env.NUXT_PUBLIC_SITE_NAME || "邓湘雷の博客", // 站点名称
-      siteDesc: process.env.NUXT_PUBLIC_SITE_DESC || "邓湘雷的个人博客，分享技术、生活与思考", // 站点描述
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || '', // 本站地址
+      siteName: process.env.NUXT_PUBLIC_SITE_NAME || '邓湘雷の博客', // 站点名称
+      siteDesc: process.env.NUXT_PUBLIC_SITE_DESC || '邓湘雷的个人博客，分享技术、生活与思考', // 站点描述
     },
   },
   modules: [
-    "@pinia/nuxt",
-    "@nuxtjs/sitemap",
-    "@nuxtjs/robots",
-    "@nuxtjs/tailwindcss",
-    "@ant-design-vue/nuxt",
-    "@vueuse/motion/nuxt",
+    '@pinia/nuxt',
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots',
+    '@nuxtjs/tailwindcss',
+    '@ant-design-vue/nuxt',
+    '@vueuse/motion/nuxt',
   ],
   sitemap: {
-    siteUrl: process.env.NUXT_PUBLIC_BASE_URL || "https://xiangleideng.site",
+    siteUrl: process.env.NUXT_PUBLIC_BASE_URL || 'https://xiangleideng.site',
+    excludeAppSources: true,
     defaults: {
-      changefreq: "weekly",
+      changefreq: 'weekly',
       priority: 0.7,
     },
-    urls: async () => {
-      const { getSitemapUrls } = await import("./server/utils/sitemap-urls");
-      return await getSitemapUrls();
-    },
+    sources: ['/blog/api/__sitemap__/urls'],
   },
   robots: {
-    robotsTxt: false,  // 禁用 robots.txt 生成（因为使用了 baseURL）
+    robotsTxt: false, // 禁用 robots.txt 生成（因为使用了 baseURL）
     rules: [
       {
-        UserAgent: "*",
-        Allow: "/",
+        UserAgent: '*',
+        Allow: '/',
         Disallow: [],
       },
     ],
-    sitemap: `${process.env.NUXT_PUBLIC_BASE_URL}/sitemap.xml`,
+    sitemap: `${process.env.NUXT_PUBLIC_BASE_URL || 'https://xiangleideng.site'}/sitemap.xml`,
   },
   css: [
-    "@/assets/scss/index.scss", // 引入 SCSS 入口文件
+    '@/assets/scss/index.scss', // 引入 SCSS 入口文件
   ],
-  plugins: [{ src: "@/plugins/mdEditorEmoji.client.js", mode: "client" }],
+  plugins: [{ src: '@/plugins/mdEditorEmoji.client.js', mode: 'client' }],
   nitro: {
     externals: {
-      inline: ["tslib"],
+      inline: ['tslib'],
     },
   },
   vite: {
@@ -101,15 +99,9 @@ export default defineNuxtConfig({
     },
   },
   hooks: {
-    "build:before": () => {
-      console.log(
-        "-----process.env.NUXT_PUBLIC_ENV-----\n",
-        process.env.NUXT_PUBLIC_ENV
-      ); // 打印环境
-      console.log(
-        "-----process.env.NUXT_PUBLIC_API_URL-----\n",
-        process.env.NUXT_PUBLIC_API_URL
-      ); // 打印环境
+    'build:before': () => {
+      console.log('-----process.env.NUXT_PUBLIC_ENV-----\n', process.env.NUXT_PUBLIC_ENV); // 打印环境
+      console.log('-----process.env.NUXT_PUBLIC_API_URL-----\n', process.env.NUXT_PUBLIC_API_URL); // 打印环境
     },
   },
 });

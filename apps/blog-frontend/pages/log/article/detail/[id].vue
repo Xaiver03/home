@@ -55,16 +55,78 @@ const { data: articleData, error: articleError } = await useAsyncData(
     watch: [() => route.params.id],
   },
 );
+if (articleError.value) {
+  throw createError({ statusCode: 502, statusMessage: '文章服务暂时不可用' });
+}
+if (!articleData.value) {
+  throw createError({ statusCode: 404, statusMessage: '文章不存在' });
+}
+
 watch(() => articleData.value?.id, probeCoverImage, { immediate: true });
-useHead({
-  title: `${articleData.value?.topic} 【 邓湘雷的博客 】`,
+const siteOrigin = String(config.public.baseUrl || 'https://xiangleideng.site').replace(/\/+$/, '');
+const articleUrl = computed(() => `${siteOrigin}/blog/log/article/detail/${articleData.value.id}`);
+const articleSocialImage = computed(() => `${siteOrigin}/uploads/image/profile/avatar.jpg`);
+const articleTitle = computed(() => `${articleData.value.topic}｜灯下灯`);
+const articleDescription = computed(
+  () => articleData.value.introduction || '灯下灯的个人写作，记录生活、技术与思考。',
+);
+
+useSeoMeta({
+  description: () => articleDescription.value,
+  robots: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+  ogType: 'article',
+  ogLocale: 'zh_CN',
+  ogSiteName: '灯下灯',
+  ogTitle: () => articleTitle.value,
+  ogDescription: () => articleDescription.value,
+  ogUrl: () => articleUrl.value,
+  ogImage: () => articleSocialImage.value,
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => articleTitle.value,
+  twitterDescription: () => articleDescription.value,
+  twitterImage: () => articleSocialImage.value,
+});
+
+useHead(() => ({
+  title: articleTitle.value,
+  link: [{ rel: 'canonical', href: articleUrl.value }],
   meta: [
+    { property: 'article:published_time', content: articleData.value.createTime },
     {
-      name: 'description',
-      content: articleData.value?.introduction,
+      property: 'article:modified_time',
+      content: articleData.value.updatedTime || articleData.value.createTime,
+    },
+    { property: 'article:author', content: articleAuthor.value },
+  ],
+  script: [
+    {
+      key: 'article-structured-data',
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        '@id': `${articleUrl.value}#article`,
+        mainEntityOfPage: articleUrl.value,
+        headline: articleData.value.topic,
+        description: articleDescription.value,
+        image: [articleSocialImage.value],
+        datePublished: articleData.value.createTime,
+        dateModified: articleData.value.updatedTime || articleData.value.createTime,
+        inLanguage: 'zh-CN',
+        author: {
+          '@type': 'Person',
+          name: articleAuthor.value,
+          url: `${siteOrigin}/blog/about`,
+        },
+        publisher: {
+          '@type': 'Person',
+          name: '邓湘雷',
+          url: `${siteOrigin}/`,
+        },
+      }),
     },
   ],
-});
+}));
 const getArticleType = (typeId) => {
   // 获取文章类别数据
   if (!typeId || !articleData.value) return;
@@ -415,11 +477,7 @@ onMounted(() => {
         </div>
       </div>
       <div v-if="coverImageVisible" id="image-box">
-        <img
-          :src="coverImageSrc"
-          :alt="articleData?.topic"
-          :preview="false"
-        />
+        <img :src="coverImageSrc" :alt="articleData?.topic" :preview="false" />
       </div>
     </article>
     <!-- 文章内容 -->
@@ -496,29 +554,42 @@ onMounted(() => {
           type="button"
           @click="likeEvent"
         >
-          <svg viewBox="0 0 24 24" class="action-svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" :fill="like ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"/></svg>
+          <svg viewBox="0 0 24 24" class="action-svg">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              :fill="like ? 'currentColor' : 'none'"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+          </svg>
           <span>喜欢 {{ articleData?.like }}</span>
         </button>
       </a-tooltip>
       <a-tooltip placement="bottom" title="复制文章链接">
-        <button
-          class="blog-action"
-          title="分享"
-          type="button"
-          @click="shareEvent"
-        >
-          <svg viewBox="0 0 24 24" class="action-svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <button class="blog-action" title="分享" type="button" @click="shareEvent">
+          <svg viewBox="0 0 24 24" class="action-svg">
+            <path
+              d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+          </svg>
           <span>分享</span>
         </button>
       </a-tooltip>
       <a-tooltip placement="bottom" title="打赏功能开发中">
-        <button
-          class="blog-action"
-          title="打赏"
-          type="button"
-          @click="showReward"
-        >
-          <svg viewBox="0 0 24 24" class="action-svg"><path d="M20 12v8H4v-8M12 2v20M12 2l5 5M12 2L7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="blog-action" title="打赏" type="button" @click="showReward">
+          <svg viewBox="0 0 24 24" class="action-svg">
+            <path
+              d="M20 12v8H4v-8M12 2v20M12 2l5 5M12 2L7 7"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
           <span>打赏</span>
         </button>
       </a-tooltip>
@@ -881,7 +952,10 @@ onMounted(() => {
       border: 1px solid $surface-border;
       border-radius: $radius-control;
       cursor: pointer;
-      transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+      transition:
+        transform 180ms ease,
+        background 180ms ease,
+        color 180ms ease;
 
       &:hover {
         transform: translateY(-1px);
