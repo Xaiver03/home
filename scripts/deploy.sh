@@ -9,6 +9,7 @@ set -e
 # ============================================================
 
 REPO_DIR="/opt/home"
+DEPLOY_SITE_ID="personal-home"
 LOG_FILE="$REPO_DIR/deploy.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -22,6 +23,27 @@ log()    { echo -e "${GREEN}[$TIMESTAMP] $1${NC}" | tee -a "$LOG_FILE"; }
 warn()   { echo -e "${YELLOW}[WARN] $1${NC}" | tee -a "$LOG_FILE"; }
 error()  { echo -e "${RED}[ERROR] $1${NC}" | tee -a "$LOG_FILE"; exit 1; }
 step()   { echo -e "${BLUE}===> $1${NC}" | tee -a "$LOG_FILE"; }
+
+verify_deploy_target() {
+  local resolved_dir marker actual_site_id
+  resolved_dir="$(readlink -f "$REPO_DIR")"
+  marker="$REPO_DIR/.deploy-site-id"
+
+  if [ "$resolved_dir" != "/opt/home" ]; then
+    error "拒绝部署：个人站目录解析为 $resolved_dir，而不是 /opt/home"
+  fi
+
+  if [ -f "$marker" ]; then
+    actual_site_id="$(cat "$marker")"
+    if [ "$actual_site_id" != "$DEPLOY_SITE_ID" ]; then
+      error "拒绝部署：目标目录属于另一个站点 ($actual_site_id)"
+    fi
+  fi
+
+  printf '%s\n' "$DEPLOY_SITE_ID" > "$marker"
+}
+
+verify_deploy_target
 
 # 解析参数
 SKIP_BUILD=false
