@@ -15,6 +15,9 @@ test('personal-site deploy scripts are locked to /opt/home', async () => {
   assert.match(localDeploy, /EXPECTED_REMOTE_DIR="\/opt\/home"/);
   assert.match(localDeploy, /verify_remote_target/);
   assert.match(localDeploy, /deploy\.sh --skip-build/);
+  assert.match(localDeploy, /COPYFILE_DISABLE=1 tar/);
+  assert.match(localDeploy, /--no-xattrs/);
+  assert.match(localDeploy, /--no-overwrite-dir/);
 
   for (const contents of serverDeploys) {
     assert.match(contents, /DEPLOY_SITE_ID="personal-home"/);

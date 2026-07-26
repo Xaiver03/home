@@ -75,7 +75,7 @@ echo "==> 检查后端测试"
 pnpm --filter blog-api test
 
 echo "==> 单连接上传源码、构建产物并重启服务"
-tar czf - \
+COPYFILE_DISABLE=1 tar --no-xattrs -czf - \
   --exclude='./.git' \
   --exclude='./.env' \
   --exclude='./.env.*' \
@@ -91,6 +91,6 @@ tar czf - \
   --exclude='*/database*.db' \
   -C "$ROOT_DIR" . \
   | ssh "${SSH_ARGS[@]}" "${DEPLOY_SSH_USER}@${DEPLOY_SSH_HOST}" \
-    "mkdir -p '$REMOTE_DIR' && tar xzf - -C '$REMOTE_DIR' && cd '$REMOTE_DIR' && bash deploy.sh --skip-build"
+    "mkdir -p '$REMOTE_DIR' && tar --no-overwrite-dir -xzf - -C '$REMOTE_DIR' && cd '$REMOTE_DIR' && bash deploy.sh --skip-build"
 
 echo "本地上传部署完成。"
