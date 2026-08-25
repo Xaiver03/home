@@ -94,6 +94,19 @@ describe('home content helpers', () => {
     });
   });
 
+  it('includes WunoOS with its local logo asset', () => {
+    const wuno = defaultSiteLinks.find((link) => link.name === 'WunoOS');
+
+    expect(wuno).toMatchObject({
+      link: 'https://wunoai.com',
+      logo: '/images/site/wuno-logo.svg',
+    });
+    expect(normalizeSiteLink(wuno)).toMatchObject({
+      href: 'https://wunoai.com',
+      external: true,
+      logo: '/images/site/wuno-logo.svg',
+    });
+  });
   it('includes the x-c company site with a local logo asset', () => {
     const xCreative = defaultSiteLinks.find((link) => link.name === '晓黎团队官网');
 

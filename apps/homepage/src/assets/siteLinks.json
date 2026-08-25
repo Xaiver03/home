@@ -12,8 +12,13 @@
     "link": "https://finlaw.cloud"
   },
   {
+    "icon": "Cpu",
+    "name": "WunoOS",
+    "logo": "/images/site/wuno-logo.svg",
+    "link": "https://wunoai.com"
+  },
+  {
     "icon": "Compass",
-    "name": "GitHub",
     "link": "https://github.com/Xaiver03/"
   },
   {

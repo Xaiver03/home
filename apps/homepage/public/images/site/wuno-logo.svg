@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Wuno 波纹标志</title>
+  <desc id="desc">蓝色圆环与三层流线组成的 Wuno 图形标志。</desc>
+  <defs>
+    <clipPath id="mark-clip"><circle cx="512" cy="430" r="304"/></clipPath>
+  </defs>
+  <g clip-path="url(#mark-clip)">
+    <rect x="208" y="126" width="608" height="608" fill="#F9FCFF"/>
+    <path d="M190 432C281 335 373 329 472 374c107 49 163 117 258 103 47-7 82-31 116-70v209H190Z" fill="#DCEBFA"/>
+    <path d="M190 448c91-72 178-63 274 9 93 70 148 121 244 105 47-8 99-37 138-87v181H190Z" fill="#2BAAF2" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M190 553c72 26 130 24 192 3 85-29 137-29 213 24 78 55 166 59 251 13v173H190Z" fill="#1477EF" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+  </g>
+  <circle cx="512" cy="430" r="304" fill="none" stroke="#1674F2" stroke-width="20"/>
+</svg>
