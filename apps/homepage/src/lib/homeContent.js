@@ -1,9 +1,9 @@
 export const DEFAULT_HOME_TEXT = Object.freeze({
-  siteName: '灯下灯',
+  siteName: 'Xaiver Space',
   siteUrl: 'xiangleideng.site',
-  helloText: '灯下灯 / Xaiver',
-  descText: '把生活、技术与思考，留在一处可以慢慢阅读的地方。',
-  siteAuthor: 'Xaiver / 灯下灯',
+  helloText: 'AI 全栈多终端开发 / FDE 工程师',
+  descText: '让精神创造触手可及。',
+  siteAuthor: '灯下灯 / Xaiver',
 });
 
 const getText = (value, fallback) => {

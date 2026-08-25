@@ -1,4 +1,5 @@
 import defaultSiteLinks from '@/assets/siteLinks.json';
+import { DEFAULT_PROFILE, getPublicHonors } from '@/lib/profileContent.js';
 import {
   DEFAULT_HOME_TEXT,
   getArticleUrl,
@@ -9,6 +10,23 @@ import {
 } from '@/lib/homeContent.js';
 
 describe('home content helpers', () => {
+  it('provides the complete public profile and honors set', () => {
+    const honors = getPublicHonors();
+
+    expect(DEFAULT_PROFILE.profession).toContain('FDE');
+    expect(DEFAULT_PROFILE.introduction).toContain('finlaw.cloud');
+    expect(honors.length).toBeGreaterThanOrEqual(10);
+    expect(honors.map((honor) => honor.title)).toEqual(
+      expect.arrayContaining([
+        '会计专业技术资格考试（初级）合格',
+        '三创赛国家级二等奖',
+        '互联网+市级一等奖',
+        '初善创投咨询理事成员聘书',
+      ]),
+    );
+    expect(honors.every((honor) => honor.visibility === 'public')).toBe(true);
+  });
+
   it('uses configured home text without losing missing defaults', () => {
     const result = getHomeText({
       'home-texts': {
@@ -95,8 +113,8 @@ describe('home content helpers', () => {
       from: '林清玄',
     });
     expect(normalizeQuote()).toEqual({
-      text: '把生活、技术与思考，留在一处可以慢慢阅读的地方。',
-      from: '灯下灯',
+      text: '让精神创造触手可及。',
+      from: 'Xaiver Space',
     });
   });
 });

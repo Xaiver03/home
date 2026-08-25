@@ -193,7 +193,7 @@
             <p>{{ honor.summary }}</p>
             <footer>
               <span>{{ honor.issuer }}</span>
-              <span>{{ honor.level }}</span>
+              <span>{{ honor.level }} · {{ honor.date }}</span>
             </footer>
           </article>
         </div>
@@ -342,40 +342,11 @@ import {
   normalizeSiteLink,
 } from '@/lib/homeContent';
 import { getHeaderScrollState, getMagneticOffset, getPointerEffect } from '@/lib/interaction';
+import { DEFAULT_PROFILE, getPublicHonors } from '@/lib/profileContent';
 import defaultSiteLinks from '@/assets/siteLinks.json';
 import Background from '@/components/Background.vue';
 
-const PUBLIC_HONORS = Object.freeze([
-  {
-    id: 'three-innovation-national-second',
-    title: '三创赛国家级二等奖',
-    category: '竞赛与项目',
-    issuer: '全国大学生电子商务“创新、创意及创业”挑战赛',
-    level: '国家级二等奖',
-    summary: '以项目实践记录产品思考、团队协作与创新能力。',
-    visibility: 'public',
-  },
-  {
-    id: 'mathematical-modeling-first',
-    title: '数学建模竞赛一等奖',
-    category: '学术与竞赛',
-    issuer: '数学建模竞赛',
-    level: '一等奖',
-    summary: '在问题分析、建模表达和落地协作中持续训练复杂问题解决能力。',
-    visibility: 'public',
-  },
-  {
-    id: 'career-planning-beijing-silver',
-    title: '职业生涯规划大赛北京市银奖',
-    category: '成长与实践',
-    issuer: '北京市职业生涯规划大赛',
-    level: '北京市银奖',
-    summary: '把个人成长、职业方向与长期实践放在同一张地图上。',
-    visibility: 'public',
-  },
-]);
-
-const publicHonors = computed(() => PUBLIC_HONORS.filter((honor) => honor.visibility === 'public'));
+const publicHonors = ref(getPublicHonors());
 const homeText = ref(getHomeText());
 const articles = ref([]);
 const filteredArticles = ref([]);
@@ -393,11 +364,11 @@ const qrDialogOpen = ref(false);
 const qrImage = ref('/uploads/wechat-qr.jpg');
 
 // Profile 数据
-const profileName = ref('');
-const profileTagline = ref('');
-const profileProfession = ref('');
-const profilePersonality = ref('');
-const profileIntro = ref('');
+const profileName = ref(DEFAULT_PROFILE.name);
+const profileTagline = ref(DEFAULT_PROFILE.tagline);
+const profileProfession = ref(DEFAULT_PROFILE.profession);
+const profilePersonality = ref(DEFAULT_PROFILE.personality);
+const profileIntro = ref(DEFAULT_PROFILE.introduction);
 const profileAvatar = ref('');
 const socialLinks = ref([]);
 
@@ -489,14 +460,39 @@ const parseProfileData = (config) => {
     const basicInfo = config['about-basic-info']?.content;
     if (basicInfo) {
       const info = typeof basicInfo === 'string' ? JSON.parse(basicInfo) : basicInfo;
-      profileName.value = info.name || '';
-      profileTagline.value = info.tagline || '';
-      profileProfession.value = info.profession || '';
-      profilePersonality.value = info.personality || '';
-      profileIntro.value = info.introduction || '';
+      profileName.value = info.name || DEFAULT_PROFILE.name;
+      profileTagline.value = info.tagline || DEFAULT_PROFILE.tagline;
+      profileProfession.value = info.profession || DEFAULT_PROFILE.profession;
+      profilePersonality.value = info.personality || DEFAULT_PROFILE.personality;
+      profileIntro.value = info.introduction || DEFAULT_PROFILE.introduction;
     }
   } catch (e) {
     console.warn('解析 about-basic-info 失败:', e);
+  }
+
+  // 荣誉资质与外部站点均优先使用后端配置
+  try {
+    const honors = config['profile-honors']?.content;
+    if (honors) {
+      const parsedHonors = typeof honors === 'string' ? JSON.parse(honors) : honors;
+      if (Array.isArray(parsedHonors)) {
+        publicHonors.value = parsedHonors
+          .filter((honor) => honor?.visibility !== 'private')
+          .sort((left, right) => (left.order || 0) - (right.order || 0));
+      }
+    }
+  } catch (e) {
+    console.warn('解析 profile-honors 失败:', e);
+  }
+
+  try {
+    const links = config['siteLinks']?.content;
+    if (links) {
+      const parsedLinks = typeof links === 'string' ? JSON.parse(links) : links;
+      if (Array.isArray(parsedLinks)) siteLinks.value = parsedLinks.map(normalizeSiteLink);
+    }
+  } catch (e) {
+    console.warn('解析 siteLinks 失败:', e);
   }
 
   // 社交链接

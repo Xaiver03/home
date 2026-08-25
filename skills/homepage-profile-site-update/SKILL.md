@@ -15,7 +15,8 @@ Allowed content targets are limited to the personal site's existing configuratio
 - `about-basic-info`
 - `about-social-links`
 - `home-texts`
-- the external site-links configuration or the checked-in `apps/homepage/src/assets/siteLinks.json` fallback
+- `profile-honors`
+- `siteLinks` or the checked-in `apps/homepage/src/assets/siteLinks.json` fallback
 - selected public honors/credentials summaries
 
 The homepage reads profile data through `apps/homepage/src/App.vue` and normalizes links through `apps/homepage/src/lib/homeContent.js`. Preserve those rules, including QR links, internal `/blog` routes, external URL detection, and logo fallbacks.

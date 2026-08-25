@@ -223,6 +223,28 @@ onBeforeUnmount(() => {
       </div>
     </a-card>
 
+    <div v-if="basicInfo.projects?.length || basicInfo.communities?.length" class="grid gap-6 lg:grid-cols-2 my-8">
+      <a-card v-if="basicInfo.projects?.length" class="card blog-glass-panel" data-pointer-surface="panel">
+        <span class="card-title">正在做什么</span>
+        <ul class="mt-6 space-y-3">
+          <li v-for="project in basicInfo.projects" :key="project" class="card-text">{{ project }}</li>
+        </ul>
+      </a-card>
+      <a-card v-if="basicInfo.communities?.length" class="card blog-glass-panel" data-pointer-surface="panel">
+        <span class="card-title">连接与实践</span>
+        <ul class="mt-6 space-y-3">
+          <li v-for="community in basicInfo.communities" :key="community" class="card-text">{{ community }}</li>
+        </ul>
+      </a-card>
+    </div>
+
+    <a-card v-if="basicInfo.experience?.length" class="card blog-glass-panel my-8" data-pointer-surface="panel">
+      <span class="card-title">经历</span>
+      <ul class="mt-6 space-y-3">
+        <li v-for="item in basicInfo.experience" :key="item" class="card-text">{{ item }}</li>
+      </ul>
+    </a-card>
+
     <!-- 技能 / 生涯 -->
     <div class="flex flex-wrap">
       <div class="w-full lg:w-1/2 pr-0 lg:pr-4 my-4">
