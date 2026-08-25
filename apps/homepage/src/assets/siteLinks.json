@@ -19,7 +19,13 @@
   },
   {
     "icon": "Compass",
+    "name": "GitHub",
     "link": "https://github.com/Xaiver03/"
+  },
+  {
+    "icon": "Compass",
+    "name": "更多站点",
+    "link": "/blog/link"
   },
   {
     "icon": "Sparkles",

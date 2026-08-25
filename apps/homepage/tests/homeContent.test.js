@@ -1,5 +1,12 @@
+/* global describe, expect, it */
+
 import defaultSiteLinks from '@/assets/siteLinks.json';
-import { DEFAULT_PROFILE, getPublicHonors } from '@/lib/profileContent.js';
+import {
+  DEFAULT_PROFILE,
+  getPublicHonors,
+  mergePublicHonors,
+  normalizeHonor,
+} from '@/lib/profileContent.js';
 import {
   DEFAULT_HOME_TEXT,
   getArticleUrl,
@@ -25,6 +32,58 @@ describe('home content helpers', () => {
       ]),
     );
     expect(honors.every((honor) => honor.visibility === 'public')).toBe(true);
+  });
+
+  it('normalizes only approved honor-wall image paths', () => {
+    expect(
+      normalizeHonor({
+        id: 'honor-1',
+        title: '奖项',
+        image_url: ' /images/honors/honor-1.webp ',
+      }),
+    ).toMatchObject({
+      id: 'honor-1',
+      image: '/images/honors/honor-1.webp',
+    });
+    expect(normalizeHonor({ title: '无图奖项' }).image).toBe('');
+    expect(
+      normalizeHonor({ title: '外链图片', image: 'https://cdn.example.com/raw.jpg' }).image,
+    ).toBe('');
+    expect(normalizeHonor({ title: '脚本图片', image: 'javascript:alert(1)' }).image).toBe('');
+    expect(
+      normalizeHonor({
+        title: '错误替代文本',
+        image: '/images/honors/example.webp',
+        imageAlt: 42,
+      }).imageAlt,
+    ).toBe('错误替代文本的脱敏展示图');
+  });
+
+  it('keeps GitHub and more sites as distinct, explicit entries', () => {
+    expect(defaultSiteLinks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'GitHub', link: 'https://github.com/Xaiver03/' }),
+        expect.objectContaining({ name: '更多站点', link: '/blog/link' }),
+      ]),
+    );
+  });
+
+  it('fills new safe image fields into legacy backend honors by id', () => {
+    const [fallback] = getPublicHonors();
+    const [merged] = mergePublicHonors([
+      {
+        id: fallback.id,
+        title: '后端标题',
+        visibility: 'public',
+        order: 1,
+      },
+    ]);
+
+    expect(merged.title).toBe('后端标题');
+    expect(merged.image).toBe(fallback.image);
+    expect(
+      mergePublicHonors([{ id: fallback.id, visibility: 'public', image: '', order: 1 }])[0].image,
+    ).toBe('');
   });
 
   it('uses configured home text without losing missing defaults', () => {

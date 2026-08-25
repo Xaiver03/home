@@ -1,7 +1,7 @@
 <template>
   <a class="skip-link" href="#articles">跳到文章列表</a>
 
-  <div class="site-shell">
+  <div class="site-shell" :inert="honorDialogOpen || undefined">
     <header
       class="site-header"
       :class="{ 'is-scrolled': isScrolled, 'is-hidden': isHeaderHidden && !menuOpen }"
@@ -187,15 +187,41 @@
         </div>
 
         <div class="honors-grid">
-          <article v-for="honor in publicHonors" :key="honor.id" class="honor-card">
-            <span class="honor-category">{{ honor.category }}</span>
-            <h3>{{ honor.title }}</h3>
-            <p>{{ honor.summary }}</p>
-            <footer>
-              <span>{{ honor.issuer }}</span>
-              <span>{{ honor.level }} · {{ honor.date }}</span>
-            </footer>
-          </article>
+          <button
+            v-for="(honor, index) in publicHonors"
+            :key="honor.id"
+            class="honor-card"
+            :class="[
+              `honor-shape-${index % 6}`,
+              `honor-phase-${index % 6}`,
+              { 'has-image': hasHonorImage(honor) },
+            ]"
+            type="button"
+            :aria-label="`查看荣誉详情：${honor.title}`"
+            @click="openHonor(honor, $event.currentTarget)"
+            @pointermove="handleTiltMove"
+            @pointerleave="resetInteractiveEffect"
+          >
+            <span class="honor-visual" aria-hidden="true">
+              <img
+                v-if="hasHonorImage(honor)"
+                :src="honor.image"
+                alt=""
+                loading="lazy"
+                @error="markHonorImageFailed(honor.id)"
+              />
+              <span v-else class="honor-placeholder">
+                <span>{{ String(index + 1).padStart(2, '0') }}</span>
+              </span>
+            </span>
+            <span class="honor-card-copy">
+              <span class="honor-category">{{ honor.category }}</span>
+              <strong>{{ honor.title }}</strong>
+              <span class="honor-summary">{{ honor.summary }}</span>
+              <span class="honor-meta">{{ honor.level }} · {{ honor.date }}</span>
+            </span>
+            <span class="honor-open" aria-hidden="true">展开 ↗</span>
+          </button>
         </div>
       </section>
 
@@ -304,6 +330,66 @@
       </a>
     </nav>
 
+    <Teleport to="body">
+      <Transition name="honor-dialog">
+        <div
+          v-if="honorDialogOpen"
+          class="qr-dialog-backdrop honor-dialog-backdrop"
+          role="presentation"
+          @click.self="closeHonor"
+        >
+          <section
+            class="honor-dialog-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="honor-dialog-title"
+            @keydown="handleHonorDialogKeydown"
+          >
+            <button
+              ref="honorDialogClose"
+              class="qr-close honor-dialog-close"
+              type="button"
+              aria-label="关闭荣誉详情"
+              @click="closeHonor"
+            >
+              ×
+            </button>
+            <div class="honor-dialog-visual">
+              <img
+                v-if="activeHonor && hasHonorImage(activeHonor)"
+                :src="activeHonor.image"
+                :alt="activeHonor.imageAlt"
+                @error="markHonorImageFailed(activeHonor.id)"
+              />
+              <div v-else class="honor-dialog-placeholder" aria-hidden="true">
+                <span>HONOR ARCHIVE</span>
+              </div>
+            </div>
+            <div class="honor-dialog-copy">
+              <span class="honor-category">{{ activeHonor?.category }}</span>
+              <h2 id="honor-dialog-title">{{ activeHonor?.title }}</h2>
+              <p>{{ activeHonor?.summary }}</p>
+              <dl>
+                <div>
+                  <dt>授予机构</dt>
+                  <dd>{{ activeHonor?.issuer }}</dd>
+                </div>
+                <div>
+                  <dt>级别</dt>
+                  <dd>{{ activeHonor?.level }}</dd>
+                </div>
+                <div>
+                  <dt>时间</dt>
+                  <dd>{{ activeHonor?.date }}</dd>
+                </div>
+              </dl>
+              <small>展示图已经不可逆脱敏，不提供证书原件下载。</small>
+            </div>
+          </section>
+        </div>
+      </Transition>
+    </Teleport>
+
     <div v-if="qrDialogOpen" class="qr-dialog-backdrop" @click.self="qrDialogOpen = false">
       <section class="qr-dialog" role="dialog" aria-modal="true" aria-label="公众号二维码">
         <button
@@ -342,7 +428,7 @@ import {
   normalizeSiteLink,
 } from '@/lib/homeContent';
 import { getHeaderScrollState, getMagneticOffset, getPointerEffect } from '@/lib/interaction';
-import { DEFAULT_PROFILE, getPublicHonors } from '@/lib/profileContent';
+import { DEFAULT_PROFILE, getPublicHonors, mergePublicHonors } from '@/lib/profileContent';
 import defaultSiteLinks from '@/assets/siteLinks.json';
 import Background from '@/components/Background.vue';
 
@@ -362,6 +448,11 @@ const menuOpen = ref(false);
 const siteLinks = ref(defaultSiteLinks.map(normalizeSiteLink));
 const qrDialogOpen = ref(false);
 const qrImage = ref('/uploads/wechat-qr.jpg');
+const honorDialogOpen = ref(false);
+const activeHonor = ref(null);
+const honorDialogClose = ref(null);
+const failedHonorImages = ref(new Set());
+let honorDialogTrigger = null;
 
 // Profile 数据
 const profileName = ref(DEFAULT_PROFILE.name);
@@ -476,9 +567,7 @@ const parseProfileData = (config) => {
     if (honors) {
       const parsedHonors = typeof honors === 'string' ? JSON.parse(honors) : honors;
       if (Array.isArray(parsedHonors)) {
-        publicHonors.value = parsedHonors
-          .filter((honor) => honor?.visibility !== 'private')
-          .sort((left, right) => (left.order || 0) - (right.order || 0));
+        publicHonors.value = mergePublicHonors(parsedHonors);
       }
     }
   } catch (e) {
@@ -518,13 +607,13 @@ const loadHome = async () => {
   articles.value = normalizeArticles(latest);
   categories.value = Array.isArray(categoryList)
     ? categoryList
-        .filter(
-          (item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章',
-        )
-        .map((item) => ({
-          id: String(item.id),
-          theme: String(item.theme).trim(),
-        }))
+      .filter(
+        (item) => Number.isInteger(Number(item?.id)) && item?.theme && item.theme !== '全部文章',
+      )
+      .map((item) => ({
+        id: String(item.id),
+        theme: String(item.theme).trim(),
+      }))
     : [];
 
   isLoading.value = false;
@@ -550,6 +639,41 @@ const handleRouteClick = (link, event) => {
   event.preventDefault();
   qrImage.value = link.qrImage;
   qrDialogOpen.value = true;
+};
+
+const hasHonorImage = (honor) => Boolean(honor?.image && !failedHonorImages.value.has(honor.id));
+
+const markHonorImageFailed = (honorId) => {
+  failedHonorImages.value = new Set([...failedHonorImages.value, honorId]);
+};
+
+const openHonor = (honor, trigger) => {
+  activeHonor.value = honor;
+  honorDialogTrigger = trigger;
+  honorDialogOpen.value = true;
+  document.body.classList.add('dialog-open');
+  nextTick(() => honorDialogClose.value?.focus());
+};
+
+const closeHonor = () => {
+  if (!honorDialogOpen.value) return;
+  honorDialogOpen.value = false;
+  document.body.classList.remove('dialog-open');
+  const trigger = honorDialogTrigger;
+  honorDialogTrigger = null;
+  nextTick(() => trigger?.focus?.());
+};
+
+const handleHonorDialogKeydown = (event) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeHonor();
+    return;
+  }
+  if (event.key === 'Tab') {
+    event.preventDefault();
+    honorDialogClose.value?.focus();
+  }
 };
 
 const updateFavicon = (url) => {
@@ -606,6 +730,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', updateScrollState);
+  document.body.classList.remove('dialog-open');
 });
 </script>
 
@@ -1218,60 +1343,220 @@ onBeforeUnmount(() => {
 
 .honors-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: clamp(0.75rem, 1.3vw, 1.15rem);
+  perspective: 1100px;
 }
 
 .honor-card {
+  --honor-rotation: 0deg;
+  position: relative;
   display: grid;
-  min-height: 12rem;
-  gap: 0.75rem;
-  padding: 1.35rem;
-  color: var(--ink);
-  background: rgb(246 247 241 / 72%);
-  border: 1px solid rgb(255 255 255 / 72%);
+  grid-column: span 4;
+  min-height: 16rem;
+  padding: 0;
+  overflow: hidden;
+  color: #f6f8f0;
+  font: inherit;
+  text-align: left;
+  background: #23483e;
+  border: 1px solid rgb(255 255 255 / 52%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 86%),
-    0 1.2rem 3rem rgb(23 32 29 / 8%);
-  backdrop-filter: blur(1rem) saturate(145%);
+    inset 0 1px 0 rgb(255 255 255 / 52%),
+    0 1.2rem 3rem rgb(16 44 39 / 13%);
+  cursor: pointer;
+  transform: perspective(1100px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg))
+    rotateZ(var(--honor-rotation));
+  transform-style: preserve-3d;
+  animation: honor-card-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    border-color 120ms ease,
+    box-shadow 240ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 
-  h3,
-  p {
-    margin: 0;
+  &::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    content: '';
+    background:
+      radial-gradient(
+        circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+        rgb(255 255 255 / 20%),
+        transparent 32%
+      ),
+      linear-gradient(180deg, transparent 22%, rgb(10 31 26 / 88%) 100%);
   }
 
-  h3 {
-    font-size: clamp(1.15rem, 2vw, 1.55rem);
-    line-height: 1.2;
+  &:hover,
+  &:focus-visible {
+    z-index: 2;
+    border-color: rgb(184 231 204 / 88%);
+    outline: 3px solid rgb(29 77 64 / 72%);
+    outline-offset: 4px;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 64%),
+      0 1.8rem 4rem rgb(16 44 39 / 22%);
+    transform: perspective(1100px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg))
+      translateY(-0.32rem) scale(1.012);
   }
 
-  p {
-    color: var(--muted);
-    line-height: 1.65;
+  &:active {
+    transform: perspective(1100px) scale(0.988);
   }
 
-  footer {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.75rem;
-    align-items: end;
-    margin-top: auto;
-    color: var(--muted);
-    font-size: 0.75rem;
+  &.honor-shape-0,
+  &.honor-shape-5 {
+    grid-column: span 7;
+    min-height: 20rem;
+  }
+
+  &.honor-shape-1 {
+    grid-column: span 5;
+    min-height: 20rem;
+  }
+
+  &.honor-shape-5 {
+    grid-column: span 5;
+    min-height: 18rem;
+  }
+
+  &:last-child {
+    grid-column: 1 / -1;
+    min-height: 14rem;
+  }
+
+  &.honor-shape-0 {
+    --honor-rotation: -0.28deg;
+  }
+  &.honor-shape-1 {
+    --honor-rotation: 0.24deg;
+  }
+  &.honor-shape-3 {
+    --honor-rotation: -0.18deg;
+  }
+  &.honor-shape-5 {
+    --honor-rotation: 0.2deg;
+  }
+
+  &.honor-phase-1 {
+    animation-delay: 45ms;
+  }
+  &.honor-phase-2 {
+    animation-delay: 90ms;
+  }
+  &.honor-phase-3 {
+    animation-delay: 135ms;
+  }
+  &.honor-phase-4 {
+    animation-delay: 180ms;
+  }
+  &.honor-phase-5 {
+    animation-delay: 225ms;
+  }
+}
+
+.honor-visual {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  background: #cfdbd2;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(72%) contrast(94%);
+    transform: scale(1.025);
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.honor-card:hover .honor-visual img,
+.honor-card:focus-visible .honor-visual img {
+  transform: scale(1.075);
+}
+
+.honor-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgb(255 255 255 / 34%);
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 14%) 0 1px, transparent 1px 18px),
+    radial-gradient(circle at 22% 18%, #668c7d, transparent 34%),
+    linear-gradient(145deg, #274f44, #112f29);
+  background-size:
+    18px 18px,
+    auto,
+    auto;
+
+  span {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: clamp(4rem, 10vw, 8rem);
     font-weight: 700;
+    letter-spacing: -0.08em;
+  }
+}
 
-    span:first-child {
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.honor-card-copy {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: end;
+  min-height: inherit;
+  padding: clamp(1.2rem, 2.4vw, 1.8rem);
+  transform: translateZ(1.5rem);
+
+  strong {
+    max-width: 24ch;
+    margin-top: 0.45rem;
+    font-size: clamp(1.15rem, 2vw, 1.7rem);
+    line-height: 1.16;
+    text-wrap: balance;
   }
 }
 
 .honor-category {
-  color: var(--forest);
+  color: #b7e7ce;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.06em;
+}
+
+.honor-summary {
+  max-width: 48ch;
+  margin-top: 0.7rem;
+  color: rgb(246 248 240 / 76%);
+  line-height: 1.58;
+  text-wrap: pretty;
+}
+
+.honor-meta {
+  margin-top: 1rem;
+  color: rgb(246 248 240 / 64%);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.honor-open {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  padding: 0.42rem 0.55rem;
+  color: rgb(246 248 240 / 74%);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: rgb(10 31 26 / 32%);
+  border: 1px solid rgb(255 255 255 / 22%);
+  backdrop-filter: blur(0.6rem);
+  transform: translateZ(2rem);
 }
 
 .route-list {
@@ -1283,7 +1568,6 @@ onBeforeUnmount(() => {
 .route-link.is-last-odd {
   grid-column: 1 / -1;
 }
-
 
 .route-link {
   position: relative;
@@ -1471,6 +1755,151 @@ onBeforeUnmount(() => {
   }
 }
 
+.honor-dialog-backdrop {
+  --ink: #171b1a;
+  --muted: #65706a;
+  --line: rgb(23 27 26 / 14%);
+  z-index: 30;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.honor-dialog-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
+  width: min(64rem, 100%);
+  max-height: min(88dvh, 48rem);
+  overflow: auto;
+  color: var(--ink);
+  background: rgb(239 241 233 / 98%);
+  border: 1px solid rgb(255 255 255 / 82%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 90%),
+    0 2.5rem 7rem rgb(7 20 16 / 34%);
+}
+
+.honor-dialog-visual {
+  display: grid;
+  min-height: 26rem;
+  overflow: hidden;
+  background: #183d34;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(74%) contrast(96%);
+  }
+}
+
+.honor-dialog-placeholder {
+  display: grid;
+  place-items: center;
+  color: rgb(255 255 255 / 44%);
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 12%) 0 1px, transparent 1px 20px),
+    radial-gradient(circle at 32% 28%, #668c7d, transparent 35%),
+    linear-gradient(145deg, #274f44, #112f29);
+  background-size:
+    20px 20px,
+    auto,
+    auto;
+
+  span {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+  }
+}
+
+.honor-dialog-copy {
+  display: grid;
+  align-content: center;
+  padding: clamp(2rem, 4vw, 3.5rem);
+
+  h2 {
+    margin: 0.65rem 0 0;
+    font-size: clamp(1.65rem, 3.2vw, 2.8rem);
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  > p {
+    margin: 1.2rem 0 0;
+    color: var(--muted);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  dl {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.8rem 0 0;
+  }
+
+  dl > div {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+
+  dt {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  dd {
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  small {
+    margin-top: 1.4rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+}
+
+.honor-dialog-close {
+  z-index: 2;
+
+  &:focus-visible {
+    outline: 3px solid rgb(29 77 64 / 72%);
+    outline-offset: 3px;
+  }
+}
+
+.honor-dialog-enter-active,
+.honor-dialog-leave-active {
+  transition: opacity 220ms ease;
+
+  .honor-dialog-panel {
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.honor-dialog-enter-from,
+.honor-dialog-leave-to {
+  opacity: 0;
+
+  .honor-dialog-panel {
+    transform: translateY(1rem) scale(0.975);
+  }
+}
+
+:global(body.dialog-open) {
+  overflow: hidden;
+}
+
 .qr-close {
   position: absolute;
   top: 0.45rem;
@@ -1505,6 +1934,19 @@ onBeforeUnmount(() => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes honor-card-in {
+  from {
+    opacity: 0;
+    filter: blur(0.25rem);
+    translate: 0 1.1rem;
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    translate: 0 0;
   }
 }
 
@@ -1621,6 +2063,25 @@ onBeforeUnmount(() => {
     grid-template-columns: 1fr;
   }
 
+  .honor-card,
+  .honor-card.honor-shape-0,
+  .honor-card.honor-shape-1,
+  .honor-card.honor-shape-5,
+  .honor-card:last-child {
+    grid-column: 1;
+    min-height: 17rem;
+  }
+
+  .honor-dialog-panel {
+    grid-template-columns: 1fr;
+    max-height: 92dvh;
+  }
+
+  .honor-dialog-visual {
+    min-height: 15rem;
+    max-height: 38dvh;
+  }
+
   .route-link.is-last-odd {
     grid-column: auto;
   }
@@ -1677,7 +2138,9 @@ onBeforeUnmount(() => {
     padding: 0.65rem 0.8rem calc(0.65rem + env(safe-area-inset-bottom));
     border-top: 1px solid rgb(184 244 204 / 18%);
     background: linear-gradient(180deg, rgb(8 18 15 / 78%), rgb(5 11 10 / 94%));
-    box-shadow: 0 -1rem 2.8rem rgb(0 0 0 / 28%), inset 0 1px 0 rgb(255 255 255 / 5%);
+    box-shadow:
+      0 -1rem 2.8rem rgb(0 0 0 / 28%),
+      inset 0 1px 0 rgb(255 255 255 / 5%);
     backdrop-filter: blur(1.25rem) saturate(150%);
     -webkit-backdrop-filter: blur(1.25rem) saturate(150%);
   }
@@ -1715,7 +2178,9 @@ onBeforeUnmount(() => {
     &.active {
       color: #07100e;
       background: #b8f4cc;
-      box-shadow: inset 0 1px 0 rgb(255 255 255 / 58%), 0 0.45rem 1.2rem rgb(184 244 204 / 18%);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 58%),
+        0 0.45rem 1.2rem rgb(184 244 204 / 18%);
     }
   }
 
@@ -1753,9 +2218,16 @@ onBeforeUnmount(() => {
   .hero-animate,
   .social-link,
   .legacy-glass-action,
-  .route-link {
+  .route-link,
+  .honor-card,
+  .honor-visual img {
     transform: none !important;
     animation: none !important;
+  }
+
+  .honor-card {
+    opacity: 1;
+    translate: none;
   }
 
   .hero-animate {

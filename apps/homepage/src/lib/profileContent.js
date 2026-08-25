@@ -1,3 +1,30 @@
+const getHonorImage = (honor = {}) => {
+  const candidates = [
+    honor.image,
+    honor.imageUrl,
+    honor.image_url,
+    honor.certificateImage,
+    honor.certificate_image,
+    honor.thumbnail,
+    honor.cover,
+  ];
+  const image = candidates.find((value) => typeof value === 'string' && value.trim())?.trim() || '';
+  return /^\/images\/honors\/[a-z0-9]+(?:-[a-z0-9]+)*\.webp$/i.test(image) ? image : '';
+};
+
+export const normalizeHonor = (honor = {}) => {
+  const image = getHonorImage(honor);
+  const imageAlt = typeof honor.imageAlt === 'string' ? honor.imageAlt.trim() : '';
+  const title =
+    typeof honor.title === 'string' && honor.title.trim() ? honor.title.trim() : '荣誉证书';
+  return {
+    ...honor,
+    image,
+    imageAlt: image ? imageAlt || `${title}的脱敏展示图` : '',
+    featured: Boolean(honor.featured),
+  };
+};
+
 export const DEFAULT_PROFILE = Object.freeze({
   name: 'Xaiver',
   tagline: '让精神创造触手可及。',
@@ -12,6 +39,7 @@ export const DEFAULT_PROFILE = Object.freeze({
 export const PUBLIC_HONORS = Object.freeze([
   {
     id: 'accounting-junior-qualification',
+    image: '/images/honors/accounting-junior-qualification.webp',
     title: '会计专业技术资格考试（初级）合格',
     category: '职业资格',
     issuer: '会计专业技术资格考试',
@@ -23,6 +51,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'financial-challenge-provincial-second',
+    image: '/images/honors/financial-challenge-provincial-second.webp',
     title: '金融挑战赛省级二等奖',
     category: '竞赛与项目',
     issuer: '金融挑战赛',
@@ -34,6 +63,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'huashu-cup-excellence',
+    image: '/images/honors/huashu-cup-excellence.webp',
     title: '华数杯优秀奖',
     category: '数学建模',
     issuer: '华数杯',
@@ -45,6 +75,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'mathematical-modeling-first',
+    image: '/images/honors/mathematical-modeling-first.webp',
     title: '大学生数学建模竞赛一等奖',
     category: '数学建模',
     issuer: '大学生数学建模竞赛',
@@ -56,6 +87,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'career-planning-beijing-silver',
+    image: '/images/honors/career-planning-beijing-silver.webp',
     title: '职业生涯规划大赛北京市银奖',
     category: '成长与实践',
     issuer: '首届职业生涯规划大赛',
@@ -67,6 +99,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'three-innovation-provincial-second',
+    image: '/images/honors/three-innovation-provincial-second.webp',
     title: '三创赛省级二等奖',
     category: '创新创业竞赛',
     issuer: '全国大学生电子商务“创新、创意及创业”挑战赛',
@@ -78,6 +111,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'three-innovation-national-second',
+    image: '/images/honors/three-innovation-national-second.webp',
     title: '三创赛国家级二等奖',
     category: '创新创业竞赛',
     issuer: '全国大学生电子商务“创新、创意及创业”挑战赛',
@@ -89,6 +123,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'three-innovation-best-innovation',
+    image: '/images/honors/three-innovation-best-innovation.webp',
     title: '三创赛最佳创新奖',
     category: '创新创业竞赛',
     issuer: '全国大学生电子商务“创新、创意及创业”挑战赛',
@@ -100,6 +135,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'internet-plus-beijing-first',
+    image: '/images/honors/internet-plus-beijing-first.webp',
     title: '互联网+市级一等奖',
     category: '创新创业竞赛',
     issuer: '中国国际“互联网+”大学生创新创业大赛',
@@ -111,6 +147,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'internet-plus-beijing-third',
+    image: '/images/honors/internet-plus-beijing-third.webp',
     title: '互联网+市级三等奖',
     category: '创新创业竞赛',
     issuer: '中国国际“互联网+”大学生创新创业大赛',
@@ -122,6 +159,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'social-enterprise-first',
+    image: '/images/honors/social-enterprise-first.webp',
     title: '未来企业家精神奖全国赛一等奖',
     category: '社会创新与实践',
     issuer: '上海益优青年服务中心、复旦大学管理学院',
@@ -133,6 +171,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'internet-innovation-2025-beijing-third',
+    image: '/images/honors/internet-innovation-2025-beijing-third.webp',
     title: '中国国际大学生创新大赛（2025）北京赛区三等奖',
     category: '创新创业竞赛',
     issuer: '中国国际大学生创新大赛（2025）北京赛区',
@@ -144,6 +183,7 @@ export const PUBLIC_HONORS = Object.freeze([
   },
   {
     id: 'council-director-appointment',
+    image: '/images/honors/council-director-appointment.webp',
     title: '初善创投咨询理事成员聘书',
     category: '组织与社会实践',
     issuer: '上海益优青年服务中心—初善创投',
@@ -201,11 +241,7 @@ export const PUBLIC_HONORS = Object.freeze([
 
 export const PUBLIC_PROFILE = Object.freeze({
   mission: '让精神创造触手可及。',
-  identity: [
-    'AI 全栈多终端开发者',
-    'FDE 工程师',
-    '创意文化产业创业者',
-  ],
+  identity: ['AI 全栈多终端开发者', 'FDE 工程师', '创意文化产业创业者'],
   projects: [
     'finlaw.cloud：即将上线的财务法务一体化智能体',
     'xiangleideng.site：个人网站与长期写作空间',
@@ -228,6 +264,16 @@ export const PUBLIC_PROFILE = Object.freeze({
 });
 
 export const getPublicHonors = () =>
-  PUBLIC_HONORS.filter((honor) => honor.visibility === 'public').sort(
-    (left, right) => left.order - right.order,
-  );
+  PUBLIC_HONORS.filter((honor) => honor.visibility === 'public')
+    .map(normalizeHonor)
+    .sort((left, right) => left.order - right.order);
+
+export const mergePublicHonors = (configuredHonors) => {
+  if (!Array.isArray(configuredHonors)) return getPublicHonors();
+  const fallbackById = new Map(getPublicHonors().map((honor) => [honor.id, honor]));
+
+  return configuredHonors
+    .filter((honor) => honor?.visibility !== 'private')
+    .map((honor) => normalizeHonor({ ...(fallbackById.get(honor.id) || {}), ...honor }))
+    .sort((left, right) => (left.order || 0) - (right.order || 0));
+};

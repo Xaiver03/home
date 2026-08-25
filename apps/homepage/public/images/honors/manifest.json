@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "redactionMethod": "irreversible-28px-downsample-rebuild-blur-metadata-strip",
+  "assets": [
+    {
+      "id": "accounting-junior-qualification",
+      "file": "/images/honors/accounting-junior-qualification.webp",
+      "sha256": "390493770decd265c8261adcd5fe4c2f11d2feec79130bfe3377502fa14e7b52",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "financial-challenge-provincial-second",
+      "file": "/images/honors/financial-challenge-provincial-second.webp",
+      "sha256": "0fd07014cfacfbbd9fa3e3297aaa40826e69da7b84d8054b8e9e40b02be22cd3",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "huashu-cup-excellence",
+      "file": "/images/honors/huashu-cup-excellence.webp",
+      "sha256": "9f40993c7e4ea34b2630dfd54fd369169bb6ad5089140e4912855cf4225f72b1",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "mathematical-modeling-first",
+      "file": "/images/honors/mathematical-modeling-first.webp",
+      "sha256": "0d1ab74a370027b49a3081377c3383d6d0f55f77b211cc9e609b30b21eeb2c60",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "career-planning-beijing-silver",
+      "file": "/images/honors/career-planning-beijing-silver.webp",
+      "sha256": "026cca3c7cde92318b391bc9bedca490d39106f115f999c99e59cbac23762a28",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "three-innovation-provincial-second",
+      "file": "/images/honors/three-innovation-provincial-second.webp",
+      "sha256": "ade9503b75b1cf3c209a04381bda5d3ce8b27bb124bb0ce12c891024d0da736f",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "three-innovation-national-second",
+      "file": "/images/honors/three-innovation-national-second.webp",
+      "sha256": "726bd2822e0a055593012b7537145478c7f9396c4ac2365281f1074cdd255d12",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "three-innovation-best-innovation",
+      "file": "/images/honors/three-innovation-best-innovation.webp",
+      "sha256": "447c390619771efc25a3b79c06c7c61f7dc0a2fa6d6ec5981e7bccb5df03eda5",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "internet-plus-beijing-first",
+      "file": "/images/honors/internet-plus-beijing-first.webp",
+      "sha256": "ced76cd9d86d0aee7cef26b46b5bf379a415ed45325cd287e3f38dd5ae5015d5",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "internet-plus-beijing-third",
+      "file": "/images/honors/internet-plus-beijing-third.webp",
+      "sha256": "3cb6df20bd63e82fe94380e563f41d9180a21bc735099a73a22c92779bb4fe3c",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "social-enterprise-first",
+      "file": "/images/honors/social-enterprise-first.webp",
+      "sha256": "a0fff5515b3767199cd26087b2dcc96850d2fc1a298b83f0f5398d5994dc8d50",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "internet-innovation-2025-beijing-third",
+      "file": "/images/honors/internet-innovation-2025-beijing-third.webp",
+      "sha256": "8c675b9f8e937fb9c729a90fec96ec206643379430136ac7dc35db52bcc9a5fa",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": "council-director-appointment",
+      "file": "/images/honors/council-director-appointment.webp",
+      "sha256": "d4cf5bf42c5d7650b5adc78615d15db516c81e11dbc4fa407a09f5f73c0a4d4b",
+      "width": 960,
+      "height": 640
+    }
+  ]
+}

@@ -33,6 +33,18 @@ Treat the user's private certificate directory as source material, not a deploym
 
 Future credentials such as `高中语文教师资格证` should be added as a new `职业资格` record without changing the component schema. Unknown or incomplete records remain private.
 
+### Honor wall assets
+
+Use `scripts/generate-honor-assets.mjs` for certificate-derived wall thumbnails. Its source allowlist contains relative paths only; provide the reviewed source root with `HONOR_SOURCE_DIR`. Run without `--apply` first, then generate only after the dry-run succeeds.
+
+The generator irreversibly reduces each source to 28×28 pixels before rebuilding and blurring it, strips metadata, and writes only 960×640 WebP files plus `manifest.json` under `apps/homepage/public/images/honors/`. This output preserves paper/color atmosphere, not readable evidence. Award titles and summaries belong in the HTML data layer.
+
+- Never add a private absolute source path to code, JSON, logs or configuration.
+- Never copy source PDF/JPEG/ZIP files into `public`.
+- Never treat CSS `filter: blur()` as redaction; a browser can remove it.
+- Honors without an approved safe output use the built-in visual placeholder.
+- Verify manifest hashes and inspect a contact sheet before publishing.
+
 ## Preflight
 
 Before any production write:
@@ -43,6 +55,7 @@ Before any production write:
 4. For external links, allow only `https://` unless the existing normalizer explicitly supports the requested scheme. Preserve QR behavior.
 5. Check that every asset path is inside the personal site's approved public/static or storage path.
 6. Run a dry-run that reports target labels, old/new summaries, asset hashes and affected counts without writing.
+7. Confirm the public configuration endpoint returns only its explicit label allowlist. For `profile-honors`, it must also filter non-public records and strip fields outside the public display schema; private source metadata must never be exposed by `reception/getConfig`.
 
 Never print passwords, private keys, full database URLs or secret environment values.
 
@@ -70,6 +83,7 @@ After an update:
 3. Check desktop and mobile layouts for even and odd site counts, long labels, keyboard focus and no horizontal overflow.
 4. Run the homepage tests and build.
 5. Keep the backup path, changed labels, asset hashes and validation results in the report.
+6. Confirm public HTML, JSON and JavaScript contain no local private path, original certificate URL, certificate number or source archive name.
 
 If any verification fails, stop publishing, restore the prior configuration and asset from the timestamped backup, and re-run the same read-only checks. Never claim production success when SSH, database, build or HTTP verification is incomplete.
 
