@@ -1,3 +1,4 @@
+import defaultSiteLinks from '@/assets/siteLinks.json';
 import {
   DEFAULT_HOME_TEXT,
   getArticleUrl,
@@ -75,6 +76,19 @@ describe('home content helpers', () => {
     });
   });
 
+  it('includes the x-c company site with a local logo asset', () => {
+    const xCreative = defaultSiteLinks.find((link) => link.name === '晓黎团队官网');
+
+    expect(xCreative).toMatchObject({
+      link: 'https://x-creative.team',
+      logo: '/images/site/xiaoli-symbol.png',
+    });
+    expect(normalizeSiteLink(xCreative)).toMatchObject({
+      href: 'https://x-creative.team',
+      external: true,
+      logo: '/images/site/xiaoli-symbol.png',
+    });
+  });
   it('uses a readable fallback when the quote service has no usable result', () => {
     expect(normalizeQuote({ hitokoto: '慢慢来，比较快。', from: '林清玄' })).toEqual({
       text: '慢慢来，比较快。',

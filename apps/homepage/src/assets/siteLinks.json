@@ -17,6 +17,12 @@
     "link": "https://github.com/Xaiver03/"
   },
   {
+    "icon": "Sparkles",
+    "name": "晓黎团队官网",
+    "logo": "/images/site/xiaoli-symbol.png",
+    "link": "https://x-creative.team"
+  },
+  {
     "icon": "LaptopCode",
     "name": "公众号",
     "link": "#wechat-qr"

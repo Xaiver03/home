@@ -144,6 +144,7 @@
             v-for="(link, index) in siteLinks"
             :key="`${link.name}-${link.href}`"
             class="route-link"
+            :class="{ 'is-last-odd': siteLinks.length % 2 === 1 && index === siteLinks.length - 1 }"
             :href="link.href"
             :target="link.external ? '_blank' : undefined"
             :rel="link.external ? 'noreferrer' : undefined"
@@ -173,6 +174,28 @@
             </span>
             <span class="route-arrow" aria-hidden="true">↗</span>
           </a>
+        </div>
+      </section>
+
+      <section id="honors" class="honors-section" aria-labelledby="honors-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">HONORS &amp; CREDENTIALS</p>
+            <h2 id="honors-title">荣誉与资质</h2>
+          </div>
+          <p class="routes-copy">记录值得被认真保存的学习、实践与成长。</p>
+        </div>
+
+        <div class="honors-grid">
+          <article v-for="honor in publicHonors" :key="honor.id" class="honor-card">
+            <span class="honor-category">{{ honor.category }}</span>
+            <h3>{{ honor.title }}</h3>
+            <p>{{ honor.summary }}</p>
+            <footer>
+              <span>{{ honor.issuer }}</span>
+              <span>{{ honor.level }}</span>
+            </footer>
+          </article>
         </div>
       </section>
 
@@ -322,6 +345,37 @@ import { getHeaderScrollState, getMagneticOffset, getPointerEffect } from '@/lib
 import defaultSiteLinks from '@/assets/siteLinks.json';
 import Background from '@/components/Background.vue';
 
+const PUBLIC_HONORS = Object.freeze([
+  {
+    id: 'three-innovation-national-second',
+    title: '三创赛国家级二等奖',
+    category: '竞赛与项目',
+    issuer: '全国大学生电子商务“创新、创意及创业”挑战赛',
+    level: '国家级二等奖',
+    summary: '以项目实践记录产品思考、团队协作与创新能力。',
+    visibility: 'public',
+  },
+  {
+    id: 'mathematical-modeling-first',
+    title: '数学建模竞赛一等奖',
+    category: '学术与竞赛',
+    issuer: '数学建模竞赛',
+    level: '一等奖',
+    summary: '在问题分析、建模表达和落地协作中持续训练复杂问题解决能力。',
+    visibility: 'public',
+  },
+  {
+    id: 'career-planning-beijing-silver',
+    title: '职业生涯规划大赛北京市银奖',
+    category: '成长与实践',
+    issuer: '北京市职业生涯规划大赛',
+    level: '北京市银奖',
+    summary: '把个人成长、职业方向与长期实践放在同一张地图上。',
+    visibility: 'public',
+  },
+]);
+
+const publicHonors = computed(() => PUBLIC_HONORS.filter((honor) => honor.visibility === 'public'));
 const homeText = ref(getHomeText());
 const articles = ref([]);
 const filteredArticles = ref([]);
@@ -958,7 +1012,8 @@ onBeforeUnmount(() => {
 }
 
 .writing-section,
-.routes-section {
+.routes-section,
+.honors-section {
   width: min(92%, 78rem);
   margin: 0 auto;
   padding: 7.5rem 0;
@@ -1161,11 +1216,78 @@ onBeforeUnmount(() => {
   line-height: 1.7;
 }
 
+.honors-section {
+  padding-top: 0;
+}
+
+.honors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.honor-card {
+  display: grid;
+  min-height: 12rem;
+  gap: 0.75rem;
+  padding: 1.35rem;
+  color: var(--ink);
+  background: rgb(246 247 241 / 72%);
+  border: 1px solid rgb(255 255 255 / 72%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 86%),
+    0 1.2rem 3rem rgb(23 32 29 / 8%);
+  backdrop-filter: blur(1rem) saturate(145%);
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    line-height: 1.2;
+  }
+
+  p {
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: end;
+    margin-top: auto;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.honor-category {
+  color: var(--forest);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
 .route-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.9rem;
 }
+
+.route-link.is-last-odd {
+  grid-column: 1 / -1;
+}
+
 
 .route-link {
   position: relative;
@@ -1489,9 +1611,22 @@ onBeforeUnmount(() => {
   }
 
   .writing-section,
-  .routes-section {
+  .routes-section,
+  .honors-section {
     padding-top: 5rem;
     padding-bottom: 5rem;
+  }
+
+  .honors-section {
+    padding-top: 0;
+  }
+
+  .honors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .route-link.is-last-odd {
+    grid-column: auto;
   }
 
   .section-heading,
@@ -1544,10 +1679,11 @@ onBeforeUnmount(() => {
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.25rem;
     padding: 0.65rem 0.8rem calc(0.65rem + env(safe-area-inset-bottom));
-    border-top: 1px solid rgb(23 27 26 / 14%);
-    background: rgb(246 247 241 / 90%);
-    box-shadow: 0 -0.8rem 2.4rem rgb(35 44 38 / 8%);
-    backdrop-filter: blur(1rem) saturate(180%);
+    border-top: 1px solid rgb(184 244 204 / 18%);
+    background: linear-gradient(180deg, rgb(8 18 15 / 78%), rgb(5 11 10 / 94%));
+    box-shadow: 0 -1rem 2.8rem rgb(0 0 0 / 28%), inset 0 1px 0 rgb(255 255 255 / 5%);
+    backdrop-filter: blur(1.25rem) saturate(150%);
+    -webkit-backdrop-filter: blur(1.25rem) saturate(150%);
   }
 
   .mobile-tab-item {
@@ -1558,7 +1694,7 @@ onBeforeUnmount(() => {
     place-items: center;
     align-content: center;
     gap: 0.28rem;
-    color: var(--muted);
+    color: rgb(220 235 225 / 62%);
     font-size: 0.68rem;
     font-weight: 700;
     line-height: 1.2;
@@ -1571,8 +1707,8 @@ onBeforeUnmount(() => {
 
     &:hover,
     &:focus-visible {
-      color: var(--ink);
-      background: rgb(255 255 255 / 72%);
+      color: #b8f4cc;
+      background: rgb(184 244 204 / 9%);
       outline: none;
     }
 
@@ -1581,9 +1717,9 @@ onBeforeUnmount(() => {
     }
 
     &.active {
-      color: #f6f9ed;
-      background: var(--forest);
-      box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%);
+      color: #07100e;
+      background: #b8f4cc;
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 58%), 0 0.45rem 1.2rem rgb(184 244 204 / 18%);
     }
   }
 
