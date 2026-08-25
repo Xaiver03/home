@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   HONOR_ASSETS,
+  getRedactionRectangles,
   getOutputFileName,
   isSafeSourcePath,
   validateHonorAssets,
@@ -42,5 +43,35 @@ test('rejects duplicate ids and unsafe source paths', () => {
   assert.throws(
     () => validateHonorAssets([{ id: 'unsafe', source: '../../private.jpg' }]),
     /不安全素材路径/,
+  );
+});
+
+test('redacts only the professional credential regions with normalized geometry', () => {
+  const professionalCredential = HONOR_ASSETS.find(
+    (asset) => asset.id === 'accounting-junior-qualification',
+  );
+  const publicAwards = HONOR_ASSETS.filter(
+    (asset) => asset.id !== 'accounting-junior-qualification',
+  );
+
+  assert.ok(professionalCredential.redactions.length >= 5);
+  assert.ok(publicAwards.every((asset) => !asset.redactions));
+  assert.deepEqual(
+    getRedactionRectangles({ redactions: [[0.1, 0.2, 0.3, 0.4]] }, 1000, 500),
+    [[100, 100, 400, 300]],
+  );
+});
+
+test('rejects redaction rectangles outside the source image', () => {
+  assert.throws(
+    () =>
+      validateHonorAssets([
+        {
+          id: 'unsafe-redaction',
+          source: '证书图片版本/a.jpg',
+          redactions: [[0.8, 0.8, 0.4, 0.4]],
+        },
+      ]),
+    /脱敏区域/,
   );
 });

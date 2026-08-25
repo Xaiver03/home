@@ -17,6 +17,14 @@ export const HONOR_ASSETS = Object.freeze([
   {
     id: 'accounting-junior-qualification',
     source: '证书图片版本/专业技术人员资格考试合格通知书.pdf',
+    redactions: [
+      [0.18, 0.17, 0.25, 0.03],
+      [0.21, 0.235, 0.5, 0.045],
+      [0.21, 0.31, 0.58, 0.045],
+      [0.39, 0.365, 0.42, 0.045],
+      [0.1, 0.44, 0.4, 0.055],
+      [0.13, 0.69, 0.34, 0.2],
+    ],
   },
   {
     id: 'financial-challenge-provincial-second',
@@ -82,12 +90,32 @@ export const getOutputFileName = (id) => {
   return `${id}.webp`;
 };
 
+const isValidRedaction = (redaction) =>
+  Array.isArray(redaction) &&
+  redaction.length === 4 &&
+  redaction.every((value) => Number.isFinite(value) && value >= 0 && value <= 1) &&
+  redaction[2] > 0 &&
+  redaction[3] > 0 &&
+  redaction[0] + redaction[2] <= 1 &&
+  redaction[1] + redaction[3] <= 1;
+
+export const getRedactionRectangles = (asset, width, height) =>
+  (asset.redactions || []).map(([x, y, redactionWidth, redactionHeight]) => [
+    Math.round(x * width),
+    Math.round(y * height),
+    Math.round((x + redactionWidth) * width),
+    Math.round((y + redactionHeight) * height),
+  ]);
+
 export const validateHonorAssets = (assets) => {
   const ids = new Set();
   for (const asset of assets) {
     getOutputFileName(asset.id);
     if (ids.has(asset.id)) throw new Error(`重复荣誉 ID: ${asset.id}`);
     if (!isSafeSourcePath(asset.source)) throw new Error(`不安全素材路径: ${asset.source}`);
+    if (asset.redactions && !asset.redactions.every(isValidRedaction)) {
+      throw new Error(`无效脱敏区域: ${asset.id}`);
+    }
     ids.add(asset.id);
   }
 };
@@ -131,31 +159,68 @@ const prepareRasterSource = (sourcePath, tempDir) => {
   return `${outputPrefix}.jpg`;
 };
 
+const preparePublicSource = (asset, rasterSource, tempDir) => {
+  const normalizedPath = path.join(tempDir, `${asset.id}-normalized.png`);
+  run('magick', [rasterSource, '-auto-orient', '-strip', normalizedPath]);
+
+  if (!asset.redactions?.length) return normalizedPath;
+
+  const [width, height] = run('magick', ['identify', '-format', '%w %h', normalizedPath])
+    .split(' ')
+    .map(Number);
+  const redactedPath = path.join(tempDir, `${asset.id}-redacted.png`);
+  const drawArgs = getRedactionRectangles(asset, width, height).flatMap(
+    ([left, top, right, bottom]) => [
+      '-fill',
+      '#e4e7e0',
+      '-draw',
+      `roundrectangle ${left},${top} ${right},${bottom} 8,8`,
+    ],
+  );
+  run('magick', [normalizedPath, ...drawArgs, '-strip', redactedPath]);
+  return redactedPath;
+};
+
 const generateAsset = (asset, tempDir) => {
   const sourcePath = resolveSource(asset.source);
   const rasterSource = prepareRasterSource(sourcePath, tempDir);
+  const publicSource = preparePublicSource(asset, rasterSource, tempDir);
   const outputPath = path.join(OUTPUT_DIR, getOutputFileName(asset.id));
 
   run('magick', [
-    rasterSource,
-    '-auto-orient',
-    '-thumbnail',
-    '28x28^',
+    publicSource,
+    '(',
+    '-clone',
+    '0',
+    '-resize',
+    '960x640^',
     '-gravity',
     'center',
     '-extent',
-    '28x28',
-    '-filter',
-    'Gaussian',
-    '-resize',
-    '960x640!',
+    '960x640',
     '-blur',
-    '0x12',
+    '0x18',
     '-modulate',
-    '94,58,100',
+    '88,68,100',
+    ')',
+    '(',
+    '-clone',
+    '0',
+    '-resize',
+    '900x590',
+    '-modulate',
+    '98,88,100',
+    ')',
+    '-delete',
+    '0',
+    '-gravity',
+    'center',
+    '-compose',
+    'over',
+    '-composite',
     '-strip',
     '-quality',
-    '72',
+    '84',
     outputPath,
   ]);
 
@@ -179,7 +244,7 @@ const main = () => {
   validateHonorAssets(HONOR_ASSETS);
   console.log(`模式: ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
   console.log(`公开缩略图: ${HONOR_ASSETS.length}`);
-  console.log('脱敏: 28×28 极限降采样后重建、强模糊、移除元数据');
+  console.log('脱敏: 竞赛奖项清晰展示；职业资格编号与二维码定点遮挡；全部移除元数据');
 
   if (!APPLY) {
     if (SOURCE_ROOT) HONOR_ASSETS.forEach((asset) => resolveSource(asset.source));
@@ -197,7 +262,7 @@ const main = () => {
     const assets = HONOR_ASSETS.map((asset) => generateAsset(asset, tempDir));
     const manifest = {
       schemaVersion: 1,
-      redactionMethod: 'irreversible-28px-downsample-rebuild-blur-metadata-strip',
+      redactionMethod: 'selective-professional-number-redaction-clear-preview-metadata-strip',
       assets,
     };
     fs.writeFileSync(

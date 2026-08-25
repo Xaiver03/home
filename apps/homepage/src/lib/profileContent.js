@@ -20,7 +20,7 @@ export const normalizeHonor = (honor = {}) => {
   return {
     ...honor,
     image,
-    imageAlt: image ? imageAlt || `${title}的脱敏展示图` : '',
+    imageAlt: image ? imageAlt || `${title}的公开展示图` : '',
     featured: Boolean(honor.featured),
   };
 };
@@ -267,6 +267,15 @@ export const getPublicHonors = () =>
   PUBLIC_HONORS.filter((honor) => honor.visibility === 'public')
     .map(normalizeHonor)
     .sort((left, right) => left.order - right.order);
+
+export const splitHonorsIntoRows = (honors = []) =>
+  honors.reduce(
+    (rows, honor, index) => {
+      rows[index % 2].push(honor);
+      return rows;
+    },
+    [[], []],
+  );
 
 export const mergePublicHonors = (configuredHonors) => {
   if (!Array.isArray(configuredHonors)) return getPublicHonors();

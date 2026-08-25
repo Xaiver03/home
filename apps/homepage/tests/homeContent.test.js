@@ -6,6 +6,7 @@ import {
   getPublicHonors,
   mergePublicHonors,
   normalizeHonor,
+  splitHonorsIntoRows,
 } from '@/lib/profileContent.js';
 import {
   DEFAULT_HOME_TEXT,
@@ -56,7 +57,7 @@ describe('home content helpers', () => {
         image: '/images/honors/example.webp',
         imageAlt: 42,
       }).imageAlt,
-    ).toBe('错误替代文本的脱敏展示图');
+    ).toBe('错误替代文本的公开展示图');
   });
 
   it('keeps GitHub and more sites as distinct, explicit entries', () => {
@@ -84,6 +85,16 @@ describe('home content helpers', () => {
     expect(
       mergePublicHonors([{ id: fallback.id, visibility: 'public', image: '', order: 1 }])[0].image,
     ).toBe('');
+  });
+
+  it('splits honors into two balanced marquee rows without losing their order', () => {
+    const honors = Array.from({ length: 7 }, (_, index) => ({ id: `honor-${index + 1}` }));
+
+    expect(splitHonorsIntoRows(honors)).toEqual([
+      [honors[0], honors[2], honors[4], honors[6]],
+      [honors[1], honors[3], honors[5]],
+    ]);
+    expect(splitHonorsIntoRows([])).toEqual([[], []]);
   });
 
   it('uses configured home text without losing missing defaults', () => {

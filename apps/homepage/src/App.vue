@@ -186,42 +186,58 @@
           <p class="routes-copy">记录值得被认真保存的学习、实践与成长。</p>
         </div>
 
-        <div class="honors-grid">
-          <button
-            v-for="(honor, index) in publicHonors"
-            :key="honor.id"
-            class="honor-card"
-            :class="[
-              `honor-shape-${index % 6}`,
-              `honor-phase-${index % 6}`,
-              { 'has-image': hasHonorImage(honor) },
-            ]"
-            type="button"
-            :aria-label="`查看荣誉详情：${honor.title}`"
-            @click="openHonor(honor, $event.currentTarget)"
-            @pointermove="handleTiltMove"
-            @pointerleave="resetInteractiveEffect"
+        <div class="honors-marquee">
+          <div
+            v-for="(row, rowIndex) in honorRows"
+            :key="`honor-row-${rowIndex}`"
+            class="honor-marquee-row"
+            :class="rowIndex === 0 ? 'moves-left' : 'moves-right'"
           >
-            <span class="honor-visual" aria-hidden="true">
-              <img
-                v-if="hasHonorImage(honor)"
-                :src="honor.image"
-                alt=""
-                loading="lazy"
-                @error="markHonorImageFailed(honor.id)"
-              />
-              <span v-else class="honor-placeholder">
-                <span>{{ String(index + 1).padStart(2, '0') }}</span>
-              </span>
-            </span>
-            <span class="honor-card-copy">
-              <span class="honor-category">{{ honor.category }}</span>
-              <strong>{{ honor.title }}</strong>
-              <span class="honor-summary">{{ honor.summary }}</span>
-              <span class="honor-meta">{{ honor.level }} · {{ honor.date }}</span>
-            </span>
-            <span class="honor-open" aria-hidden="true">展开 ↗</span>
-          </button>
+            <div
+              class="honor-marquee-track"
+              :style="{ '--honor-duration': `${Math.max(row.length * 5.4, 32)}s` }"
+            >
+              <div
+                v-for="copyIndex in 2"
+                :key="`honor-copy-${copyIndex}`"
+                class="honor-marquee-group"
+                :aria-hidden="copyIndex === 2 ? 'true' : undefined"
+              >
+                <button
+                  v-for="(honor, itemIndex) in row"
+                  :key="`${copyIndex}-${honor.id}`"
+                  class="honor-card"
+                  :class="{ 'has-image': hasHonorImage(honor) }"
+                  type="button"
+                  :tabindex="copyIndex === 1 ? 0 : -1"
+                  :aria-label="`查看荣誉详情：${honor.title}`"
+                  @click="openHonor(honor, $event.currentTarget)"
+                  @pointermove="handleTiltMove"
+                  @pointerleave="resetInteractiveEffect"
+                >
+                  <span class="honor-visual" aria-hidden="true">
+                    <img
+                      v-if="hasHonorImage(honor)"
+                      :src="honor.image"
+                      alt=""
+                      loading="lazy"
+                      @error="markHonorImageFailed(honor.id)"
+                    />
+                    <span v-else class="honor-placeholder">
+                      <span>{{ String(rowIndex + itemIndex * 2 + 1).padStart(2, '0') }}</span>
+                    </span>
+                  </span>
+                  <span class="honor-card-copy">
+                    <span class="honor-category">{{ honor.category }}</span>
+                    <strong>{{ honor.title }}</strong>
+                    <span class="honor-summary">{{ honor.summary }}</span>
+                    <span class="honor-meta">{{ honor.level }} · {{ honor.date }}</span>
+                  </span>
+                  <span class="honor-open" aria-hidden="true">展开 ↗</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -383,7 +399,7 @@
                   <dd>{{ activeHonor?.date }}</dd>
                 </div>
               </dl>
-              <small>展示图已经不可逆脱敏，不提供证书原件下载。</small>
+              <small>公开展示图仅用于荣誉说明，不提供证书原件下载。</small>
             </div>
           </section>
         </div>
@@ -428,7 +444,12 @@ import {
   normalizeSiteLink,
 } from '@/lib/homeContent';
 import { getHeaderScrollState, getMagneticOffset, getPointerEffect } from '@/lib/interaction';
-import { DEFAULT_PROFILE, getPublicHonors, mergePublicHonors } from '@/lib/profileContent';
+import {
+  DEFAULT_PROFILE,
+  getPublicHonors,
+  mergePublicHonors,
+  splitHonorsIntoRows,
+} from '@/lib/profileContent';
 import defaultSiteLinks from '@/assets/siteLinks.json';
 import Background from '@/components/Background.vue';
 
@@ -466,6 +487,7 @@ const socialLinks = ref([]);
 const visibleArticles = computed(() =>
   selectedCategoryId.value === 'all' ? articles.value : filteredArticles.value,
 );
+const honorRows = computed(() => splitHonorsIntoRows(publicHonors.value));
 const latestArticle = computed(() => visibleArticles.value[0] || articles.value[0] || null);
 const articleListLoading = computed(() => isLoading.value || isFilterLoading.value);
 const articleCountLabel = computed(() => {
@@ -1341,20 +1363,57 @@ onBeforeUnmount(() => {
   padding-top: 0;
 }
 
-.honors-grid {
+.honors-marquee {
+  --honor-gap: clamp(0.75rem, 1.3vw, 1.1rem);
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-flow: dense;
-  gap: clamp(0.75rem, 1.3vw, 1.15rem);
+  gap: var(--honor-gap);
+  overflow: hidden;
   perspective: 1100px;
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.honor-marquee-row {
+  width: 100%;
+  padding: 0.4rem 0 0.65rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:hover .honor-marquee-track,
+  &:focus-within .honor-marquee-track,
+  &:active .honor-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+.honor-marquee-track {
+  display: flex;
+  gap: var(--honor-gap);
+  width: max-content;
+  will-change: transform;
+  animation: honor-marquee var(--honor-duration) linear infinite;
+}
+
+.honor-marquee-row.moves-right .honor-marquee-track {
+  animation-direction: reverse;
+}
+
+.honor-marquee-group {
+  display: flex;
+  flex: none;
+  gap: var(--honor-gap);
 }
 
 .honor-card {
-  --honor-rotation: 0deg;
   position: relative;
   display: grid;
-  grid-column: span 4;
-  min-height: 16rem;
+  flex: 0 0 clamp(18rem, 26vw, 23rem);
+  width: clamp(18rem, 26vw, 23rem);
+  min-height: 13.5rem;
   padding: 0;
   overflow: hidden;
   color: #f6f8f0;
@@ -1367,9 +1426,8 @@ onBeforeUnmount(() => {
     0 1.2rem 3rem rgb(16 44 39 / 13%);
   cursor: pointer;
   transform: perspective(1100px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg))
-    rotateZ(var(--honor-rotation));
+    rotateZ(0deg);
   transform-style: preserve-3d;
-  animation: honor-card-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
   transition:
     border-color 120ms ease,
     box-shadow 240ms ease,
@@ -1405,56 +1463,6 @@ onBeforeUnmount(() => {
 
   &:active {
     transform: perspective(1100px) scale(0.988);
-  }
-
-  &.honor-shape-0,
-  &.honor-shape-5 {
-    grid-column: span 7;
-    min-height: 20rem;
-  }
-
-  &.honor-shape-1 {
-    grid-column: span 5;
-    min-height: 20rem;
-  }
-
-  &.honor-shape-5 {
-    grid-column: span 5;
-    min-height: 18rem;
-  }
-
-  &:last-child {
-    grid-column: 1 / -1;
-    min-height: 14rem;
-  }
-
-  &.honor-shape-0 {
-    --honor-rotation: -0.28deg;
-  }
-  &.honor-shape-1 {
-    --honor-rotation: 0.24deg;
-  }
-  &.honor-shape-3 {
-    --honor-rotation: -0.18deg;
-  }
-  &.honor-shape-5 {
-    --honor-rotation: 0.2deg;
-  }
-
-  &.honor-phase-1 {
-    animation-delay: 45ms;
-  }
-  &.honor-phase-2 {
-    animation-delay: 90ms;
-  }
-  &.honor-phase-3 {
-    animation-delay: 135ms;
-  }
-  &.honor-phase-4 {
-    animation-delay: 180ms;
-  }
-  &.honor-phase-5 {
-    animation-delay: 225ms;
   }
 }
 
@@ -1937,16 +1945,12 @@ onBeforeUnmount(() => {
   }
 }
 
-@keyframes honor-card-in {
+@keyframes honor-marquee {
   from {
-    opacity: 0;
-    filter: blur(0.25rem);
-    translate: 0 1.1rem;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    opacity: 1;
-    filter: blur(0);
-    translate: 0 0;
+    transform: translate3d(calc(-50% - var(--honor-gap) / 2), 0, 0);
   }
 }
 
@@ -2059,17 +2063,16 @@ onBeforeUnmount(() => {
     padding-top: 0;
   }
 
-  .honors-grid {
-    grid-template-columns: 1fr;
+  .honors-marquee {
+    margin-inline: -0.35rem;
+    mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
   }
 
-  .honor-card,
-  .honor-card.honor-shape-0,
-  .honor-card.honor-shape-1,
-  .honor-card.honor-shape-5,
-  .honor-card:last-child {
-    grid-column: 1;
-    min-height: 17rem;
+  .honor-card {
+    flex-basis: min(78vw, 19rem);
+    width: min(78vw, 19rem);
+    min-height: 12.5rem;
   }
 
   .honor-dialog-panel {
@@ -2228,6 +2231,25 @@ onBeforeUnmount(() => {
   .honor-card {
     opacity: 1;
     translate: none;
+  }
+
+  .honors-marquee {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .honor-marquee-row {
+    scroll-snap-type: x proximity;
+  }
+
+  .honor-marquee-track {
+    transform: none !important;
+    animation: none !important;
+    will-change: auto;
+  }
+
+  .honor-card {
+    scroll-snap-align: start;
   }
 
   .hero-animate {

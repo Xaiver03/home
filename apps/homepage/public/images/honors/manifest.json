@@ -1,95 +1,95 @@
 {
   "schemaVersion": 1,
-  "redactionMethod": "irreversible-28px-downsample-rebuild-blur-metadata-strip",
+  "redactionMethod": "selective-professional-number-redaction-clear-preview-metadata-strip",
   "assets": [
     {
       "id": "accounting-junior-qualification",
       "file": "/images/honors/accounting-junior-qualification.webp",
-      "sha256": "390493770decd265c8261adcd5fe4c2f11d2feec79130bfe3377502fa14e7b52",
+      "sha256": "2dc7a94376b97b191d6b2b72ef81bb28ba855e787f15549a93ac603e8b306c0f",
       "width": 960,
       "height": 640
     },
     {
       "id": "financial-challenge-provincial-second",
       "file": "/images/honors/financial-challenge-provincial-second.webp",
-      "sha256": "0fd07014cfacfbbd9fa3e3297aaa40826e69da7b84d8054b8e9e40b02be22cd3",
+      "sha256": "4f9a0f6c83dccffa78c40176292746d51b71763531cfb6b1cc87e3bca758881e",
       "width": 960,
       "height": 640
     },
     {
       "id": "huashu-cup-excellence",
       "file": "/images/honors/huashu-cup-excellence.webp",
-      "sha256": "9f40993c7e4ea34b2630dfd54fd369169bb6ad5089140e4912855cf4225f72b1",
+      "sha256": "ec945904f47c508f3ac7d9910f8d006157e3434faac845b3325ead913e303258",
       "width": 960,
       "height": 640
     },
     {
       "id": "mathematical-modeling-first",
       "file": "/images/honors/mathematical-modeling-first.webp",
-      "sha256": "0d1ab74a370027b49a3081377c3383d6d0f55f77b211cc9e609b30b21eeb2c60",
+      "sha256": "ca3f498380c1ac0c0ed4a6720ea99efeb2e11a3971a22159f49f1284d93bbb81",
       "width": 960,
       "height": 640
     },
     {
       "id": "career-planning-beijing-silver",
       "file": "/images/honors/career-planning-beijing-silver.webp",
-      "sha256": "026cca3c7cde92318b391bc9bedca490d39106f115f999c99e59cbac23762a28",
+      "sha256": "d94e8e2610661e94f7266f814be594f7fce85cd71e9535133d6c687f8342d00a",
       "width": 960,
       "height": 640
     },
     {
       "id": "three-innovation-provincial-second",
       "file": "/images/honors/three-innovation-provincial-second.webp",
-      "sha256": "ade9503b75b1cf3c209a04381bda5d3ce8b27bb124bb0ce12c891024d0da736f",
+      "sha256": "7f17ce88a45018c374679499c0279d04e898dd72eca53e85a0c4ac22c62f8298",
       "width": 960,
       "height": 640
     },
     {
       "id": "three-innovation-national-second",
       "file": "/images/honors/three-innovation-national-second.webp",
-      "sha256": "726bd2822e0a055593012b7537145478c7f9396c4ac2365281f1074cdd255d12",
+      "sha256": "9265c37a83876fe55b357a624fc1de0b05221d0b83a5c8a9387ad20185495286",
       "width": 960,
       "height": 640
     },
     {
       "id": "three-innovation-best-innovation",
       "file": "/images/honors/three-innovation-best-innovation.webp",
-      "sha256": "447c390619771efc25a3b79c06c7c61f7dc0a2fa6d6ec5981e7bccb5df03eda5",
+      "sha256": "ce0190ab9f2d82adccc1a10e66f09a831a869761fae0074fc9b7381c3a8e8bc5",
       "width": 960,
       "height": 640
     },
     {
       "id": "internet-plus-beijing-first",
       "file": "/images/honors/internet-plus-beijing-first.webp",
-      "sha256": "ced76cd9d86d0aee7cef26b46b5bf379a415ed45325cd287e3f38dd5ae5015d5",
+      "sha256": "9fbf2dd092738a837a4ac4ba27fdff16a5c140f5263f1efac3a4de0787b783ae",
       "width": 960,
       "height": 640
     },
     {
       "id": "internet-plus-beijing-third",
       "file": "/images/honors/internet-plus-beijing-third.webp",
-      "sha256": "3cb6df20bd63e82fe94380e563f41d9180a21bc735099a73a22c92779bb4fe3c",
+      "sha256": "8877aa715dbcc99def3ea4d96c8daf89f08d06b4c84501b7e68c9fd0e9366338",
       "width": 960,
       "height": 640
     },
     {
       "id": "social-enterprise-first",
       "file": "/images/honors/social-enterprise-first.webp",
-      "sha256": "a0fff5515b3767199cd26087b2dcc96850d2fc1a298b83f0f5398d5994dc8d50",
+      "sha256": "8bb000879ca06d8a6e15330e0dacdde64e4d0573aafe75715df3f33c29759eee",
       "width": 960,
       "height": 640
     },
     {
       "id": "internet-innovation-2025-beijing-third",
       "file": "/images/honors/internet-innovation-2025-beijing-third.webp",
-      "sha256": "8c675b9f8e937fb9c729a90fec96ec206643379430136ac7dc35db52bcc9a5fa",
+      "sha256": "574fa3b8fccf5d30e77616b732f9580f144bc422570e91f73196f1e28afd3d04",
       "width": 960,
       "height": 640
     },
     {
       "id": "council-director-appointment",
       "file": "/images/honors/council-director-appointment.webp",
-      "sha256": "d4cf5bf42c5d7650b5adc78615d15db516c81e11dbc4fa407a09f5f73c0a4d4b",
+      "sha256": "d88d2ec0ff5119cf8faf2a14d55aa6d6bee86bdb1f378337f893dd827504e3b2",
       "width": 960,
       "height": 640
     }

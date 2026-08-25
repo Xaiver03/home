@@ -27,8 +27,8 @@ Treat the user's private certificate directory as source material, not a deploym
 
 1. Confirm the exact title, category, issuer, date and summary.
 2. Mark the item `public` only after the user explicitly selects it.
-3. Remove certificate numbers, identity numbers, addresses, contact information, signatures and unrelated document pages.
-4. Prefer a text summary or a deliberately redacted thumbnail.
+3. Remove identity numbers, addresses, contact information, private QR codes and unrelated document pages. Redact professional credential numbers unless the user explicitly approves that exact field; public competition-award numbers may remain when the user approves the certificate for clear display.
+4. Prefer a text summary or a reviewed public thumbnail with only the necessary fields redacted.
 5. Keep original PDFs and high-resolution evidence local unless the user explicitly authorizes publication.
 
 Future credentials such as `高中语文教师资格证` should be added as a new `职业资格` record without changing the component schema. Unknown or incomplete records remain private.
@@ -37,7 +37,7 @@ Future credentials such as `高中语文教师资格证` should be added as a ne
 
 Use `scripts/generate-honor-assets.mjs` for certificate-derived wall thumbnails. Its source allowlist contains relative paths only; provide the reviewed source root with `HONOR_SOURCE_DIR`. Run without `--apply` first, then generate only after the dry-run succeeds.
 
-The generator irreversibly reduces each source to 28×28 pixels before rebuilding and blurring it, strips metadata, and writes only 960×640 WebP files plus `manifest.json` under `apps/homepage/public/images/honors/`. This output preserves paper/color atmosphere, not readable evidence. Award titles and summaries belong in the HTML data layer.
+The generator creates clear 960×640 WebP previews with a softly blurred framing background and strips all metadata. Its allowlist applies normalized, irreversible region masks only to reviewed sensitive fields. The current professional-accounting credential masks document/identity/management numbers and its lookup QR code; approved competition awards remain readable. Keep redaction geometry explicit and test-validated instead of applying a global blur.
 
 - Never add a private absolute source path to code, JSON, logs or configuration.
 - Never copy source PDF/JPEG/ZIP files into `public`.
@@ -83,7 +83,7 @@ After an update:
 3. Check desktop and mobile layouts for even and odd site counts, long labels, keyboard focus and no horizontal overflow.
 4. Run the homepage tests and build.
 5. Keep the backup path, changed labels, asset hashes and validation results in the report.
-6. Confirm public HTML, JSON and JavaScript contain no local private path, original certificate URL, certificate number or source archive name.
+6. Confirm public HTML, JSON and JavaScript contain no local private path, original certificate URL, protected professional credential/identity number or source archive name.
 
 If any verification fails, stop publishing, restore the prior configuration and asset from the timestamped backup, and re-run the same read-only checks. Never claim production success when SSH, database, build or HTTP verification is incomplete.
 
