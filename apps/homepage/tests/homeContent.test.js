@@ -60,13 +60,13 @@ describe('home content helpers', () => {
     ).toBe('错误替代文本的公开展示图');
   });
 
-  it('keeps GitHub and more sites as distinct, explicit entries', () => {
+  it('keeps GitHub without adding a redundant more-sites entry', () => {
     expect(defaultSiteLinks).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: 'GitHub', link: 'https://github.com/Xaiver03/' }),
-        expect.objectContaining({ name: '更多站点', link: '/blog/link' }),
       ]),
     );
+    expect(defaultSiteLinks.some((link) => link.name === '更多站点')).toBe(false);
   });
 
   it('fills new safe image fields into legacy backend honors by id', () => {
