@@ -1,0 +1,150 @@
+# push 前置闸的判据。目的很窄：拦住「把口令写进连接串或赋值语句再提交」这一类，
+# 这一类是本仓 2026-10-10 那两枚真口令泄露的实际形状。
+#
+# 语法约束（实测出来的，不是猜的）：
+#  1) gitleaks 用 Go 的 RE2，不支持 (?!) 前瞻，所以「占位/变量」只能靠 allowlists 排除；
+#  2) allowlist 的 regexes 默认对「整条 match」判，不对「抽出来的 secret」判——
+#     要给锚定的 ^<…>$ 这种形状用，必须显式写 regexTarget = "secret" 并给规则配 secretGroup；
+#  3) [[rules.allowlists]] 只作用于**它上面最近的那一条 [[rules]]**，靠位置不靠缩进；
+#  4) 一条空的 [[rules.allowlists]]（没 regexes/paths/commits）会让 gitleaks 直接 FTL 拒载整份配置
+#     ——现量：`gitleaks dir` 报 "an [[allowlists]] must contain at least one check for: commits,
+#     paths, regexes"，退 1 且一条 finding 都不出。那是"闸门坏了"被误读成"仓很干净"的最快一条路，
+#     所以改完这份文件必须跑：gitleaks dir 能出报表 ＋ tfa-gate-teeth.sh 的红臂仍拦、绿臂仍放。
+title = "_shared gitleaks 前置闸"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "credential-in-connection-uri"
+description = "连接串里内联口令：scheme://user:pass@host（任何协议，含 postgres/mysql/redis/amqp/http，含 SQLAlchemy 那种 scheme+driver 写法）"
+regex = '''(?i)\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis(?:s)?|amqp(?:s)?|https?|ftp|clickhouse|sqlserver|mssql)(?:\+[a-z0-9_.\-]+)?://[^\s:@/]{0,64}:([^\s@/]{6,})@[^\s/"']+'''
+keywords = ["://"]
+secretGroup = 1
+[[rules.allowlists]]
+description = "口令位是变量引用或尖括号占位——这两种是本仓文档实际用的写法"
+regexTarget = "secret"
+regexes = [
+  '''^<.*>$''',
+  '''^\$[{]?[A-Za-z_][A-Za-z0-9_]*[}]?$''',
+  '''^\{\{[^}]+\}\}''',
+  '''^(?:x|X|\*|\.){6,}$''',
+  '''(?i)^(?:changeme|replace[_-]?me|placeholder|your[_-]?password|my[_-]?password|password123|123456789|example)$''',
+  # compose 的必设变量：口令位写成 ${NAME:?一句纯小写说明} 时不算值；混进大写/数字/符号即不命中这一条
+  '''^\$\{[A-Z0-9_]+:\?[a-z ]{1,40}\}$''',
+]
+
+[[rules]]
+id = "literal-password-assignment"
+description = "把口令写成字面量的赋值：PASSWORD= / PGPASSWORD= / PASSWD= / pwd=（值长度 ≥8 且不是变量引用）"
+regex = '''(?i)\b(?:pg)?(?:password|passwd|pwd)\s*=\s*["']?([^\s"']{8,})["']?'''
+keywords = ["password", "passwd", "pwd"]
+secretGroup = 1
+[[rules.allowlists]]
+description = "右边是变量/模板占位，不是值"
+regexTarget = "secret"
+regexes = [
+  '''^<.*>$''',
+  '''^["']?\$\{?[A-Za-z_][A-Za-z0-9_]*\}?["']?$''',
+  '''^["']?\{\{[^}]+\}\}["']?$''',
+  '''^["']?(?:x|X|\*|\.){6,}["']?$''',
+  '''(?i)^["']?(?:changeme|change_me|replace[_-]?me|placeholder|dummy|fake|example|sample|your[_-]?(?:password|passwd|pwd)|password[_-]?here|<.*>)["']?$''',
+  '''(?i)^["']?(?:null|none|empty|true|false|undefined|required)["']?$''',
+  '''^\$\{[A-Z0-9_]+:\?[a-z ]{1,40}\}$''',
+]
+
+[[rules]]
+id = "cloud-secret-id"
+description = "腾讯云 SecretId 形态（AKID… 开头）——本机 .cos.conf 那枚坏掉的凭证就是这个形状，别再进提交"
+regex = '''\bAKID[0-9A-Za-z]{13,}\b'''
+keywords = ["AKID"]
+
+# 没有整文件/整目录豁免。要让某一格免掉，得带着「文件:行 + 为什么它是占位」来加一条形状，
+# 而不是把判据对一片路径关掉。默认规则（private key、AK/SK、各类厂商 token）一律保留。
+
+[[rules]]
+id = "chinese-keyed-password"
+description = "中文键名紧贴分隔符的字面量口令：**密码**: x / 口令：x / 密码=x（值 >=8，尖括号与变量引用不算）"
+regex = '''(?:密码|口令|密钥|秘钥|令牌)[ \t]*(?:\*\*)?[ \t]*(?::|：|=|为)[ \t]*(?:\*\*)?[ \t]*(?:`)["'`]?([A-Za-z0-9_!@#%\^&*()\-+=.~?]{8,})'''
+keywords = ["密码", "口令", "密钥", "令牌"]
+secretGroup = 1
+[[rules.allowlists]]
+description = "变量引用与模板占位不算值"
+regexTarget = "secret"
+regexes = [
+  '''^\$[{]?[A-Za-z_][A-Za-z0-9_]*[}]?$''',
+  '''^\$\{[^}]+\}$''',
+  '''^\$\{[A-Z0-9_]+:\?[a-z ]{1,40}\}$''',
+]
+
+# 下面三条是 2026-10-10 03:3x 补的。当时那 6 格 App Store 审核账号口令用的全是中文键那条认不出的写法
+# （`| **密码** | x |`、`密码已设置: x`、`测试账号: u / x`）：尺照不出来不等于仓里没有——
+# 那 6 格是拿「按字节比存储值」那把尺（tfa-blob-desecret.py / tfa-git-blob-scan.py）照出来的，不是闸照出来的。
+# 三条都把「整段 ${…}」列为首选捕获，这样 JWT_SECRET=${VAR:?说明} 这种写法被整段拿走、
+# 再由豁免只放过"说明段纯小写"那一档；不这么写的话捕获组会钻进花括号里把变量名当成口令值（实测假阳）。
+
+# 下面这两条是 2026-10-10 03:3x 补的。当时那 6 格 App Store 审核账号口令用的全是上面几条认不出的写法
+# （`| **密码** | x |` 与 `密码已设置: \`x\``、`测试账号: u / x`）——尺照不出来不等于仓里没有：
+# 那 6 格是拿「按字节比存储值」那把尺（tfa-blob-desecret.py / tfa-git-blob-scan.py）照出来的，不是闸照出来的。
+#
+# 这一版为什么把 affix 那条收窄到「中文标签 + 反引号包着的值」：第一版把 password|secret|token 也当标签、
+# 且不要求反引号，整仓一扫就是 56 枚假阳（JWT_SECRET=…、`authorization: Bearer`、模板里的 TS 代码全中），
+# 判据把人挡到想 `--no-verify` 时，它比漏掉一种形状更有害。收窄后假阳=0（现量见退役台账执行记录七）。
+# 三条都把「整段 ${…}」列为首选捕获，让 JWT_SECRET=${VAR:?说明} 这种被整段拿走、
+# 再由豁免只放过"说明段纯小写"那一档。
+[[rules]]
+id = "credential-in-markdown-table"
+description = "表格格子里的口令：| **密码** | 值 |（这类没有冒号，中文键那条命中不了）"
+regex = """(?i)\\|[ \\t]*(?:\\*\\*)?(?:密码|口令|秘钥|密钥|令牌|password|passwd|secret|token|api[ _-]?key)(?:\\*\\*)?[ \\t]*\\|[ \\t]*["'`]?(\\$\\{[^}]+\\}|[A-Za-z0-9_!@#%\\^&*()\\-+=.~?]{8,})["'`]?[ \\t]*\\|"""
+keywords = ["密码", "口令", "密钥", "令牌", "password", "secret", "token"]
+secretGroup = 1
+[[rules.allowlists]]
+description = "尖括号占位、变量引用、必设变量的 lowercase 说明不算值"
+regexTarget = "secret"
+regexes = [
+  """^<.*>$""",
+  """^\\$[{]?[A-Za-z_][A-Za-z0-9_]*[}]?$""",
+  """^\\$\\{[^}]+\\}$""",
+  """^\\$\\{[A-Z0-9_]+:\\?[a-z ]{1,40}\\}$""",
+]
+[[rules.allowlists]]
+description = "这一行是本轮脱敏后留下的指针句式，写明值不在文档里"
+regexTarget = "line"
+regexes = ["""真值不落文档|不落文档|已移出文档|tfa-credentials"""]
+
+[[rules]]
+id = "credential-label-with-affix"
+description = "中文标签后还带一句话的口令格：密码已设置: `x` / 口令（新）为 `x`（中文键那条只认标签紧贴分隔符）"
+regex = """(?:密码|口令|秘钥|密钥|令牌)[^|\\n<>:：=为]{0,12}?[:：=为][ \\t]*`(?:\\$\\{[^}]+\\}|[A-Za-z0-9_!@#%\\^&*()\\-+=.~?]{8,})`"""
+keywords = ["密码", "口令", "密钥", "令牌"]
+secretGroup = 0
+[[rules.allowlists]]
+description = "尖括号占位与变量引用不算值"
+regexTarget = "secret"
+regexes = [
+  """^<.*>$""",
+  """^\\$\\{[^}]+\\}$""",
+]
+[[rules.allowlists]]
+description = "指针句式那一行不算"
+regexTarget = "line"
+regexes = ["""真值不落文档|不落文档|已移出文档|tfa-credentials"""]
+
+[[rules]]
+id = "account-slash-password"
+description = "「账号: user / 口令」这种一行两格的写法（本仓审核账号文档就是这么写的）"
+regex = """(?i)(?:测试账号|试用账号|账号|账户)[^|\\n<>]{0,8}?[:：][ \\t]*["'`]?(\\$\\{[^}]+\\}|[A-Za-z0-9_!@#%\\^&*()\\-+=.~?.\\[\\]{}<>-]{2,64})["'`]?[ \\t]*/[ \\t]*["'`]?(\\$\\{[^}]+\\}|[A-Za-z0-9_!@#%\\^&*()\\-+=.~?]{8,})"""
+keywords = ["账号", "账户"]
+secretGroup = 2
+[[rules.allowlists]]
+description = "第二位是变量引用或尖括号占位就不算值"
+regexTarget = "secret"
+regexes = [
+  """^<.*>$""",
+  """^\\$\\{[^}]+\\}$""",
+  """^\\$\\{[A-Z0-9_]+:\\?[a-z ]{1,40}\\}$""",
+]
+[[rules.allowlists]]
+description = "指针句式那一行不算"
+regexTarget = "line"
+regexes = ["""真值不落文档|不落文档|已移出文档|tfa-credentials"""]
