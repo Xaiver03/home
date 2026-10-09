@@ -105,7 +105,7 @@ cache_dir = os.path.expanduser(os.environ.get('TFA_CACHE_DIR', '~/.cache/tfa-pre
 cache_dir = os.path.expanduser(cache_dir)
 cache_f = os.path.join(cache_dir, '%s-%s.json' % (os.path.basename(repo.rstrip('/')), key))
 
-pub, remote_rows = None, 0
+pub, remote_rows = None, None
 if not tips:
     pub = {}
     print('字节臂：本仓远端跟踪引用=0 枚 ⇒ 无可对照的"已公开侧"，射程内每枚活值都按首次公开算')
@@ -118,6 +118,7 @@ elif os.path.isfile(cache_f):
         pub = None
 if pub is None and tips:
     seen = {}
+    remote_rows = 0
     for i in range(0, len(tips), 25):
         sub = scan(tips[i:i + 25])
         if sub is None:
@@ -149,8 +150,14 @@ for name, h in sorted(rng['hits'].items(), key=lambda kv: -kv[1]['rows']):
               % (name, h['rows'], len(h['commits'])), file=sys.stderr)
         blocked.append(name)
 
-print('字节臂分母：射程=%s 笔/diff 行=%d/已公开侧引用=%d 枚(其 diff 行=%d)/在册值=%d 枚/命中值名=%d 枚/拦=%d 枚'
-      % (rng['ncommits'], rng['rows'], len(tips), remote_rows, len(vals), len(rng['hits']), len(blocked)))
+if not tips:
+    side_note = '无已公开侧可对照'
+elif remote_rows is None:
+    side_note = '判定取自缓存，缓存不记行数'
+else:
+    side_note = '其 diff 行=%d' % remote_rows
+print('字节臂分母：射程=%s 笔/diff 行=%d/已公开侧引用=%d 枚(%s)/在册值=%d 枚/命中值名=%d 枚/拦=%d 枚'
+      % (rng['ncommits'], rng['rows'], len(tips), side_note, len(vals), len(rng['hits']), len(blocked)))
 if blocked:
     print('✗ 字节臂拦下 %d 枚：先轮换（值变死 ⇒ 改名成 *.retired-* 后本臂自动放行）或改写历史；'
           '别用 --no-verify 绕，绕过去等于交出这枚值的第一份公开副本' % len(blocked), file=sys.stderr)
