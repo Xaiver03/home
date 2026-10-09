@@ -94,8 +94,8 @@ ln -s ../../blog/space-log-express/config apps/blog-api/config
 **数据库信息**（从 CLAUDE.md）:
 - **数据库**: MySQL `space_log_blog`
 - **用户**: `blog_user`
-- **密码**: `C3AnRPL8HHGNbd33reAV`
-- **Redis**: 端口 6379，密码 `MrpBLxNrWvQPCkz3kznltO9CwdyCiP5S`
+- **密码**: `<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=20 sha12=7695b15308d3>`
+- **Redis**: 端口 6379，密码 `<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-redis.password，len=32 sha12=e4fd3d92f5a0>`
 
 ---
 
@@ -156,7 +156,7 @@ pnpm build
 
    # 测试连接
    mysql -u blog_user -p space_log_blog
-   redis-cli -a MrpBLxNrWvQPCkz3kznltO9CwdyCiP5S
+   redis-cli -a <真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-redis.password，len=32 sha12=e4fd3d92f5a0>
    ```
 
 ### 中优先级 🟡

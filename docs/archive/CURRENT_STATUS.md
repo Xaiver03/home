@@ -46,7 +46,7 @@ bash scripts/init-database.sh
 
 # 2. 执行以下 SQL
 CREATE DATABASE IF NOT EXISTS space_log_blog CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'blog_user'@'localhost' IDENTIFIED BY 'C3AnRPL8HHGNbd33reAV';
+CREATE USER IF NOT EXISTS 'blog_user'@'localhost' IDENTIFIED BY '<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=20 sha12=7695b15308d3>';
 GRANT ALL PRIVILEGES ON space_log_blog.* TO 'blog_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;

@@ -100,7 +100,7 @@ SITE_URL=xiangleideng.site
 ```bash
 VITE_SITE_NAME=邓湘雷の主页
 VITE_BASE_URL=
-VITE_WEATHER_KEY=cd5b9380bb4544201fb884a67418a7b8
+VITE_WEATHER_KEY=<真值不落文档：本机 cat ~/.config/tfa-credentials/amap-weather.key，len=32 sha12=468e2d7919ee>
 ```
 
 ### 9. Nuxt 特定配置

@@ -47,19 +47,19 @@ Error: Configuration property "mysql" is not defined
   "mysql": {
     "host": "localhost",
     "user": "blog_user",
-    "password": "C3AnRPL8HHGNbd33reAV",
+    "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=20 sha12=7695b15308d3>",
     "database": "space_log_blog"
   },
   "redis": {
     "host": "127.0.0.1",
     "port": 6379,
-    "password": "MrpBLxNrWvQPCkz3kznltO9CwdyCiP5S"
+    "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-redis.password，len=32 sha12=e4fd3d92f5a0>"
   },
   "mail": {
     "smtp_host": "gz-smtp.qcloudmail.com",
     "smtp_port": 465,
     "smtp_user": "light@xiangleideng.site",
-    "smtp_password": "Aiaih768aUShsinxSAu",
+    "smtp_password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-smtp.password，len=19 sha12=8274ea785975>",
     "from_email": "light@xiangleideng.site",
     "from_name": "邓湘雷の博客"
   },
@@ -167,7 +167,7 @@ sudo systemctl status redis
 redis-cli ping
 
 # 2. 测试密码认证
-redis-cli -a MrpBLxNrWvQPCkz3kznltO9CwdyCiP5S
+redis-cli -a <真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-redis.password，len=32 sha12=e4fd3d92f5a0>
 > PING
 ```
 
