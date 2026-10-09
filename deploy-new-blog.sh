@@ -198,7 +198,7 @@ create_backend_config() {
   "port": 8085,
   "db": {
     "type": "sqlite",
-    "mysql": "blog_user:C3AnRPL8HHGNbd33reAV@tcp(127.0.0.1:3306)/space_blog?charset=utf8mb4&parseTime=true&loc=Local",
+    "mysql": "blog_user_r2:${MYSQL_PASSWORD:-$(cat "$HOME/.config/tfa-credentials/spacep-mysql.password")}@tcp(127.0.0.1:3306)/space_blog?charset=utf8mb4&parseTime=true&loc=Local",
     "sqlite": "file:blog.db"
   },
   "storage": {
@@ -216,7 +216,7 @@ create_backend_config() {
     "smtp_host": "gz-smtp.qcloudmail.com",
     "smtp_port": 465,
     "smtp_user": "light@xiangleideng.site",
-    "smtp_password": "Aiaih768aUShsinxSAu",
+    "smtp_password": "${SMTP_PASSWORD:-$(cat "$HOME/.config/tfa-credentials/spacep-smtp.password")}",
     "from_email": "light@xiangleideng.site",
     "from_name": "邓湘雷の博客"
   },

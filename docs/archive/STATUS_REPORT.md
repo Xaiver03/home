@@ -94,7 +94,7 @@ ln -s ../../blog/space-log-express/config apps/blog-api/config
 **数据库信息**（从 CLAUDE.md）:
 - **数据库**: MySQL `space_log_blog`
 - **用户**: `blog_user`
-- **密码**: `<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=20 sha12=7695b15308d3>`
+- **密码**: `<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=32 sha12=d8d1bf43bb6e>`
 - **Redis**: 端口 6379，密码 `<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-redis.password，len=32 sha12=e4fd3d92f5a0>`
 
 ---

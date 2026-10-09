@@ -47,7 +47,7 @@ Error: Configuration property "mysql" is not defined
   "mysql": {
     "host": "localhost",
     "user": "blog_user",
-    "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=20 sha12=7695b15308d3>",
+    "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=32 sha12=d8d1bf43bb6e>",
     "database": "space_log_blog"
   },
   "redis": {

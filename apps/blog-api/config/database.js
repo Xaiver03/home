@@ -12,8 +12,9 @@ module.exports = {
     logging: false
   },
   production: {
-    username: process.env.DB_USER || 'blog_user',
-    password: process.env.DB_PASSWORD || 'C3AnRPL8HHGNbd33reAV',
+    username: process.env.DB_USER || process.env.MYSQL_USER || 'blog_user_r2',
+    // 口令不落仓库：这条 sequelize-cli 路径读 DB_PASSWORD，运行时那条读 MYSQL_PASSWORD（node-config）
+    password: process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD || '',
     database: process.env.DB_NAME || 'space_log_blog',
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,

@@ -33,7 +33,7 @@
 ```json
 // pro.json
 "mysql": {
-  "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=20 sha12=7695b15308d3>"  // 生产数据库密码
+  "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-mysql.password，len=32 sha12=d8d1bf43bb6e>"  // 生产数据库密码
 },
 "redis": {
   "password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-redis.password，len=32 sha12=e4fd3d92f5a0>"  // Redis 密码

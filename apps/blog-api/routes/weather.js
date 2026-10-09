@@ -3,7 +3,8 @@ const router = express.Router();
 const axios = require('axios');
 
 // 高德API配置
-const AMAP_KEY = 'cd5b9380bb4544201fb884a67418a7b8';
+const AMAP_KEY = process.env.WEATHER_API_KEY || process.env.VITE_WEATHER_KEY || '';
+if (!AMAP_KEY) console.warn('未取到天气 key：现取 ~/.config/tfa-credentials/amap-weather.key（0600）')
 
 // 获取IP定位信息
 router.get('/ip', async (req, res) => {

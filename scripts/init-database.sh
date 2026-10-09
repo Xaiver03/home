@@ -5,8 +5,10 @@
 
 MYSQL_BIN="/usr/local/mysql-8.2.0-macos13-arm64/bin/mysql"
 DB_NAME="space_log_blog"
-DB_USER="blog_user"
-DB_PASS="C3AnRPL8HHGNbd33reAV"
+DB_USER="${DB_USER:-blog_user_r2}"
+# 口令不落仓库：现取 ~/.config/tfa-credentials/spacep-mysql.password（0600，len=32）
+DB_PASS="${DB_PASS:-$(cat "$HOME/.config/tfa-credentials/spacep-mysql.password" 2>/dev/null || true)}"
+[ -n "$DB_PASS" ] || { echo "拿不到 DB_PASS：设 DB_PASS 或放好 ~/.config/tfa-credentials/spacep-mysql.password" >&2; exit 1; }
 
 echo "🔧 开始初始化数据库..."
 echo ""
