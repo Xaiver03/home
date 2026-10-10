@@ -144,8 +144,18 @@ if not tips:
 elif os.path.isfile(cache_f):
     try:
         j = json.load(open(cache_f))
-        pub = j['pub']
-        print('字节臂：已公开侧读数取自缓存（键=%s 远端引用=%d 枚；远端 tip 一变键就变）' % (key, len(tips)))
+        cached = j['pub']
+        # 「缓存里没有这枚键」≠「已公开侧 0 笔」：缓存是上一发射程写下的，上一发没命中的值名压根不在表里。
+        # 现量撞到的那一发：同一射程连跑两发，第一发射程没带 volc-supabase.anon.key（那枚值这时还没进这批复射），
+        # 第二发带上了 ⇒ 拿 .get(name,0) 读出「已公开侧 0 笔 ⇒ 这次 push 第一次推上公开面」，
+        # 而这枚值实测在已推侧全部 4 笔提交的树里，自 2026-06-05 根提交就在。缺任何一枚在册名 ⇒ 整份缓存作废、重扫。
+        missing = [n for n, _, _ in vals if n not in cached]
+        if missing:
+            pub = None
+            print('字节臂：缓存缺 %d 枚在册名（上一发射程没命中它们，不是"已公开侧 0 笔"）⇒ 整份重扫' % len(missing))
+        else:
+            pub = cached
+            print('字节臂：已公开侧读数取自缓存（键=%s 远端引用=%d 枚；远端 tip 一变键就变）' % (key, len(tips)))
     except Exception:
         pub = None
 if pub is None and tips:
@@ -160,7 +170,8 @@ if pub is None and tips:
         for name, h in sub['hits'].items():
             st = seen.setdefault(name, set())
             st.update(h['commits'])
-    pub = {name: len(seen.get(name, set())) for name in rng['hits']}
+    # 写缓存时按**全部在册名**建表，不按"这一发命中的名"建表：只存命中名会让下一发把缺键读成 0（上面那条注释的形状）。
+    pub = {name: len(seen.get(name, set())) for name, _, _ in vals}
     os.makedirs(cache_dir, exist_ok=True)
     fd = os.open(cache_f, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w') as f:
