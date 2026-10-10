@@ -28,6 +28,38 @@ STORE = os.path.expanduser(os.environ.get('TFA_SECRET_STORE', '~/.config/tfa-cre
 if not range_opts.strip():
     print('字节臂：没给射程 ⇒ 这一臂没跑（不许读成"没命中"）', file=sys.stderr)
     sys.exit(3)
+
+# 文件名臂（不需要值目录 ⇒ 在没装存储的机器上照样有效）：私钥材料以"路径形状"进射程就拦。
+# 豁免 debug.keystore：那是跟仓走的公开模板件（heyta 里已跟踪，台账十七 §4 记的就是它），拦它只会逼人 --no-verify 绕闸。
+NAME_SHAPE = re.compile(r'(?:^|/)(?:keystore|signing|key)\.properties$|\.(?:keystore|jks|p12|mobileprovision|pk8)$')
+NAME_EXEMPT = re.compile(r'(?:^|/)debug\.keystore$')
+ns = subprocess.run(['git', '-c', 'core.quotepath=off', '-C', repo, 'log', *range_opts.split(),
+                     '--format=', '--name-status', '--no-color'],
+                    capture_output=True, text=True)
+if ns.returncode != 0:
+    print('文件名臂：射程取不出（%s）⇒ 本臂作废（退 3）' % (ns.stderr.strip()[:120] or 'rev 选项坏了'), file=sys.stderr)
+    sys.exit(3)
+bad_names = []
+for line in ns.stdout.splitlines():
+    parts = line.split('\t')
+    if len(parts) < 2 or not parts[0]:
+        continue
+    status, paths = parts[0], parts[1:]
+    if status[0] not in ('A', 'R', 'C'):
+        continue
+    # R/C 只看落地那一个路径：把私钥文件改名成普通文件是允许的，反过来（普通→私钥形状）才算新增。
+    checked = [paths[-1]] if status[0] in ('R', 'C') else paths
+    for p in checked:
+        if NAME_SHAPE.search(p) and not NAME_EXEMPT.search(p):
+            bad_names.append('%s %s' % (status, p))
+if bad_names:
+    print('文件名臂：射程里有 %d 枚私钥形状的新增/改名路径 ⇒ 拦（这类路径的值不在值目录里也拦，'
+          '因为判的是形状不是值）' % len(bad_names), file=sys.stderr)
+    for b in bad_names[:20]:
+        print('  ✗ ' + b, file=sys.stderr)
+    sys.exit(1)
+print('文件名臂：射程内私钥形状新增/改名=0 枚（豁免 debug.keystore）')
+
 if not os.path.isdir(STORE):
     print('字节臂：本机没有值目录 %s ⇒ 这一臂没跑（形状尺照跑；换机时要么把值目录装齐，'
           '要么别指望这一臂）' % STORE, file=sys.stderr)
