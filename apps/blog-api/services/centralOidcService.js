@@ -11,8 +11,9 @@ const SESSION_COOKIE = '__Host-home_session';
 const CSRF_COOKIE = '__Host-home_csrf';
 const CLAIM_COOKIE = '__Host-home_oidc_claim';
 const STATE_COOKIE = '__Host-home_oidc_state';
-const MANAGEMENT_CAPABILITY = 'xcreative.blog.manage';
-const PUBLIC_CAPABILITY = 'xcreative.blog.use';
+// 本仓是个人主页，只认自己产品的两项能力。
+const MANAGEMENT_CAPABILITY = 'home.blog.manage';
+const PUBLIC_CAPABILITY = 'home.blog.use';
 const SUBJECT_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const runtime = () => {
@@ -212,6 +213,10 @@ const introspect = async (accessToken) => {
   return result;
 };
 
+// 中央可能在同一 token 上返回其他产品的能力；本站仅保留明确登记的两项。
+const ownCapabilities = (list) => list
+  .filter((item) => item === MANAGEMENT_CAPABILITY || item === PUBLIC_CAPABILITY);
+
 // 管理权限属于中央能力协议，不由 OIDC scope 或本地留档推导。
 // 该请求始终带产品 client Basic 认证和中央 access token，便于中央同时校验
 // token、client 绑定及能力撤销状态。
@@ -227,7 +232,7 @@ const capabilities = async (accessToken) => {
     body: new URLSearchParams({ token: accessToken }).toString(),
   });
   if (result.active !== true || result.client_id !== config.clientId || !SUBJECT_RE.test(result.sub || '') || !Array.isArray(result.capabilities)) return null;
-  return { sub: result.sub, capabilities: result.capabilities.filter((item) => typeof item === 'string') };
+  return { sub: result.sub, capabilities: ownCapabilities(result.capabilities) };
 };
 
 const refresh = async (refreshToken) => {
@@ -484,6 +489,8 @@ module.exports = {
   CSRF_COOKIE,
   CLAIM_COOKIE,
   STATE_COOKIE,
+  MANAGEMENT_CAPABILITY,
+  PUBLIC_CAPABILITY,
   beginLogin,
   finishLogin,
   sessionFromRequest,

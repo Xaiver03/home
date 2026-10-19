@@ -61,7 +61,19 @@ describe('文章路由的统一能力边界', () => {
     const res = response();
     const proceed = next();
 
-    route.stack[0].handle({ auth: { capabilities: ['xcreative.blog.use'] } }, res, proceed);
+    route.stack[0].handle({ auth: { capabilities: ['home.blog.use'] } }, res, proceed);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: -1 }));
+    expect(proceed).not.toHaveBeenCalled();
+  });
+
+  test('只持有公司站管理能力时拒绝本站管理查询', () => {
+    const route = routeFor('/getArticleNumData', 'get');
+    const res = response();
+    const proceed = next();
+
+    route.stack[0].handle({ auth: { capabilities: ['xcreative.blog.manage'] } }, res, proceed);
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: -1 }));
@@ -73,7 +85,7 @@ describe('文章路由的统一能力边界', () => {
     const res = response();
     const proceed = next();
 
-    route.stack[0].handle({ auth: { capabilities: ['xcreative.blog.manage'] } }, res, proceed);
+    route.stack[0].handle({ auth: { capabilities: ['home.blog.manage'] } }, res, proceed);
 
     expect(proceed).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();

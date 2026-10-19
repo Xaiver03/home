@@ -31,6 +31,8 @@ const {
   sessionFromRequest,
   sendPendingClaimCode,
   createProductSession,
+  MANAGEMENT_CAPABILITY,
+  PUBLIC_CAPABILITY,
 } = require('../services/centralOidcService');
 
 const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
@@ -68,12 +70,12 @@ describe('中央 OIDC 安全边界', () => {
     process.env.OIDC_CLIENT_SECRET = 'secret';
     process.env.BLOG_PUBLIC_ORIGIN = 'https://blog.example.test';
     global.fetch = jest.fn()
-      .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'home', capabilities: ['xcreative.blog.manage'] }) });
+      .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'home', capabilities: ['home.blog.manage'] }) });
 
     const received = await capabilities('opaque-access-token');
     await expect(Promise.resolve(received)).resolves.toEqual({
       sub: subject,
-      capabilities: ['xcreative.blog.manage'],
+      capabilities: [MANAGEMENT_CAPABILITY],
     });
     const capabilityRequest = global.fetch.mock.calls[0];
     expect(capabilityRequest[0]).toBe('https://identity.example.test/api/oidc/capabilities');
@@ -82,8 +84,63 @@ describe('中央 OIDC 安全边界', () => {
     expect(capabilityRequest[1].headers['content-type']).toBe('application/x-www-form-urlencoded');
     expect(capabilityRequest[1].body).toBe('token=opaque-access-token');
 
-    global.fetch.mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'another-product', capabilities: ['xcreative.blog.manage'] }) });
+    global.fetch.mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'another-product', capabilities: ['home.blog.manage'] }) });
     await expect(capabilities('opaque-access-token')).resolves.toBeNull();
+  });
+
+  test('公司站 xcreative.blog.* 能力不进入本站会话，不能换取本站权限', async () => {
+    const subject = '11111111-1111-4111-8111-111111111112';
+    process.env.OIDC_ISSUER_URL = 'https://identity.example.test/api/oidc';
+    process.env.OIDC_CLIENT_ID = 'home';
+    process.env.OIDC_CLIENT_SECRET = 'secret';
+    process.env.BLOG_PUBLIC_ORIGIN = 'https://blog.example.test';
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      text: async () => JSON.stringify({
+        active: true,
+        sub: subject,
+        client_id: 'home',
+        capabilities: ['xcreative.blog.manage', 'xcreative.blog.use', 'platform.manage', 'litopia.use'],
+      }),
+    });
+
+    const received = await capabilities('opaque-access-token');
+    expect(received).toEqual({ sub: subject, capabilities: [] });
+    expect(received.capabilities).not.toContain('xcreative.blog.manage');
+    expect(received.capabilities).not.toContain('xcreative.blog.use');
+    expect(received.capabilities).not.toContain('platform.manage');
+    expect(received.capabilities).not.toContain('litopia.use');
+  });
+
+  test('只有公司站管理能力时管理登录被拒，不映射成本站管理员', async () => {
+    configureClient();
+    const subject = '11111111-1111-4111-8111-111111111113';
+    const admin = { id: 9, mail: 'admin@example.test', identitySubject: subject };
+    Admin.findOne.mockResolvedValue(admin);
+    User.findOne.mockResolvedValue(null);
+    const result = await createProductSession({
+      subject, email: 'admin@example.test', displayName: 'Admin', token: 'opaque',
+      scope: 'openid profile email offline_access', mode: 'management',
+      grantedCapabilities: ['xcreative.blog.manage'], returnTo: '/admin/',
+      res: { cookie: jest.fn() },
+    });
+    expect(result.identityBindingRequired).toBe(true);
+    expect(CentralAuthSession.create).not.toHaveBeenCalled();
+  });
+
+  test('只有公司站公开能力时公开登录被拒，不 JIT 建立本站用户', async () => {
+    configureClient();
+    const subject = '11111111-1111-4111-8111-111111111114';
+    Admin.findOne.mockResolvedValue(null);
+    User.findOne.mockResolvedValue(null);
+    const result = await createProductSession({
+      subject, email: 'person@example.test', displayName: 'Person', token: 'opaque',
+      scope: 'openid profile email offline_access', mode: 'public',
+      grantedCapabilities: ['xcreative.blog.use'], returnTo: '/blog/',
+      res: { cookie: jest.fn() },
+    });
+    expect(result.identityBindingRequired).toBe(true);
+    expect(User.findOrCreate).not.toHaveBeenCalled();
   });
 
   test('公开能力通过且本地没有 User 时按中央 subject JIT 创建，不按邮箱自动合并', async () => {
@@ -97,7 +154,7 @@ describe('中央 OIDC 安全边界', () => {
     const result = await createProductSession({
       subject, email: 'Person@Example.Test', displayName: 'Person', token: 'opaque',
       scope: 'openid profile email offline_access', mode: 'public',
-      grantedCapabilities: ['xcreative.blog.use'], returnTo: '/blog/',
+      grantedCapabilities: [PUBLIC_CAPABILITY], returnTo: '/blog/',
       res: { cookie: jest.fn() },
     });
     expect(result.identity.kind).toBe('user');
@@ -116,7 +173,7 @@ describe('中央 OIDC 安全边界', () => {
     const result = await createProductSession({
       subject, email: 'person@example.test', displayName: 'Person', token: 'opaque',
       scope: 'openid profile email offline_access', mode: 'public',
-      grantedCapabilities: ['xcreative.blog.use'], returnTo: '/blog/',
+      grantedCapabilities: [PUBLIC_CAPABILITY], returnTo: '/blog/',
       res: { cookie: jest.fn() },
     });
     expect(result.identityBindingRequired).toBe(true);
@@ -132,7 +189,7 @@ describe('中央 OIDC 安全边界', () => {
     const result = await createProductSession({
       subject, email: 'person@example.test', displayName: 'Person', token: 'opaque',
       scope: 'openid profile email offline_access', mode: 'public',
-      grantedCapabilities: ['xcreative.blog.use'], returnTo: '/blog/',
+      grantedCapabilities: [PUBLIC_CAPABILITY], returnTo: '/blog/',
       res: { cookie: jest.fn() },
     });
     expect(result.identityBindingRequired).toBe(true);
@@ -198,7 +255,7 @@ describe('中央 OIDC 安全边界', () => {
     const result = await createProductSession({
       subject, email: 'person@example.test', displayName: 'Person', token: 'opaque',
       scope: 'openid profile email offline_access', mode: 'public',
-      grantedCapabilities: ['xcreative.blog.use'], returnTo: '/blog/',
+      grantedCapabilities: [PUBLIC_CAPABILITY], returnTo: '/blog/',
       res: { cookie: jest.fn() },
     });
     expect(result.identity.id).toBe(44);
@@ -237,14 +294,62 @@ describe('中央 OIDC 安全边界', () => {
         jwks_uri: 'https://identity.example.test/api/oidc/jwks',
       }) })
       .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, client_id: 'home', token_type: 'Bearer', sub: subject, scope: row.scope }) })
-      .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'home', capabilities: ['xcreative.blog.manage'] }) })
+      .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'home', capabilities: [MANAGEMENT_CAPABILITY] }) })
       .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, client_id: 'home', token_type: 'Bearer', sub: subject, scope: row.scope }) })
       .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ active: true, sub: subject, client_id: 'home', capabilities: [] }) });
 
     const req = { cookies: { '__Host-home_session': 'handle' } };
-    await expect(sessionFromRequest(req)).resolves.toEqual(expect.objectContaining({ capabilities: ['xcreative.blog.manage'] }));
+    await expect(sessionFromRequest(req)).resolves.toEqual(expect.objectContaining({ capabilities: [MANAGEMENT_CAPABILITY] }));
     await expect(sessionFromRequest(req)).resolves.toEqual(expect.objectContaining({ capabilities: [] }));
     expect(global.fetch).toHaveBeenCalledTimes(5);
+  });
+
+  test('中央只保留公司站管理能力时，本站在下一次请求即视为已撤销', async () => {
+    const subject = '22222222-2222-4222-8222-222222222223';
+    process.env.OIDC_ISSUER_URL = 'https://identity.example.test/api/oidc';
+    process.env.OIDC_CLIENT_ID = 'home';
+    process.env.OIDC_CLIENT_SECRET = 'secret';
+    process.env.OIDC_STATE_ENCRYPTION_KEY = 'test-state-secret';
+    process.env.BLOG_PUBLIC_ORIGIN = 'https://blog.example.test';
+    const row = {
+      identitySubject: subject,
+      accessTokenCiphertext: sealed('access-token'),
+      refreshTokenCiphertext: null,
+      tokenExpiresAt: new Date(Date.now() + 3600 * 1000),
+      idleExpiresAt: new Date(Date.now() + 3600 * 1000),
+      absoluteExpiresAt: new Date(Date.now() + 3600 * 1000),
+      revokedAt: null,
+      scope: 'openid profile email offline_access',
+      mode: 'management',
+      localUserId: null,
+      localAdminId: 7,
+      csrfHash: 'csrf-hash',
+      handleHash: 'handle-hash',
+      update: jest.fn().mockResolvedValue(undefined),
+    };
+    CentralAuthSession.findOne.mockResolvedValue(row);
+    global.fetch = jest.fn(async (url) => {
+      let body;
+      if (url.endsWith('/.well-known/openid-configuration')) body = {
+        issuer: process.env.OIDC_ISSUER_URL,
+        authorization_endpoint: 'https://identity.example.test/api/oidc/authorize',
+        token_endpoint: 'https://identity.example.test/api/oidc/token',
+        introspection_endpoint: 'https://identity.example.test/api/oidc/introspect',
+        jwks_uri: 'https://identity.example.test/api/oidc/jwks',
+      };
+      else if (url.endsWith('/introspect')) body = {
+        active: true, client_id: 'home', token_type: 'Bearer', sub: subject, scope: row.scope,
+      };
+      else if (url.endsWith('/capabilities')) body = {
+        active: true, sub: subject, client_id: 'home', capabilities: ['xcreative.blog.manage'],
+      };
+      else throw new Error(`unexpected request: ${url}`);
+      return { ok: true, text: async () => JSON.stringify(body) };
+    });
+
+    const session = await sessionFromRequest({ cookies: { '__Host-home_session': 'handle' } });
+    expect(session.capabilities).toEqual([]);
+    expect(session.capabilities).not.toContain('xcreative.blog.manage');
   });
 
   test('普通博客认领验证码只发给待认领中央邮箱，错误邮箱不泄露本地账号存在性', async () => {

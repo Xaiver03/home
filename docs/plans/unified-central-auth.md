@@ -31,3 +31,16 @@ host-only、Secure、HttpOnly Cookie，所有写请求有 CSRF 防护；WebSocke
 验收包含真实持久化与协议、账号认领冲突、普通用户/管理员和双用户隔离、撤销后已有
 WS 断连、Cookie/CSRF、桌面/移动明暗界面及受影响生产构建。最终切换前保留明确的
 代码候选与线上状态区分；新生产写入和发布按该任务已确认的授权范围执行。
+
+## 个人站能力命名空间
+
+本站只认自己命名空间下的能力：公开能力 `home.blog.use`，管理能力 `home.blog.manage`。
+公司站（x-c）的 `xcreative.blog.*` 等其他产品能力，中央能力端点即使对同一 token 一并
+返回，也会在进入本站会话前被剥离，既不写入本地会话也不参与授权判定；WebSocket 网关
+同样只接受 `home.blog.manage`。
+
+中央侧仍需为本站客户端 `home` 登记 `home.blog.use` 与 `home.blog.manage` 两个能力，
+并在能力端点按产品返回；未登记或未授予时本站 fail closed（不建立会话、不 JIT 建号）。
+跨产品 token 的拒绝与撤销行为在 `apps/blog-api/tests/centralOidcSecurity.test.js`、
+`apps/blog-api/tests/authRouteSecurity.test.js`、`apps/blog-api/tests/articleRouteSecurity.test.js`
+与 `services/ws-gateway/test/auth.test.js` 中有对应断言。

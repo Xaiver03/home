@@ -7,6 +7,8 @@ jest.mock('../services/centralOidcService', () => ({
   claimPendingIdentity: jest.fn(),
   sendPendingClaimCode: jest.fn(),
   STATE_COOKIE: '__Host-home_oidc_state',
+  MANAGEMENT_CAPABILITY: 'home.blog.manage',
+  PUBLIC_CAPABILITY: 'home.blog.use',
 }));
 
 const service = require('../services/centralOidcService');
@@ -35,7 +37,15 @@ describe('统一认证路由的能力边界', () => {
   });
 
   test('管理端 session 查询拒绝只有普通博客能力的产品会话', async () => {
-    service.sessionFromRequest.mockResolvedValue({ capabilities: ['xcreative.blog.use'] });
+    service.sessionFromRequest.mockResolvedValue({ capabilities: [service.PUBLIC_CAPABILITY] });
+    const res = response();
+    await handlerFor('/session', 'get')({ query: { mode: 'management' } }, res);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalled();
+  });
+
+  test('管理端 session 查询拒绝只持有公司站管理能力的产品会话', async () => {
+    service.sessionFromRequest.mockResolvedValue({ capabilities: ['xcreative.blog.manage'] });
     const res = response();
     await handlerFor('/session', 'get')({ query: { mode: 'management' } }, res);
     expect(res.status).toHaveBeenCalledWith(403);
@@ -45,12 +55,12 @@ describe('统一认证路由的能力边界', () => {
   test('管理端 session 查询接受中央实时管理能力', async () => {
     service.sessionFromRequest.mockResolvedValue({
       subject: 'subject', localUserId: null, localAdminId: 1,
-      capabilities: ['xcreative.blog.manage'], scope: ['openid'],
+      capabilities: [service.MANAGEMENT_CAPABILITY], scope: ['openid'],
     });
     const res = response();
     await handlerFor('/session', 'get')({ query: { mode: 'management' } }, res);
     expect(res.status).not.toHaveBeenCalled();
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: expect.anything(), data: expect.objectContaining({ capabilities: ['xcreative.blog.manage'] }) }));
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: expect.anything(), data: expect.objectContaining({ capabilities: [service.MANAGEMENT_CAPABILITY] }) }));
   });
 
   test('中央退出失败时返回 503，不向客户端报告成功', async () => {

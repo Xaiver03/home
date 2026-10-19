@@ -1,4 +1,4 @@
-const { sessionFromRequest, csrfValid } = require('../services/centralOidcService');
+const { sessionFromRequest, csrfValid, MANAGEMENT_CAPABILITY, PUBLIC_CAPABILITY } = require('../services/centralOidcService');
 
 const publicPaths = [
   /\/.*\/reception\//,
@@ -23,7 +23,7 @@ const testOnlyAuth = (req) => {
     const tokenService = require('../services/tokenService');
     const token = tokenService.checkToken(req.headers.authorization)?.data;
     if (!token) return null;
-    return { capabilities: token.power === 'admin' ? ['xcreative.blog.manage'] : ['xcreative.blog.use'] };
+    return { capabilities: token.power === 'admin' ? [MANAGEMENT_CAPABILITY] : [PUBLIC_CAPABILITY] };
   } catch {
     return null;
   }
@@ -46,10 +46,10 @@ const checkToken = async (req, res, next) => {
   }
 };
 
-const checkPermissions = (requiredPower = 'xcreative.blog.manage') => (req, res, next) => {
+const checkPermissions = (requiredPower = MANAGEMENT_CAPABILITY) => (req, res, next) => {
   const auth = req.auth || testOnlyAuth(req);
   if (!auth) return deny(res, 401, { code: -1, msg: '请先完成统一登录', data: {} });
-  const capability = requiredPower === 'admin' ? 'xcreative.blog.manage' : requiredPower === 'user' ? 'xcreative.blog.use' : requiredPower;
+  const capability = requiredPower === 'admin' ? MANAGEMENT_CAPABILITY : requiredPower === 'user' ? PUBLIC_CAPABILITY : requiredPower;
   if (!auth.capabilities?.includes(capability)) return deny(res, 403, { code: -1, msg: '权限不足' });
   next();
 };

@@ -8,6 +8,7 @@ const {
   claimPendingIdentity,
   sendPendingClaimCode,
   STATE_COOKIE,
+  MANAGEMENT_CAPABILITY,
 } = require('../services/centralOidcService');
 const utils = require('../utils');
 
@@ -58,7 +59,7 @@ router.get('/oidc/callback', async (req, res) => {
 router.get('/session', async (req, res) => {
   const session = await sessionFromRequest(req).catch(() => null);
   if (!session) return res.status(401).json(utils.postMessage(-1, '请先完成统一登录', {}));
-  if (req.query.mode === 'management' && !session.capabilities?.includes('xcreative.blog.manage')) {
+  if (req.query.mode === 'management' && !session.capabilities?.includes(MANAGEMENT_CAPABILITY)) {
     return res.status(403).json(utils.postMessage(-1, '管理能力未授予', {}));
   }
   res.json(utils.postMessage(undefined, '统一会话有效', {
