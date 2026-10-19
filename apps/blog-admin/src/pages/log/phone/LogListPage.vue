@@ -124,7 +124,7 @@ const { proxy } = getCurrentInstance();
 import { useRouter } from 'vue-router'
 const router = useRouter()
 import dayjs from 'dayjs';
-import Cookies from "js-cookie";
+import { getCsrfToken } from '@/utils/auth';
 import { notification } from 'ant-design-vue';
 import { useStore } from 'vuex'
 const store = useStore()
@@ -172,7 +172,7 @@ const getArticleTypes = () => { // 获取文章类目数据
 }
 let imageFileList = ref([]) // 上传封面数组
 const fileHeaders = {
-    authorization: `Bearer ${Cookies.get("token")}`,
+    'X-CSRF-Token': getCsrfToken(),
 }; // 封面图片上传header
 const handleUploadImageChange = (info) => { // 上传图片状态改变回调
     if (info.file.status === 'done') {

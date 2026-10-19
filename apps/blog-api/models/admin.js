@@ -14,6 +14,12 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false,
         comment: "管理员邮箱",
       },
+      identitySubject: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        unique: true,
+        comment: "中央统一身份 subject；只允许显式双证明绑定",
+      },
       username: {
         type: DataTypes.STRING(255),
         allowNull: true,

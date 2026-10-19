@@ -283,20 +283,9 @@ const copyTrackingCode = async (trackingCode) => {
 let userData = reactive({}); // 登录用户数据
 const getUserData = () => {
   // 获取用户数据
-  const token = utils.getCookie('token');
-  if (!utils.isNullOrEmpty(token)) {
-    // 若登录了
-    api.getUserDataByToken().then((res) => {
-      if (utils.analysisData(res, false)) {
-        // 信息获取成功
-        Object.assign(userData, res.data);
-      } else {
-        // 信息获取失败
-        utils.removeCookie('token'); // 去除token
-        userData = {};
-      }
-    });
-  }
+  api.getUserDataByToken().then((res) => {
+    if (res.code >= 0 && res.data) Object.assign(userData, res.data);
+  }).catch(() => {});
 };
 const mdEditor = ref(null); // md编辑器实体
 let currentMessage = reactive({

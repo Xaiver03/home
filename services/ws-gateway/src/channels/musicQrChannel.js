@@ -15,7 +15,7 @@ const mapEventName = (data) => {
 
 const isFinalStatus = (data) => data.code < 0 || data.status === 0 || data.status === 65;
 
-const subscribe = ({ ws, id, params, token }) => {
+const subscribe = ({ ws, id, params, cookie }) => {
   const sessionId = params && params.sessionId;
   if (!sessionId) {
     sendJson(ws, {
@@ -65,7 +65,7 @@ const subscribe = ({ ws, id, params, token }) => {
       pollUrl.searchParams.set('sessionId', sessionId);
       const response = await fetch(pollUrl, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Cookie: cookie,
         },
       });
       const data = await response.json();

@@ -20,8 +20,6 @@ router.delete(
   checkPermissions(),
   adminController.deleteAdminById
 );
-router.post("/reception/getLoginCode", adminController.sendLoginMail);
-router.post("/reception/login", adminController.adminLogin);
-router.post("/reception/loginByPassword", adminController.loginByPassword);
+// 旧邮箱码/密码只能通过 /api/auth/claim 完成双证明认领，不能再创建管理员会话。
 
 module.exports = router;

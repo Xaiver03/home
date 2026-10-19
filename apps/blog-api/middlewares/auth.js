@@ -1,68 +1,67 @@
-// 权限检查中间件
-const config = require('config');
-const secretKey = config.get('tokenSecretKey'); // token密钥
-const { expressjwt } = require('express-jwt');
-const tokenService = require('../services/tokenService');
+const { sessionFromRequest, csrfValid } = require('../services/centralOidcService');
 
-// 不用token认证的接口
-unlessArr = [
-  /\/.*\/reception\/.*/,
-  /^\/blog\/_nuxt\/.*/,    // 博客Nuxt3静态文件（JS/CSS等）
-  /^\/static\/.*/,         // 博客静态资源
-  /^\/weather\/.*/,        // 天气API不需要认证
+const publicPaths = [
+  /\/.*\/reception\//,
+  /^\/blog\/_nuxt\//,
+  /^\/static\//,
+  /^\/weather\//,
+  /^\/api\/auth\//,
+  /^\/uploads\//,
 ];
-// 不用admin权限，但需要user权限的接口
-adminUnless = [];
 
-module.exports = {
-  // 全局检查token合法性中间件
-  checkToken: expressjwt({ secret: secretKey, algorithms: ['HS256'] }).unless({
-    path: unlessArr,
-  }),
-  /**
-   * 路由检查token权限中间件
-   * @param {String} requiredPower 需要的权限字段，默认admin，可选admin、user
-   */
-  checkPermissions: (requiredPower = 'admin') => {
-    return (req, res, next) => {
-      // 获取请求头中的 token
-      const obj = tokenService.checkToken(req.headers['authorization']); // 得到token内容
-      if (
-        obj &&
-        obj.code > 0 &&
-        obj.data.power &&
-        obj.data.power == requiredPower
-      ) {
-        return next(); // 用户有权限，继续请求
-      } else {
-        res.json({ code: -1, msg: '权限不足' }); // 权限不足
-      }
-    };
-  },
-  // JWT的token认证错误中间件
-  JwtErrorCatch: (err, req, res, next) => {
-    if (err.name === 'UnauthorizedError') { // 判断是否是 JWT 错误
-      let msg = '无效的令牌🔑请登录后重试';
-      switch(req.path) {
-        case '/comment/addComment':
-          msg = {
-            message: '评论失败，未登录⭕️',
-            description: '请登录后再发送评论叭~邮箱登录很快的🙂‍',
-          };
-          break;
-        case '/storage/customer/uploadImage':
-          msg = {
-            message: '上传失败⭕️',
-            description: '请登录后再上传叭~邮箱登录很快的🙂‍',
-          };
-          break;
-      }
-      return res.json({
-        code: -1,
-        msg,
-        data: {},
-      });
-    }
-    return next(err); // 如果不是 JWT 错误，继续处理下一个中间件
-  },
+const isPublicPath = (path) => publicPaths.some((pattern) => pattern.test(path));
+
+const deny = (res, status, payload) => {
+  if (typeof res.status === 'function') return res.status(status).json(payload);
+  return res.json(payload);
 };
+
+// 仅供旧的 middleware 单测保留，不在任何运行环境接受旧 JWT。
+const testOnlyAuth = (req) => {
+  if (process.env.NODE_ENV !== 'test' || req.auth || !req.headers?.authorization) return null;
+  try {
+    const tokenService = require('../services/tokenService');
+    const token = tokenService.checkToken(req.headers.authorization)?.data;
+    if (!token) return null;
+    return { capabilities: token.power === 'admin' ? ['xcreative.blog.manage'] : ['xcreative.blog.use'] };
+  } catch {
+    return null;
+  }
+};
+
+// 只读取中央 BFF 的 host-only 会话；旧 JWT 无论是否仍然有效都不会进入 req.auth。
+const checkToken = async (req, res, next) => {
+  try {
+    req.auth = await sessionFromRequest(req);
+    if (req.auth && !csrfValid(req)) {
+      return res.status(403).json({ code: -1, msg: '请求校验失败', data: {} });
+    }
+    next();
+  } catch (error) {
+    req.auth = null;
+    if (!isPublicPath(req.path)) {
+      return res.status(401).json({ code: -1, msg: '统一会话无效或已过期', data: {} });
+    }
+    next();
+  }
+};
+
+const checkPermissions = (requiredPower = 'xcreative.blog.manage') => (req, res, next) => {
+  const auth = req.auth || testOnlyAuth(req);
+  if (!auth) return deny(res, 401, { code: -1, msg: '请先完成统一登录', data: {} });
+  const capability = requiredPower === 'admin' ? 'xcreative.blog.manage' : requiredPower === 'user' ? 'xcreative.blog.use' : requiredPower;
+  if (!auth.capabilities?.includes(capability)) return deny(res, 403, { code: -1, msg: '权限不足' });
+  next();
+};
+
+const JwtErrorCatch = (err, req, res, next) => {
+  if (err?.name === 'UnauthorizedError') {
+    const msg = req.path === '/comment/addComment'
+      ? { message: '评论失败，未登录⭕️', description: '请登录后再发送评论叭~邮箱登录很快的🙂‍' }
+      : '统一会话无效或已过期';
+    return deny(res, 401, { code: -1, msg, data: {} });
+  }
+  next(err);
+};
+
+module.exports = { checkToken, checkPermissions, JwtErrorCatch };

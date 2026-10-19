@@ -92,8 +92,7 @@ module.exports = {
   },
   // 通过token获取用户信息
   getUserDataByToken: async (req, res) => {
-    let tokenData = tokenService.checkToken(req.headers["authorization"]);
-    if (tokenData.code < 0) {
+    if (!req.auth?.localUserId) {
       res.json(
         utils.postMessage(
           -1,
@@ -106,7 +105,7 @@ module.exports = {
       );
       return;
     }
-    const userData = await userService.getUserById(tokenData.data.id);
+    const userData = await userService.getUserById(req.auth.localUserId);
     res.json(
       utils.postMessage(
         userData ? undefined : -1,
@@ -130,7 +129,7 @@ module.exports = {
   },
   // 更新用户信息
   updateUser: async (req, res) => {
-    if (!tokenService.checkUserByToken(req, req.body.id)) {
+    if (!req.auth?.localUserId || String(req.auth.localUserId) !== String(req.body.id)) {
       // 判断当前更改的是不是自己的数据
       res.json(
         utils.postMessage(
@@ -156,14 +155,16 @@ module.exports = {
   },
   // 上传头像到oss
   uploadUserAvatar: async (req, res) => {
-    let tokenData = tokenService.checkToken(req.headers["authorization"]);
+    if (!req.auth?.localUserId) {
+      return res.status(401).json(utils.postMessage(-1, '请先完成统一登录', {}));
+    }
     let result = {};
     const { fields, files, tempFilePath } = await storageService.readAndSaveFile(
       req
     );
     const ossPath =
       "/image/userAvatar/" +
-      tokenData.data.id +
+      req.auth.localUserId +
       '.png';
     result = await storageService.uploadFileStream(ossPath, tempFilePath);
     fs.unlinkSync(tempFilePath); // 删除临时文件

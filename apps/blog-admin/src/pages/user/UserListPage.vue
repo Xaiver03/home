@@ -68,7 +68,7 @@
 
 <script setup>
 import utils from "@/utils";
-import Cookies from "js-cookie";
+import { getCsrfToken } from '@/utils/auth';
 import { ref, reactive, onMounted, getCurrentInstance, computed, createVNode } from 'vue'
 import { Modal, notification } from 'ant-design-vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -166,7 +166,7 @@ const deleteCurrentData = (id) => { // 删除当前列
 
 let imageFileList = ref([]) // 上传文件数组
 const fileHeaders = {
-    authorization: `Bearer ${Cookies.get("token")}`,
+    'X-CSRF-Token': getCsrfToken(),
 }; // 封面图片上传header
 const handleUploadImageChange = (info) => { // 上传图片状态改变回调
     if (info.file.status === 'done') {

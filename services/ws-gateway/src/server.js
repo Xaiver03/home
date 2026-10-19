@@ -3,6 +3,7 @@ const { randomUUID } = require('crypto');
 const { WebSocketServer } = require('ws');
 const config = require('./config');
 const { createChannelManager } = require('./channelManager');
+const { authenticateRequest } = require('./auth');
 
 const sendJson = (ws, payload) => {
   if (ws.readyState === 1) {
@@ -35,15 +36,16 @@ const createServer = () => {
   });
 
   const wss = new WebSocketServer({ noServer: true });
-  const heartbeat = setInterval(() => {
-    wss.clients.forEach((ws) => {
+  const heartbeat = setInterval(async () => {
+    for (const ws of wss.clients) {
       if (ws.isAlive === false) {
         ws.terminate();
-        return;
+        continue;
       }
+      if (ws.revalidate && !(await ws.revalidate())) continue;
       ws.isAlive = false;
       ws.ping();
-    });
+    }
   }, config.heartbeatIntervalMs);
 
   server.on('upgrade', (req, socket, head) => {
@@ -58,12 +60,17 @@ const createServer = () => {
       return;
     }
 
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      wss.emit('connection', ws, req);
+    wss.handleUpgrade(req, socket, head, async (ws) => {
+      const initialAuth = await authenticateRequest(req);
+      if (!initialAuth) {
+        ws.close(1008, '统一会话无效');
+        return;
+      }
+      wss.emit('connection', ws, req, initialAuth);
     });
   });
 
-  wss.on('connection', (ws) => {
+  wss.on('connection', (ws, req, initialAuth) => {
     const connectionId = randomUUID();
     connectionCount += 1;
     ws.isAlive = true;
@@ -72,8 +79,15 @@ const createServer = () => {
       ws.isAlive = true;
     });
 
-    ws.on('message', (raw) => {
-      channelManager.handleMessage(ws, connectionId, raw);
+    const authenticate = async () => {
+      const auth = await authenticateRequest(req);
+      if (!auth && ws.readyState === 1) ws.close(1008, '统一会话已撤销');
+      return auth;
+    };
+    ws.revalidate = authenticate;
+
+    ws.on('message', async (raw) => {
+      await channelManager.handleMessage(ws, connectionId, raw, authenticate);
     });
 
     ws.on('close', () => {
@@ -88,6 +102,7 @@ const createServer = () => {
     sendJson(ws, {
       type: 'connected',
       connectionId,
+      subject: initialAuth.subject,
     });
   });
 

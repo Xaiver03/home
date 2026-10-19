@@ -1,6 +1,5 @@
 const utils = require("../utils/index");
 const storageService = require("../services/storageService");
-const tokenService = require("../services/tokenService");
 const uuid = require("uuid");
 let path = require("path");
 
@@ -39,7 +38,7 @@ module.exports = {
 
   // 客户端上传图片到 MinIO
   customerUploadImage: async (req, res) => {
-    let tokenData = tokenService.checkToken(req.headers["authorization"]);
+    if (!req.auth?.localUserId) return res.status(401).json(utils.postMessage(-1, '请先完成统一登录', {}));
     const allowFilePath = ["/temp/", `/image/messageImage/`];
     const allowFileType = [
       "image/png", "image/jpeg", "image/gif", "image/webp",
@@ -57,7 +56,7 @@ module.exports = {
     }
     const storagePath =
       fields.path[0] +
-      tokenData.data.id +
+      req.auth.localUserId +
       "/" +
       (fields.uuidOrNot[0] == "true"
         ? uuid.v4() + path.extname(files.file[0].originalFilename)
@@ -86,10 +85,10 @@ module.exports = {
 
   // 客户端删除文件
   customerDeleteImage: async (req, res) => {
-    let tokenData = tokenService.checkToken(req.headers["authorization"]);
+    if (!req.auth?.localUserId) return res.status(401).json(utils.postMessage(-1, '请先完成统一登录', {}));
     const allowFilePath = [
-      `/temp/${tokenData.data.id}/`,
-      `/image/messageImage/${tokenData.data.id}/`,
+      `/temp/${req.auth.localUserId}/`,
+      `/image/messageImage/${req.auth.localUserId}/`,
     ];
     const lastSlashIndex = req.query.path.lastIndexOf("/");
     let directory = req.query.path.substring(0, lastSlashIndex + 1);

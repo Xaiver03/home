@@ -52,7 +52,6 @@
 import { ref, onUnmounted, computed } from 'vue'
 import { notification } from 'ant-design-vue'
 import http from '@/api/http'
-import { getToken } from '@/utils/auth'
 
 const status = ref({ hasKey: false })
 const qrcode = ref('')
@@ -140,8 +139,7 @@ const fallbackToPoll = () => {
 }
 
 const startWsPush = () => {
-  const token = getToken()
-  if (!token || !qrSessionId.value || !window.WebSocket) {
+  if (!qrSessionId.value || !window.WebSocket) {
     fallbackToPoll()
     return
   }
@@ -160,7 +158,6 @@ const startWsPush = () => {
       type: 'subscribe',
       id: `music-qr-${Date.now()}`,
       channel: 'music.qr',
-      token,
       params: { sessionId: qrSessionId.value },
     }))
   }

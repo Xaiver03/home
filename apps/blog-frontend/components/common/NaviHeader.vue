@@ -1,8 +1,7 @@
 <script setup>
-import { notification, Modal, Upload } from 'ant-design-vue';
+import { notification, Modal } from 'ant-design-vue';
 import {
   ExclamationCircleOutlined,
-  UploadOutlined,
   MenuOutlined,
   BulbOutlined,
   HomeOutlined,
@@ -127,74 +126,27 @@ const changePath = ([key]) => {
   }
 };
 // #region --用户模块--
-let userImageStatus = ref(true); // 用户头像加载状态
 let loginStatus = ref(false); // 用户登录状态
-let userData = reactive({}); // 用户数据
-let editUserMsgShow = ref(false); // 用户信息编辑框的显示/隐藏
-let userUpdateData = reactive({}); // 编辑用户信息数据
-let userUpdateLoading = ref(false); // 用户编辑加载
-let imageFileList = ref([]); // 图片上传数组
-const handleImageError = () => {
-  // 头像加载失败回调
-  userImageStatus.value = false;
-};
+const userData = reactive({}); // 用户数据
+const claimOpen = ref(false);
+const claimMail = ref('');
+const claimCode = ref('');
+const claimBusy = ref(false);
+const claimMessage = ref('');
+const claimRequired = computed(() => route.query.auth_error === 'identity_binding_required');
 const getUserData = () => {
-  // 获取用户数据（静默处理：过期/无效token不弹通知，直接清理）
-  const token = utils.getCookie('token');
-  if (!utils.isNullOrEmpty(token)) {
-    // 若登录了
-    api.getUserDataByToken().then((res) => {
-      if (res.code >= 0 && res.data) {
-        // 信息获取成功
-        loginStatus.value = true;
-        Object.assign(userData, res.data);
-      } else {
-        // 信息获取失败，静默清理，不打扰用户
-        utils.removeCookie('token'); // 去除token
-        loginStatus.value = false;
-        userData = {};
-      }
-    });
-  }
-};
-let sendCodeRest = ref(0); // 发送验证码按钮的休息时长
-const sendMailCode = () => {
-  // 发送验证码
-  if (utils.isNullOrEmpty(userData.mail) || !utils.isValidEmail(userData.mail)) {
-    // 若为空或者不是邮箱格式
-    notification.open({
-      message: '⏰提示',
-      description: '请输入有效的邮箱📨',
-      placement: 'top',
-      duration: 3,
-    });
-    return;
-  }
-  sendCodeRest.value = 60; // 60秒的休息时间
-  const sendCodeInterval = setInterval(() => {
-    if (--sendCodeRest.value <= 0) {
-      clearInterval(sendCodeInterval);
+  // 产品会话由 blog-api 的 host-only cookie 承载；没有会话时静默保持访客状态。
+  api.getUserDataByToken().then((res) => {
+    if (res.code >= 0 && res.data) {
+      loginStatus.value = true;
+      Object.assign(userData, res.data);
     }
-  }, 1000);
-  api.getLoginCode({ mail: userData.mail }).then((res) => {
-    utils.analysisData(res);
+  }).catch(() => {
+    loginStatus.value = false;
   });
 };
 const login = () => {
-  // 登录
-  api
-    .login({
-      mail: userData.mail,
-      code: userData.code,
-    })
-    .then((res) => {
-      if (utils.analysisData(res)) {
-        loginStatus.value = true;
-        Object.assign(userData, res.data);
-        utils.setCookie('token', userData.token);
-        fileHeaders.authorization = `Bearer ${userData.token}`;
-      }
-    });
+  api.startLogin();
 };
 const quit = () => {
   // 退出登录
@@ -206,63 +158,59 @@ const quit = () => {
     okType: 'danger',
     cancelText: '取消',
     onOk() {
-      utils.removeCookie('token'); // 去除token
-      utils.removeCookie('id'); // 去除token
-      utils.removeCookie('mail'); // 去除token
-      loginStatus.value = false;
-      userData = {};
-      notification.open({
-        message: '提示📢',
-        description: '退出成功♻️等待你的再次到来',
-        placement: 'top',
-        duration: 3,
+      return api.logout().then(() => {
+        loginStatus.value = false;
+        Object.keys(userData).forEach((key) => delete userData[key]);
+        notification.open({
+          message: '提示📢',
+          description: '退出成功♻️等待你的再次到来',
+          placement: 'top',
+          duration: 3,
+        });
+      }).catch(() => {
+        notification.error({
+          message: '退出失败',
+          description: '中央退出暂时不可用，请稍后重试',
+          placement: 'top',
+          duration: 4,
+        });
       });
-      fileHeaders.authorization = `Bearer ${utils.getCookie('token')}`;
     },
   });
 };
-const updateUserData = () => {
-  // 更新用户信息
-  if (utils.isNullOrEmpty(userUpdateData.mail) || !utils.isValidEmail(userUpdateData.mail)) {
-    // 若为空或者不是邮箱格式
-    notification.open({
-      message: '⏰提示',
-      description: '请输入有效的邮箱📨',
-      placement: 'top',
-      duration: 3,
-    });
+const requestClaimCode = async () => {
+  if (!claimMail.value) {
+    claimMessage.value = '请输入原账号邮箱';
     return;
   }
-  userUpdateLoading.value = true;
-  api.updateUserData(Object.assign({}, userUpdateData)).then((res) => {
-    userUpdateLoading.value = false;
-    if (utils.analysisData(res)) {
-      Object.assign(userData, userUpdateData);
-    }
-  });
-};
-let fileHeaders = reactive({
-  authorization: `Bearer ${utils.getCookie('token')}`,
-}); // 封面图片上传header
-let avatarTimestamp = ref(null);
-const beforeFileUpload = (file) => {
-  if (file.size > 30 * 1024 * 1024) {
-    // 若文件大小大于30MB
-    notification.open({
-      message: '⚠️提示',
-      description: '文件大小需小于30MB💾',
-      placement: 'top',
-      duration: 3,
-    });
-    return false || Upload.LIST_IGNORE;
+  claimBusy.value = true;
+  claimMessage.value = '';
+  try {
+    await api.requestClaimCode({ mail: claimMail.value });
+    claimMessage.value = '验证码已发送，请查收邮件';
+  } catch (error) {
+    claimMessage.value = error?.msg || error?.message || '验证码发送失败';
+  } finally {
+    claimBusy.value = false;
   }
 };
-const handleUploadImageChange = (info) => {
-  // 上传图片状态改变回调
-  if (['done', 'error'].includes(info.file.status) && info.file.response) {
-    if (utils.analysisData(info.file.response)) {
-      avatarTimestamp.value = new Date();
-    }
+const submitClaim = async () => {
+  if (!claimMail.value || !claimCode.value) {
+    claimMessage.value = '请输入邮箱和验证码';
+    return;
+  }
+  claimBusy.value = true;
+  claimMessage.value = '';
+  try {
+    await api.claimIdentity({ kind: 'user', mail: claimMail.value, proofType: 'code', proof: claimCode.value });
+    claimOpen.value = false;
+    await getUserData();
+    await router.replace({ query: {} });
+    notification.success({ message: '绑定成功', description: '旧账号已连接到统一身份' });
+  } catch (error) {
+    claimMessage.value = error?.msg || error?.message || '绑定失败，请确认验证码';
+  } finally {
+    claimBusy.value = false;
   }
 };
 // #endregion
@@ -270,6 +218,7 @@ const handleUploadImageChange = (info) => {
 onMounted(() => {
   getLocalTheme();
   getUserData();
+  if (claimRequired.value) claimOpen.value = true;
 });
 </script>
 
@@ -313,6 +262,14 @@ onMounted(() => {
           <span>{{ currentTheme }}</span>
         </button>
         <button
+          class="tool-button auth-button"
+          data-pointer-surface="nav"
+          type="button"
+          @click="loginStatus ? quit() : login()"
+        >
+          <span>{{ loginStatus ? '退出登录' : '统一登录' }}</span>
+        </button>
+        <button
           class="tool-button menu-button"
           data-pointer-surface="nav"
           type="button"
@@ -336,6 +293,16 @@ onMounted(() => {
         :tree-data="naviData"
       ></a-tree>
     </a-drawer>
+    <a-modal v-model:open="claimOpen" title="绑定已有博客账号" :footer="null" :mask-closable="false">
+      <p>这次登录需要确认你仍然持有旧账号。请输入旧邮箱并获取一次性验证码，系统不会按邮箱自动合并账号。</p>
+      <a-input v-model:value="claimMail" placeholder="旧账号邮箱" autocomplete="email" />
+      <div class="claim-code-row">
+        <a-input v-model:value="claimCode" placeholder="邮箱验证码" autocomplete="one-time-code" />
+        <a-button :loading="claimBusy" @click="requestClaimCode">获取验证码</a-button>
+      </div>
+      <p v-if="claimMessage" class="claim-message">{{ claimMessage }}</p>
+      <a-button type="primary" block :loading="claimBusy" @click="submitClaim">完成绑定</a-button>
+    </a-modal>
     <nav class="mobile-tab-bar" aria-label="移动端主导航">
       <button
         v-for="item in mobileNavItems"
@@ -644,5 +611,15 @@ button {
   .ant-tree-list-holder-inner {
     align-items: flex-end;
   }
+}
+
+.claim-code-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.claim-message {
+  color: #65706a;
 }
 </style>
