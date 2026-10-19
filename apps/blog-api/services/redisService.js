@@ -17,6 +17,19 @@ module.exports = {
   get: async (key) => {
     return await client.get(key);
   },
+  // Compare and consume in one Redis command: concurrent requests cannot reuse
+  // a successful proof, and a wrong guess must not delete the actual code.
+  consumeLoginCode: async (mail, code) => {
+    if (typeof mail !== 'string' || mail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)
+      || typeof code !== 'string' || !/^[A-Za-z0-9]{5}$/.test(code)) return false;
+    const result = await client.eval(`
+      local expected = redis.call('GET', KEYS[1])
+      if not expected or expected ~= ARGV[1] then return 0 end
+      redis.call('DEL', KEYS[1])
+      return 1
+    `, { keys: [mail], arguments: [code] });
+    return result === 1;
+  },
   // 删除键值
   del: async (key) => {
     return await client.del(key);
