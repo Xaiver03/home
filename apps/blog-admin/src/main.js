@@ -25,17 +25,10 @@ import "./assets/sass/index.scss";
 import store from "./store";
 // 引入接口
 import api from "./api/api.js";
-import { getToken, setToken } from "./utils/auth";
 import { applyThemeVars, getStoredTheme } from "@xld/design-tokens";
 
 // 在 app 挂载前立即初始化主题 CSS 变量，防止首屏样式闪烁
 applyThemeVars(getStoredTheme());
-
-// 刷新后若 cookie 丢失但 localStorage 仍有 token，则恢复 cookie
-const persistedToken = getToken();
-if (persistedToken) {
-  setToken(persistedToken);
-}
 
 const app = createApp(App);
 // --全局变量--

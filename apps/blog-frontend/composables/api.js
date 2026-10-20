@@ -65,14 +65,13 @@ export const api = {
   // #endregion
 
   // #region 用户api
-  // 获取登录验证码
-  getLoginCode: (data) => {
-    return http.post('/user/reception/getLoginCode', data);
+  // 统一身份登录由浏览器重定向完成；中央 access token 不进入前端。
+  startLogin: () => {
+    if (import.meta.client) window.location.assign('/api/auth/oidc/start?mode=public&return_to=%2Fblog%2F');
   },
-  // 登录接口
-  login: (data) => {
-    return http.post('/user/reception/login', data);
-  },
+  logout: () => http.post('/auth/logout', {}),
+  requestClaimCode: (data) => http.post('/auth/claim-code', data),
+  claimIdentity: (data) => http.post('/auth/claim', data),
   // 通过token获取用户信息
   getUserDataByToken: () => {
     return http.get('/user/getUserDataByToken', {});

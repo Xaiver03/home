@@ -1,22 +1,22 @@
 // 请求封装
 const request = async (url, options, headers) => {
   try {
-    const token = utils.getCookie("token");
     let baseUrl = useRuntimeConfig().public.apiUrl;
     // 解决win客户端和服务端差异（只有服务端能使用host.docker.internal）
     if (import.meta.client && baseUrl.includes("host.docker.internal")) {
       baseUrl = baseUrl.replace("host.docker.internal", "localhost");
     }
     const reqUrl = baseUrl + url;
+    const csrf = utils.getCookie('__Host-home_csrf');
     const customHeaders = {
-      Authorization: `Bearer ${token}`, // 添加权限，从store中获取token
+      ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
       ...headers,
     };
     // 删除 undefined key
     Object.keys(customHeaders).forEach(
       (key) => customHeaders[key] === undefined && delete customHeaders[key]
     );
-    const res = await $fetch(reqUrl, { ...options, headers: customHeaders });
+    const res = await $fetch(reqUrl, { ...options, headers: customHeaders, credentials: 'include' });
     return res;
   } catch (e) {
     console.log("fetch error:", e);

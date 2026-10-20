@@ -20,6 +20,12 @@ module.exports = function (sequelize, DataTypes) {
         comment: "用户邮箱",
         unique: "mail",
       },
+      identitySubject: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        unique: true,
+        comment: "中央统一身份 subject；只允许显式双证明绑定",
+      },
       createTime: {
         type: DataTypes.DATE,
         allowNull: false,

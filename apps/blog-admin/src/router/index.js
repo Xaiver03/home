@@ -120,7 +120,7 @@ const routes = [
     },
 ]
 
-import { getToken } from "@/utils/auth";
+import axios from 'axios';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.MODE === 'pro' ? '/admin/' : '/'),
@@ -128,13 +128,17 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = !!getToken();
-    if (to.name !== '登录' && !isAuthenticated) {
-        next({ name: '登录', replace: true })
+router.beforeEach(async (to, from, next) => {
+    if (to.name === '登录') {
+        next()
         return
     }
-    next()
+    try {
+        await axios.get('/api/auth/session?mode=management', { withCredentials: true })
+        next()
+    } catch {
+        next({ name: '登录', replace: true })
+    }
 })
 
 export default router

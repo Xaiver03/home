@@ -5,6 +5,18 @@ const redisService = require("../services/redisService");
 const tokenService = require("../services/tokenService");
 const bcrypt = require("bcryptjs");
 
+const validLoginMail = (mail) => typeof mail === 'string'
+  && mail.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail);
+
+// Database credential columns must never become response fields or JWT claims.
+const adminLoginResponse = (row) => {
+  const { id, mail, username, createTime, updatedTime } = row.dataValues;
+  return {
+    id, mail, username, createTime, updatedTime,
+    token: tokenService.getToken({ id, mail, username, power: 'admin' }),
+  };
+};
+
 module.exports = {
   // --获取--
   // 分页获取管理员
@@ -43,16 +55,18 @@ module.exports = {
   },
   // 管理员登录认证
   adminLogin: async (req, res) => {
-    const loginCode = await redisService.get(req.body.mail);
-    if (loginCode == req.body.code) {
-      let adminData = await adminService.getAdminByMail(req.body.mail); // 获取用户信息
+    const { mail, code } = req.body ?? {};
+    if (!validLoginMail(mail) || typeof code !== 'string' || !/^[A-Za-z0-9]{5}$/.test(code)) {
+      res.json(utils.postMessage(-1, "验证码错误❗️请检查重试", {}));
+      return;
+    }
+    if (await redisService.consumeLoginCode(mail, code)) {
+      const adminData = await adminService.getAdminByMail(mail); // 获取用户信息
       if (!adminData) {
         res.json(utils.postMessage(-1, "暂无该管理员❗️请联系站长", {}));
         return
       }
-      adminData = adminData.dataValues; // 得到数据
-      adminData.token = tokenService.getToken({ ...adminData, power: "admin" }); // 获取token并设置admin权限
-      res.json(utils.postMessage(undefined, "登录成功✅欢迎您", adminData));
+      res.json(utils.postMessage(undefined, "登录成功✅欢迎您", adminLoginResponse(adminData)));
       return;
     }
     res.json(utils.postMessage(-1, "验证码错误❗️请检查重试", {}));
@@ -75,9 +89,7 @@ module.exports = {
       res.json(utils.postMessage(-1, "邮箱或密码错误❗️", {}));
       return;
     }
-    adminData = adminData.dataValues;
-    adminData.token = tokenService.getToken({ ...adminData, power: "admin" });
-    res.json(utils.postMessage(undefined, "登录成功✅欢迎您", adminData));
+    res.json(utils.postMessage(undefined, "登录成功✅欢迎您", adminLoginResponse(adminData)));
   },
 
   // --修改--

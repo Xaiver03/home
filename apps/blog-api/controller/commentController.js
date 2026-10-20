@@ -1,6 +1,5 @@
 const utils = require("../utils/index");
 const commentService = require("../services/commentService");
-const tokenService = require("../services/tokenService");
 const storageService = require("../services/storageService");
 const fs = require("fs");
 
@@ -67,24 +66,10 @@ module.exports = {
   createComment: async (req, res) => {
     try {
       // 留言允许匿名提交；文章评论仍然必须登录。
-      const authorization = req.headers["authorization"];
-      const hasUsableAuthorization =
-        authorization && !/^Bearer\s+(null|undefined)$/i.test(authorization.trim());
-      if (hasUsableAuthorization) {
-        try {
-          const tokenData = tokenService.checkToken(authorization).data;
-          req.body.userId =
-            tokenData.power == "admin" || utils.isAdminCustomer(tokenData.mail)
-              ? -1
-              : tokenData.id;
-        } catch (err) {
-          // 留言板允许匿名提交；旧 token 不能阻塞匿名留言。
-          if (req.body.entityType === "Message") {
-            req.body.userId = 0;
-          } else {
-            throw err;
-          }
-        }
+      if (req.auth?.localAdminId) {
+        req.body.userId = -1;
+      } else if (req.auth?.localUserId) {
+        req.body.userId = req.auth.localUserId;
       } else if (req.body.entityType === "Message") {
         req.body.userId = 0;
       } else {

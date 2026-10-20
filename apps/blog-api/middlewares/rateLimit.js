@@ -1,4 +1,3 @@
-const tokenService = require("../services/tokenService");
 const redisService = require("../services/redisService");
 const utils = require("../utils/index");
 
@@ -17,8 +16,14 @@ module.exports = {
     msg = "限流拦截，请稍后重试"
   ) => {
     return async (req, res, next) => {
-      let tokenData = tokenService.checkToken(req.headers["authorization"]);
-      const uploadLimitKey = `${limitKey}:${tokenData.data.id}`;
+      // 认证链现在只接受中央产品会话；匿名上传按 IP 限流，避免旧 JWT
+      // 成为隐式认证入口，同时保留公开留言的图片上传能力。
+      const principal = req.auth?.localUserId
+        ? `user:${req.auth.localUserId}`
+        : req.auth?.subject
+          ? `subject:${req.auth.subject}`
+          : `ip:${req.ip || req.connection?.remoteAddress || 'unknown'}`;
+      const uploadLimitKey = `${limitKey}:${principal}`;
       let current = await redisService.get(uploadLimitKey);
       if (current === null) {
         await redisService.set(uploadLimitKey, 1, seconds);

@@ -110,3 +110,25 @@ describe('auth.JwtErrorCatch', () => {
     expect(callArg.msg.message).toContain('评论失败');
   });
 });
+
+describe('生产认证链', () => {
+  const previousEnvironment = process.env.NODE_ENV;
+
+  afterEach(() => {
+    process.env.NODE_ENV = previousEnvironment;
+  });
+
+  it('生产环境不会把旧 Authorization JWT 当成统一会话', () => {
+    process.env.NODE_ENV = 'pro';
+    const token = tokenService.getToken({ id: 1, power: 'admin' });
+    const req = { headers: { authorization: `Bearer ${token}` } };
+    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    const next = jest.fn();
+
+    require('../middlewares/auth').checkPermissions('admin')(req, res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: -1 }));
+  });
+});

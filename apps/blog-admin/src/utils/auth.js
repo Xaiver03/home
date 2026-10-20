@@ -1,23 +1,15 @@
-import Cookies from 'js-cookie';
-
-const TOKEN_KEY = 'token';
-
-/**
- * 统一 Token 读写工具
- * 同时维护 cookie（兼容现有逻辑）和 localStorage（刷新后双保险）
- */
+// 管理端不持有中央 access token；产品会话由 blog-api 的 host-only HttpOnly
+// cookie 承载，前端只读取非敏感 CSRF cookie。
 export function getToken() {
-  return Cookies.get(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || null;
+  return null;
 }
 
-export function setToken(token) {
-  if (!token) return;
-  // expires: 10 天，与后端 JWT 默认过期时间保持一致
-  Cookies.set(TOKEN_KEY, token, { expires: 10, secure: false, sameSite: 'Lax' });
-  localStorage.setItem(TOKEN_KEY, token);
-}
+export function setToken() {}
 
-export function removeToken() {
-  Cookies.remove(TOKEN_KEY);
-  localStorage.removeItem(TOKEN_KEY);
+export function removeToken() {}
+
+export function getCsrfToken() {
+  if (typeof document === 'undefined') return null;
+  const item = document.cookie.split('; ').find((entry) => entry.startsWith('__Host-home_csrf='));
+  return item ? decodeURIComponent(item.slice('__Host-home_csrf='.length)) : null;
 }

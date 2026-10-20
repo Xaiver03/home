@@ -66,6 +66,8 @@ db.Admin = require("./admin.js")(sequelize, Sequelize.DataTypes);
 db.FriendLink = require("./friendLink.js")(sequelize,Sequelize.DataTypes)
 db.Configuration = require("./configuration.js")(sequelize,Sequelize.DataTypes)
 db.Question = require("./question.js")(sequelize, Sequelize.DataTypes)
+db.CentralAuthSession = require("./centralAuthSession.js")(sequelize, Sequelize.DataTypes)
+db.CentralOidcState = require("./centralOidcState.js")(sequelize, Sequelize.DataTypes)
 
 // 定义模型间的关系
 db.ArticleType.hasMany(db.Article, {

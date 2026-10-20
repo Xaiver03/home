@@ -27,7 +27,6 @@ router.post("/createUser", checkPermissions(), userController.createUser);
 router.post("/searchUser", checkPermissions(), userController.searchUser);
 router.post("/updateUser", userController.updateUser);
 router.delete("/deleteUser", checkPermissions(), userController.deleteUserById);
-router.post("/reception/getLoginCode", userController.sendLoginMail);
-router.post("/reception/login", userController.userLogin);
+// 旧邮箱码只能通过 /api/auth/claim 完成双证明认领，不能再创建用户会话。
 
 module.exports = router;

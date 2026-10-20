@@ -39,6 +39,7 @@ var questionRouter = require("./routes/question")
 var configurationRouter = require("./routes/configuration")
 var weatherRouter = require("./routes/weather"); // 天气API路由
 var musicRouter = require("./routes/music"); // 音乐Cookie管理路由
+var authRouter = require("./routes/auth");
 
 // 中间件引入
 var { checkToken, JwtErrorCatch } = require("./middlewares/auth");
@@ -92,7 +93,10 @@ app.get('/admin/*', function(req, res, next) {
   res.sendFile(path.join(__dirname, 'public/admin/index.html'));
 });
 
-app.use(checkToken); // JWT认证 token合法性
+// 中央 OIDC BFF 入口位于全局业务认证之前；回调不携带产品会话。
+app.use('/api/auth', authRouter);
+
+app.use(checkToken); // 中央 host-only 产品会话认证
 
 // --路由使用--
 // API路由（带 /api 前缀）

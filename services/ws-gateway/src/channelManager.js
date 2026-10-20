@@ -1,5 +1,4 @@
 const config = require('./config');
-const { verifyAdminToken } = require('./auth');
 const musicQrChannel = require('./channels/musicQrChannel');
 
 const channels = {
@@ -21,7 +20,7 @@ const createChannelManager = () => {
     subscriptions.delete(connectionId);
   };
 
-  const handleSubscribe = (ws, connectionId, message) => {
+  const handleSubscribe = async (ws, connectionId, message, authenticate) => {
     const channel = channels[message.channel];
     if (!channel) {
       sendJson(ws, {
@@ -33,13 +32,13 @@ const createChannelManager = () => {
       return;
     }
 
-    const auth = verifyAdminToken(message.token);
-    if (!auth.ok) {
+    const auth = await authenticate();
+    if (!auth) {
       sendJson(ws, {
         type: 'error',
         id: message.id,
-        code: auth.code,
-        message: auth.message,
+        code: 'INVALID_SESSION',
+        message: '统一会话无效或已撤销',
       });
       return;
     }
@@ -59,15 +58,15 @@ const createChannelManager = () => {
       ws,
       id: message.id,
       params: message.params || {},
-      token: auth.token,
-      user: auth.user,
+      cookie: auth.cookie,
+      user: auth,
     });
 
     stops.push(stop);
     subscriptions.set(connectionId, stops);
   };
 
-  const handleMessage = (ws, connectionId, raw) => {
+  const handleMessage = async (ws, connectionId, raw, authenticate) => {
     let message;
     try {
       message = JSON.parse(raw.toString());
@@ -83,7 +82,7 @@ const createChannelManager = () => {
     if (message.type === 'pong') return;
 
     if (message.type === 'subscribe') {
-      handleSubscribe(ws, connectionId, message);
+      await handleSubscribe(ws, connectionId, message, authenticate);
       return;
     }
 
