@@ -116,6 +116,21 @@ GitHub Actions 的 `deploy.yml` 只保留手动触发，作为备用部署通道
 - 修改 blog-api 的模型关系后，通过 Sequelize migration 而非直接修改数据库
 - **禁止生成无意义的文档 md 文件**（如 SUMMARY.md、CHANGELOG.md、FIX_REPORT.md 等），不要自行增加文档
 
+## 第二台开发机：Windows PC
+
+`windows-pc`（ZeroTier 10.111.127.237，Win11，主机名 邓湘雷-WIN）上有一份同构检出 `D:\home`，
+分支 `dev`，与 Mac 走同一个 GitHub 仓。两边是**各自独立的检出**，不是共享目录——
+
+- **改完必须提交并推送**，另一台 `git pull` 才能看到；没提交的改动另一台永远看不见。
+- 本机 `core.autocrlf=false`，两边换行按原样，不要在 Windows 上开 autocrlf。
+- Windows 没有 MySQL / Redis / MinIO，开发环境走 SQLite（`apps/blog-api/database.dev.db`），
+  Redis 连不上是预期内的，不是故障。
+- Windows 上 `npm test` 走的是 `tfa-shield` 宿主盾，整棵进程树限额 2400MB（2026-10-28 从默认 1500
+  提上来：本仓 blog-api 的 jest 与 homepage 的 vitest 同时跑时到 1638MB，1500 会误杀）。
+  改了上限就去跑一遍 `pnpm test`，别只看盾没报错。
+- Windows 上 RESTRICTED 权限的 sshd 会话读 stdin 会卡、`cmd /c ... &` 的 `%errorlevel%` 不可靠，
+  自动化脚本请用 `powershell -File xxx.ps1` 并把结果写文件再取回，不要靠单行 `-Command`。
+
 ## 工作流程（极其重要）
 
 **硬性约束：任何代码/配置修改完成后，严禁停在本地或服务器未提交状态；必须 commit 并 push 到 origin/dev。除非用户明确说“不要提交/不要推送”，否则改完即提交、推送、监控 CI/CD，这是不可省略步骤。**
