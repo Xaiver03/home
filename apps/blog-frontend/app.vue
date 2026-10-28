@@ -111,7 +111,7 @@ const defaultSeo = {
 };
 const currentSeo = computed(() => seo.find((item) => item.path === route.path) || defaultSeo);
 const siteOrigin = computed(() =>
-  String(config.public.baseUrl || 'https://xiangleideng.site').replace(/\/+$/, ''),
+  String(config.public.baseUrl || 'https://xaiverdeng.site').replace(/\/+$/, ''),
 );
 const canonicalUrl = computed(() => {
   const path = route.path === '/' ? '/' : route.path.replace(/\/+$/, '');

@@ -49,7 +49,7 @@ pnpm dev:music           # 音乐 API（3005）
 - **音乐 API**: http://localhost:3005
 
 ### 生产环境
-- **网站**: https://xiangleideng.site
+- **网站**: https://xaiverdeng.site
 - **服务器**: 124.223.13.226 (`ssh finlaw`)
 
 ---
@@ -216,7 +216,7 @@ git log --oneline -10
 ### 开发工具
 - **GitHub**: https://github.com/Xaiver03/home
 - **服务器**: `ssh finlaw`
-- **域名**: https://xiangleideng.site
+- **域名**: https://xaiverdeng.site
 
 ### 第三方服务
 - **高德天气 API**: 配置在 `.env` 中
@@ -249,8 +249,8 @@ alias home-ssh="ssh finlaw"
 ## 📞 联系方式
 
 - **作者**: 邓湘雷 / Xaiver / 灯下灯
-- **邮箱**: light@xiangleideng.site
-- **网站**: https://xiangleideng.site
+- **邮箱**: light@xaiverdeng.site
+- **网站**: https://xaiverdeng.site
 - **GitHub**: https://github.com/Xaiver03
 
 ---

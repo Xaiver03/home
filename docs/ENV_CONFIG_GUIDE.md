@@ -74,9 +74,9 @@ JWT_SECRET=xld_blog_jwt_secret_2025_dev
 ```bash
 SMTP_HOST=gz-smtp.qcloudmail.com
 SMTP_PORT=465
-SMTP_USER=light@xiangleideng.site
+SMTP_USER=light@xaiverdeng.site
 SMTP_PASSWORD=               # 参考 CREDENTIALS.md
-MAIL_FROM=light@xiangleideng.site
+MAIL_FROM=light@xaiverdeng.site
 MAIL_FROM_NAME=邓湘雷の博客
 ```
 
@@ -92,7 +92,7 @@ MINIO_DOMAIN=
 ```bash
 SITE_NAME=邓湘雷の主页
 SITE_AUTHOR=Xaiver/灯下灯
-SITE_URL=xiangleideng.site
+SITE_URL=xaiverdeng.site
 ```
 
 ### 8. Vite 特定配置

@@ -86,7 +86,7 @@ home/                    # Monorepo 根目录
 ## 📞 联系方式
 
 - **作者**: 灯下灯/Xaiver
-- **主页**: https://xiangleideng.site
+- **主页**: https://xaiverdeng.site
 - **GitHub**: https://github.com/Xaiver03
 
 ---

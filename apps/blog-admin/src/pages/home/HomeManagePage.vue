@@ -146,7 +146,7 @@
                 </a-col>
                 <a-col :span="8">
                   <a-form-item label="站点URL">
-                    <a-input v-model:value="homeTexts.siteUrl" placeholder="如：xiangleideng.site" />
+                    <a-input v-model:value="homeTexts.siteUrl" placeholder="如：xaiverdeng.site" />
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -360,7 +360,7 @@ const handleQrUpload = async (file, index) => {
 
 // 预览主页
 const previewHomePage = () => {
-  window.open('https://xiangleideng.site/', '_blank')
+  window.open('https://xaiverdeng.site/', '_blank')
 }
 
 // 保存配置的辅助函数

@@ -244,7 +244,7 @@ export const PUBLIC_PROFILE = Object.freeze({
   identity: ['AI 全栈多终端开发者', 'FDE 工程师', '创意文化产业创业者'],
   projects: [
     'finlaw.cloud：即将上线的财务法务一体化智能体',
-    'xiangleideng.site：个人网站与长期写作空间',
+    'xaiverdeng.site：个人网站与长期写作空间',
     'x-creative.team：团队官网与创意文化协作入口',
     'litopia.space：文学网站',
     '一站式文创定制服务',

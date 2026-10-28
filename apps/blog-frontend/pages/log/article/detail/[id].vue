@@ -63,7 +63,7 @@ if (!articleData.value) {
 }
 
 watch(() => articleData.value?.id, probeCoverImage, { immediate: true });
-const siteOrigin = String(config.public.baseUrl || 'https://xiangleideng.site').replace(/\/+$/, '');
+const siteOrigin = String(config.public.baseUrl || 'https://xaiverdeng.site').replace(/\/+$/, '');
 const articleUrl = computed(() => `${siteOrigin}/blog/log/article/detail/${articleData.value.id}`);
 const articleSocialImage = computed(() => `${siteOrigin}/uploads/image/profile/avatar.jpg`);
 const articleTitle = computed(() => `${articleData.value.topic}｜灯下灯`);

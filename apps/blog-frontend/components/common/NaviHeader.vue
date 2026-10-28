@@ -41,7 +41,7 @@ const primaryLinks = [
   {
     title: '首页',
     label: '首页',
-    path: 'https://xiangleideng.site/#top',
+    path: 'https://xaiverdeng.site/#top',
     key: 'homepage',
     external: true,
   },

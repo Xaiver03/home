@@ -14,7 +14,7 @@ export default ({ mode }) => {
     process.env.VITE_BLOG_API_TARGET ||
     (process.env.VITE_BLOG_API_PORT
       ? `http://localhost:${process.env.VITE_BLOG_API_PORT}`
-      : 'https://xiangleideng.site');
+      : 'https://xaiverdeng.site');
 
   return defineConfig({
     plugins: [

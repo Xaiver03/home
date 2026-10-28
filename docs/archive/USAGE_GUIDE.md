@@ -276,17 +276,17 @@ pnpm build
 
 # 2. 主页部署
 # 构建产物在 apps/homepage/dist/
-# 部署到 /var/www/xiangleideng.site (通过符号链接)
+# 部署到 /var/www/xaiverdeng.site (通过符号链接)
 
 # 3. 博客系统部署
 # 使用现有的部署脚本
 bash deploy.sh
 
 # 4. 验证部署
-curl https://xiangleideng.site/
-curl https://xiangleideng.site/blog
-curl https://xiangleideng.site/mgmt
-curl https://xiangleideng.site/api/
+curl https://xaiverdeng.site/
+curl https://xaiverdeng.site/blog
+curl https://xaiverdeng.site/mgmt
+curl https://xaiverdeng.site/api/
 ```
 
 ### 环境变量配置

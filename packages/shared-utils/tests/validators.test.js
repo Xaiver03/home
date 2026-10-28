@@ -14,7 +14,7 @@ describe('isValidEmail', () => {
   it('应接受合法邮箱', () => {
     expect(isValidEmail('user@example.com')).toBe(true);
     expect(isValidEmail('user.name+tag@sub.domain.org')).toBe(true);
-    expect(isValidEmail('light@xiangleideng.site')).toBe(true);
+    expect(isValidEmail('light@xaiverdeng.site')).toBe(true);
   });
 
   it('应拒绝非法邮箱', () => {
@@ -44,7 +44,7 @@ describe('isValidPhone', () => {
 
 describe('isValidUrl', () => {
   it('应接受合法 URL', () => {
-    expect(isValidUrl('https://xiangleideng.site')).toBe(true);
+    expect(isValidUrl('https://xaiverdeng.site')).toBe(true);
     expect(isValidUrl('http://localhost:3000')).toBe(true);
     expect(isValidUrl('https://example.com/path?q=1#hash')).toBe(true);
   });

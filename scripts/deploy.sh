@@ -2,7 +2,7 @@
 set -e
 
 # ============================================================
-# CD 部署脚本 - xiangleideng.site
+# CD 部署脚本 - xaiverdeng.site
 # 由 GitHub Actions 通过 SSH 触发执行
 # 服务器路径: /opt/home/deploy.sh
 # 用法: bash deploy.sh [--skip-build]
@@ -45,6 +45,20 @@ verify_deploy_target() {
 
 verify_deploy_target
 
+# 同一份 dist 要同时铺到 /admin 与 /mgmt：产物里的资源路径是绝对 /admin/assets，故两处共用一份。
+sync_admin_dist() {
+  if [ ! -d "$REPO_DIR/apps/blog-admin/dist" ]; then
+    warn "未找到 blog-admin 构建产物，跳过后台静态文件同步"
+    return
+  fi
+  for target in admin mgmt; do
+    mkdir -p "$REPO_DIR/apps/blog-api/public/$target"
+    rm -rf "$REPO_DIR/apps/blog-api/public/$target/"*
+    cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/$target/"
+  done
+  log "已同步 blog-admin 构建产物到 public/admin 与 public/mgmt"
+}
+
 # 解析参数
 SKIP_BUILD=false
 for arg in "$@"; do
@@ -58,12 +72,7 @@ log "========== CI/CD 自动部署开始 =========="
 
 if [ "$SKIP_BUILD" = true ]; then
   log "跳过 Git 同步和构建步骤 (--skip-build，使用本地上传的文件)"
-  if [ -d "$REPO_DIR/apps/blog-admin/dist" ]; then
-    mkdir -p "$REPO_DIR/apps/blog-api/public/admin"
-    rm -rf "$REPO_DIR/apps/blog-api/public/admin/"*
-    cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/admin/"
-    log "已同步本地 blog-admin 构建产物"
-  fi
+  sync_admin_dist
 else
   # ---- Step 1: 拉取最新代码 ----
   step "Step 1/6: 拉取最新代码"
@@ -101,11 +110,7 @@ else
   log "构建 blog-admin (生产模式)..."
   cd "$REPO_DIR"
   pnpm --filter blog-admin build:pro 2>&1 | tail -5
-  # 复制到 blog-api public 目录，让 Express 托管静态文件
-  mkdir -p "$REPO_DIR/apps/blog-api/public/admin"
-  rm -rf "$REPO_DIR/apps/blog-api/public/admin/"*
-  cp -r "$REPO_DIR/apps/blog-admin/dist/"* "$REPO_DIR/apps/blog-api/public/admin/"
-  log "blog-admin 构建完成，已复制到 blog-api/public/admin/"
+  sync_admin_dist
 
   # 3c. blog-frontend (Nuxt3 SSR)
   log "构建 blog-frontend (Nuxt3 SSR)..."
@@ -194,12 +199,23 @@ fi
 
 sleep 2
 
-# ---- Step 5: 重载 Nginx ----
-step "Step 5/6: 重载 Nginx"
-if sudo /usr/sbin/nginx -t 2>&1 && sudo /usr/sbin/nginx -s reload 2>&1; then
-  log "Nginx 重载成功"
+# ---- Step 5: 重载反向代理 ----
+step "Step 5/6: 重载反向代理"
+if command -v nginx >/dev/null 2>&1; then
+  if nginx -t 2>&1 && nginx -s reload 2>&1; then
+    log "Nginx 重载成功"
+  else
+    warn "Nginx 重载失败，请检查配置"
+  fi
+elif command -v caddy >/dev/null 2>&1; then
+  # Caddy 直接 file_server 托管 homepage dist，静态文件更新无需重载；只在配置变更时重载。
+  if caddy validate --config /etc/caddy/Caddyfile >/dev/null 2>&1; then
+    log "Caddy 配置校验通过（静态产物变更无需重载）"
+  else
+    warn "Caddy 配置校验失败，请检查 /etc/caddy/Caddyfile"
+  fi
 else
-  warn "Nginx 重载失败，请检查配置"
+  warn "未找到 nginx 或 caddy，跳过反向代理重载"
 fi
 
 # ---- Step 6: 健康检查 ----

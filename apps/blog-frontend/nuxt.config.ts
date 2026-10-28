@@ -8,7 +8,7 @@ config({ path: `../../.env.${process.env.NUXT_PUBLIC_ENV}` });
 const defaultApiUrl =
   process.env.NUXT_PUBLIC_ENV === 'dev'
     ? 'http://localhost:8086/api'
-    : 'https://xiangleideng.site/api';
+    : 'https://xaiverdeng.site/api';
 const defaultStorageUrl = process.env.NUXT_PUBLIC_ENV === 'dev' ? '' : '/uploads';
 
 export default defineNuxtConfig({
@@ -51,7 +51,7 @@ export default defineNuxtConfig({
     '@vueuse/motion/nuxt',
   ],
   sitemap: {
-    siteUrl: process.env.NUXT_PUBLIC_BASE_URL || 'https://xiangleideng.site',
+    siteUrl: process.env.NUXT_PUBLIC_BASE_URL || 'https://xaiverdeng.site',
     excludeAppSources: true,
     defaults: {
       changefreq: 'weekly',
@@ -68,7 +68,7 @@ export default defineNuxtConfig({
         Disallow: [],
       },
     ],
-    sitemap: `${process.env.NUXT_PUBLIC_BASE_URL || 'https://xiangleideng.site'}/sitemap.xml`,
+    sitemap: `${process.env.NUXT_PUBLIC_BASE_URL || 'https://xaiverdeng.site'}/sitemap.xml`,
   },
   css: [
     '@/assets/scss/index.scss', // 引入 SCSS 入口文件

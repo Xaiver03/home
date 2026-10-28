@@ -21,10 +21,10 @@ const sitemapRoute = read('apps/blog-frontend/server/api/__sitemap__/urls.get.ts
 const sitemapUtils = read('apps/blog-frontend/server/utils/sitemap-urls.ts');
 
 test('homepage exposes complete crawl and social metadata', () => {
-  assert.match(homepage, /rel="canonical" href="https:\/\/xiangleideng\.site\/"/);
+  assert.match(homepage, /rel="canonical" href="https:\/\/xaiverdeng\.site\/"/);
   assert.match(homepage, /name="robots"[\s\S]*content="index, follow, max-image-preview:large/);
   assert.match(homepage, /property="og:title"/);
-  assert.match(homepage, /property="og:url" content="https:\/\/xiangleideng\.site\/"/);
+  assert.match(homepage, /property="og:url" content="https:\/\/xaiverdeng\.site\/"/);
   assert.match(homepage, /name="twitter:card" content="summary_large_image"/);
   assert.match(homepage, /name="google-site-verification"/);
   assert.match(homepage, /name="baidu-site-verification" content="codeva-yGfzYFWEH3"/);
@@ -40,11 +40,11 @@ test('homepage exposes complete crawl and social metadata', () => {
 
 test('root robots and sitemap index expose canonical discovery endpoints', () => {
   assert.match(robots, /^User-agent: \*/m);
-  assert.match(robots, /Sitemap: https:\/\/xiangleideng\.site\/sitemap\.xml/);
+  assert.match(robots, /Sitemap: https:\/\/xaiverdeng\.site\/sitemap\.xml/);
   assert.match(sitemapIndex, /<sitemapindex/);
-  assert.match(sitemapIndex, /https:\/\/xiangleideng\.site\/homepage-sitemap\.xml/);
-  assert.match(sitemapIndex, /https:\/\/xiangleideng\.site\/blog\/sitemap\.xml/);
-  assert.match(homepageSitemap, /<loc>https:\/\/xiangleideng\.site\/<\/loc>/);
+  assert.match(sitemapIndex, /https:\/\/xaiverdeng\.site\/homepage-sitemap\.xml/);
+  assert.match(sitemapIndex, /https:\/\/xaiverdeng\.site\/blog\/sitemap\.xml/);
+  assert.match(homepageSitemap, /<loc>https:\/\/xaiverdeng\.site\/<\/loc>/);
 });
 
 test('blog sitemap uses a runtime source and includes public articles', () => {

@@ -5,7 +5,7 @@ description: "Safely update this personal website's profile, homepage text, exte
 
 # Homepage Profile and Site Update
 
-Use this Skill for content and asset updates to the personal site `xiangleideng.site`. Do not use it to update the separate `x-c` company website or its company PostgreSQL database.
+Use this Skill for content and asset updates to the personal site `xaiverdeng.site`. Do not use it to update the separate `x-c` company website or its company PostgreSQL database.
 
 ## Scope
 

@@ -30,8 +30,8 @@ test("homepage exposes API errors to its loading states", () => {
 
 test("production API URLs always include the API prefix", () => {
   assert.equal(
-    normalizeApiUrl("https://xiangleideng.site"),
-    "https://xiangleideng.site/api",
+    normalizeApiUrl("https://xaiverdeng.site"),
+    "https://xaiverdeng.site/api",
   );
   assert.equal(
     normalizeApiUrl("http://localhost:8086/api"),

@@ -41,9 +41,13 @@ apps/blog-api/config/local.json
 .env.dev
 .env.pro
 .env.beta
+.env.local
 apps/blog-api/database.dev.db
 apps/blog-api/public/uploads/
 
 # Credentials and sensitive information
 CREDENTIALS.md
 **/CREDENTIALS.md
+
+# 中央服务凭据（本地生成，不入库）
+.central/

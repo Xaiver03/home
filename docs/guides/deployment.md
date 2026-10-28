@@ -3,7 +3,7 @@
 ## 生产环境架构
 
 ```
-https://xiangleideng.site/
+https://xaiverdeng.site/
 ├── /              → Nginx 静态文件 (/opt/home/dist)
 ├── /blog          → Nginx 代理 → Express:8085 (Nuxt3 博客前台)
 ├── /mgmt          → Nginx 代理 → Express:8085 (Vue3 管理后台)
@@ -43,6 +43,6 @@ tail -f apps/blog-api/logs/app.log
 
 ## 符号链接说明
 
-主页构建输出到 `/opt/home/dist`，通过符号链接 `/var/www/xiangleideng.site → /opt/home/dist` 自动生效，无需手动复制文件。
+主页构建输出到 `/opt/home/dist`，通过符号链接 `/var/www/xaiverdeng.site → /opt/home/dist` 自动生效，无需手动复制文件。
 
 > 详细部署配置见 CLAUDE.md。

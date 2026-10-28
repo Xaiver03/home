@@ -58,13 +58,13 @@ Error: Configuration property "mysql" is not defined
   "mail": {
     "smtp_host": "gz-smtp.qcloudmail.com",
     "smtp_port": 465,
-    "smtp_user": "light@xiangleideng.site",
+    "smtp_user": "light@xaiverdeng.site",
     "smtp_password": "<真值不落文档：本机 cat ~/.config/tfa-credentials/spacep-smtp.password，len=19 sha12=8274ea785975>",
-    "from_email": "light@xiangleideng.site",
+    "from_email": "light@xaiverdeng.site",
     "from_name": "邓湘雷の博客"
   },
   "tokenSecretKey": "xld_blog_jwt_secret_2025_dev",
-  "vipCustomerEmail": ["light@xiangleideng.site", "allen030703@163.com"]
+  "vipCustomerEmail": ["light@xaiverdeng.site", "allen030703@163.com"]
 }
 ```
 

@@ -75,7 +75,7 @@ const loadPayloads = async () => {
     'home-texts': {
       siteName: 'Xaiver Space',
       siteAuthor: '灯下灯/Xaiver',
-      siteUrl: 'xiangleideng.site',
+      siteUrl: 'xaiverdeng.site',
       helloText: 'AI 全栈多终端开发 / FDE 工程师',
       descText: profileModule.PUBLIC_PROFILE.mission,
       siteKeyWords: '邓湘雷,Xaiver,灯下灯,AI全栈,FDE,FinLaw,文创,文学,创业',

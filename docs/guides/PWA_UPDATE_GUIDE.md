@@ -37,7 +37,7 @@
 
 #### 方法1：URL参数（推荐）
 ```
-https://xiangleideng.site/?clear-cache=true
+https://xaiverdeng.site/?clear-cache=true
 ```
 
 #### 方法2：浏览器控制台
@@ -130,7 +130,7 @@ const updateSW = registerSW({
 **问题1：更新后仍显示旧版本**
 ```bash
 # 解决方案
-https://xiangleideng.site/?clear-cache=true
+https://xaiverdeng.site/?clear-cache=true
 ```
 
 **问题2：PWA 更新对话框不显示**

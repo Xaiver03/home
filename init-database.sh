@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `configurations` (
 
 -- 插入默认管理员用户
 INSERT IGNORE INTO `users` (`username`, `email`, `password`, `role`) VALUES
-('admin', 'light@xiangleideng.site', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+('admin', 'light@xaiverdeng.site', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
 -- 插入默认分类
 INSERT IGNORE INTO `categories` (`name`, `slug`, `description`) VALUES
@@ -241,7 +241,7 @@ INSERT IGNORE INTO `configurations` (`key`, `value`, `description`) VALUES
 ('site_description', '一点浩然气，千里快哉风', '网站描述'),
 ('site_keywords', '邓湘雷,个人博客,技术分享', '网站关键词'),
 ('site_author', '邓湘雷', '网站作者'),
-('site_url', 'https://xiangleideng.site', '网站地址');
+('site_url', 'https://xaiverdeng.site', '网站地址');
 
 EOF
 
@@ -263,7 +263,7 @@ show_result() {
     echo ""
     echo "👤 默认管理员账号："
     echo "   用户名: admin"
-    echo "   邮箱: light@xiangleideng.site"
+    echo "   邮箱: light@xaiverdeng.site"
     echo "   密码: password (请登录后修改)"
     echo ""
     echo "🔧 后续步骤："

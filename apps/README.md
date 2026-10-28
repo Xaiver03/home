@@ -12,7 +12,7 @@ This directory contains all independently deployable applications.
 - **技术栈**: Vue 3 + Vite + Pinia + Element Plus
 - **端口**: 3000 (dev)
 - **构建输出**: `dist/`
-- **部署**: 静态文件部署到 `/var/www/xiangleideng.site`
+- **部署**: 静态文件部署到 `/var/www/xaiverdeng.site`
 
 **开发命令**:
 ```bash

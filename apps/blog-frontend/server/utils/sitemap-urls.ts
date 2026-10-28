@@ -23,7 +23,7 @@ interface CategoryItem {
   id?: number | string;
 }
 
-const SITE_ORIGIN = 'https://xiangleideng.site';
+const SITE_ORIGIN = 'https://xaiverdeng.site';
 
 export const STATIC_BLOG_URLS: UrlItem[] = [
   { loc: `${SITE_ORIGIN}/blog/`, changefreq: 'daily', priority: 0.9 },
@@ -72,7 +72,7 @@ async function http(path: string, options: HttpOptions = {}) {
     process.env.NUXT_PUBLIC_API_URL ||
     (process.env.NUXT_PUBLIC_ENV === 'dev'
       ? 'http://localhost:8086/api'
-      : 'https://xiangleideng.site/api');
+      : 'https://xaiverdeng.site/api');
   const {
     method = 'GET',
     headers = { 'Content-Type': 'application/json' },

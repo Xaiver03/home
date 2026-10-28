@@ -449,7 +449,7 @@ git push
 ### 需要帮助？
 
 - GitHub Issues: https://github.com/Xaiver03/home/issues
-- 项目主页: https://xiangleideng.site
+- 项目主页: https://xaiverdeng.site
 
 ---
 

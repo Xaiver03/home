@@ -275,7 +275,7 @@ DEPLOY_SSH_KEY=... \
 
 ### 8.4 Nginx 与 SSL
 
-- Nginx 配置文件路径：`/etc/nginx/sites-enabled/xiangleideng.site`。
+- Nginx 配置文件路径：`/etc/nginx/sites-enabled/xaiverdeng.site`。
 - 任何 Nginx 配置修改后使用 `sudo nginx -t` 和 `sudo nginx -s reload`。
 - Let's Encrypt 证书位于 `/etc/letsencrypt`；普通用户直接读取会因权限不足产生误报，应通过 root 权限或 Nginx 状态判断。
 

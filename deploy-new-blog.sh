@@ -153,9 +153,9 @@ create_frontend_env() {
 
     cat > .env.pro << EOF
 # Nuxt3 前台生产环境配置
-NUXT_PUBLIC_API_URL=https://xiangleideng.site/api
+NUXT_PUBLIC_API_URL=https://xaiverdeng.site/api
 NUXT_PUBLIC_STORAGE_URL=/uploads
-NUXT_PUBLIC_BASE_URL=https://xiangleideng.site
+NUXT_PUBLIC_BASE_URL=https://xaiverdeng.site
 NUXT_PUBLIC_ENV=pro
 NUXT_PORT=3000
 EOF
@@ -176,7 +176,7 @@ create_admin_env() {
 # Vue3 管理后台生产环境配置
 NODE_ENV=pro
 VUE_APP_PORT=8080
-VUE_APP_BASE_URL=https://xiangleideng.site/api
+VUE_APP_BASE_URL=https://xaiverdeng.site/api
 VUE_APP_STORAGE_IMAGE_BASE_URL=
 VUE_APP_STORAGE_BASE_DIR=/uploads
 EOF
@@ -215,20 +215,20 @@ create_backend_config() {
   "mail": {
     "smtp_host": "gz-smtp.qcloudmail.com",
     "smtp_port": 465,
-    "smtp_user": "light@xiangleideng.site",
+    "smtp_user": "light@xaiverdeng.site",
     "smtp_password": "${SMTP_PASSWORD:-$(cat "$HOME/.config/tfa-credentials/spacep-smtp.password")}",
-    "from_email": "light@xiangleideng.site",
+    "from_email": "light@xaiverdeng.site",
     "from_name": "邓湘雷の博客"
   },
   "comment": {
     "entityType": ["Article", "Message"],
-    "adminCustomerEmail": ["light@xiangleideng.site"]
+    "adminCustomerEmail": ["light@xaiverdeng.site"]
   },
   "tokenSecretKey": "xld_blog_jwt_secret_2025_please_change_this",
-  "vipCustomerEmail": ["light@xiangleideng.site"],
+  "vipCustomerEmail": ["light@xaiverdeng.site"],
   "author": {
     "name": "邓湘雷",
-    "website": "https://xiangleideng.site"
+    "website": "https://xaiverdeng.site"
   }
 }
 EOF
@@ -400,9 +400,9 @@ show_result() {
     log_success "🎉 新博客系统部署完成！"
     echo ""
     echo "📍 访问地址："
-    echo "   前台博客: https://xiangleideng.site/blog"
-    echo "   管理后台: https://xiangleideng.site/mgmt"
-    echo "   API接口:  https://xiangleideng.site/api/"
+    echo "   前台博客: https://xaiverdeng.site/blog"
+    echo "   管理后台: https://xaiverdeng.site/mgmt"
+    echo "   API接口:  https://xaiverdeng.site/api/"
     echo ""
     echo "🔧 服务管理："
     echo "   查看PM2进程: pm2 list"

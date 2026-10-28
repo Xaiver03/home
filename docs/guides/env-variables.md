@@ -35,7 +35,7 @@
 | `VITE_SITE_AUTHOR` | 作者名称 | `Xaiver/灯下灯` |
 | `VITE_SITE_KEYWORDS` | SEO 关键词 | `邓湘雷,个人主页` |
 | `VITE_SITE_DES` | 站点描述 | `一点浩然气，千里快哉风` |
-| `VITE_SITE_URL` | 站点域名（不含 `https://`） | `xiangleideng.site` |
+| `VITE_SITE_URL` | 站点域名（不含 `https://`） | `xaiverdeng.site` |
 | `VITE_BASE_URL` | 基础 URL（开发留空，生产填完整域名） | 空 |
 | `VITE_SITE_LOGO` | favicon 路径 | `/images/icon/favicon.ico` |
 | `VITE_SITE_MAIN_LOGO` | 主 Logo 路径 | `/images/icon/logo.png` |
@@ -83,7 +83,7 @@
 | `tokenSecretKey` | JWT 签名密钥（生产环境务必修改） | `xld_blog_jwt_secret_2025_dev` |
 | `vipCustomerEmail` | 管理员邮箱列表（可登录后台） | — |
 | `author.name` | 博客作者名称 | `邓湘雷` |
-| `author.website` | 博客作者网站 | `https://xiangleideng.site` |
+| `author.website` | 博客作者网站 | `https://xaiverdeng.site` |
 
 > **注意：** 开发环境使用 SQLite（通过 Sequelize），`mysql` 字段在开发环境下可忽略。详见 `apps/blog-api/config/database.js`。
 

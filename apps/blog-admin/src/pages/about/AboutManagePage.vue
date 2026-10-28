@@ -583,7 +583,7 @@ const getIconPreview = (iconName) => {
 
 // 预览About页面
 const previewAboutPage = () => {
-  window.open('https://xiangleideng.site/blog/about', '_blank')
+  window.open('https://xaiverdeng.site/blog/about', '_blank')
 }
 
 // 安全解析配置内容（数据库JSON列已自动反序列化）

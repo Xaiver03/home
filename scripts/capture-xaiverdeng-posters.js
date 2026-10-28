@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { chromium } = require('playwright');
 
-const BASE_URL = process.env.SCREENSHOT_BASE_URL || 'https://xiangleideng.site';
+const BASE_URL = process.env.SCREENSHOT_BASE_URL || 'https://xaiverdeng.site';
 const ROOT_DIR = path.resolve(__dirname, '..');
 const OUTPUT_DIR = path.join(ROOT_DIR, 'webshots');
 const RAW_DIR = path.join(OUTPUT_DIR, 'raw');
@@ -404,7 +404,7 @@ async function createClassicPoster(browser, sourceImagePath, state) {
         <img src="${imageUrl}" alt="${state.title}" />
       </div>
       <div class="foot">
-        <small>xiangleideng.site</small>
+        <small>xaiverdeng.site</small>
         <span class="badge">功能快照</span>
       </div>
     </div>
@@ -695,7 +695,7 @@ async function createPoster(browser, sourceImagePath, state) {
         </div>
       </div>
       <div class="foot">
-        <small>xiangleideng.site</small>
+        <small>xaiverdeng.site</small>
         <strong>FEATURE SNAPSHOT</strong>
       </div>
     </div>

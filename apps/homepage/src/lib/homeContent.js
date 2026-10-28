@@ -1,6 +1,6 @@
 export const DEFAULT_HOME_TEXT = Object.freeze({
   siteName: 'Xaiver Space',
-  siteUrl: 'xiangleideng.site',
+  siteUrl: 'xaiverdeng.site',
   helloText: 'AI 全栈多终端开发 / FDE 工程师',
   descText: '让精神创造触手可及。',
   siteAuthor: '灯下灯 / Xaiver',
