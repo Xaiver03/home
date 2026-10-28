@@ -15,6 +15,7 @@ module.exports = {
   sendQuestionAnswerMail: async (question) => {
     const email = String(question?.contact || "").trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+    if (!transporter) return false;
 
     const trackingCode = encodeURIComponent(question.trackingCode);
     const answerUrl = `${config.get("author.website")}/blog/message?tab=ask&trackingCode=${trackingCode}`;
@@ -38,6 +39,7 @@ module.exports = {
 
   // 发送验证码邮件
   sendCodeMail: async (mail) => {
+    if (!transporter) return -1;
     const code = utils.getRandomChar(); // 获取验证码
     await redisService.set(mail, code); // 存入redis，默认10天过期
     const mailContent = `

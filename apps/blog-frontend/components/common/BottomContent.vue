@@ -26,7 +26,6 @@ onMounted(() => {
         <div>Copyright © 2024-2029 <a href=".">Xaiver's Space</a></div>
         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>
       </div>
-      <a href="https://beian.miit.gov.cn" target="_blank">湘ICP备2026026942号-1</a>
     </div>
   </div>
 </template>

@@ -194,11 +194,6 @@
                     <a-date-picker v-model:value="homeTexts.siteStart" placeholder="选择建站日期" style="width: 100%" />
                   </a-form-item>
                 </a-col>
-                <a-col :span="12">
-                  <a-form-item label="ICP备案号">
-                    <a-input v-model:value="homeTexts.siteIcp" placeholder="如：湘ICP备2026026942号-1" />
-                  </a-form-item>
-                </a-col>
               </a-row>
             </a-form>
           </a-card>
@@ -255,8 +250,7 @@ const homeTexts = ref({
   helloOther: '',
   descText: '',
   descTextOther: '',
-  siteStart: null,
-  siteIcp: ''
+  siteStart: null
 })
 
 // 数组移动方法
@@ -483,8 +477,7 @@ const initializeDefaults = () => {
       helloOther: 'Oops !',
       descText: '把生活和思考，留在能慢慢阅读的地方。',
       descTextOther: '哎呀，这都被你发现了（ 再点击一次可关闭 ）',
-      siteStart: dayjs('2024-07-06'),
-      siteIcp: '湘ICP备2026026942号-1'
+      siteStart: dayjs('2024-07-06')
     }
   }
 }

@@ -42,7 +42,6 @@
 | `VITE_SITE_APPLE_LOGO` | Apple Touch Icon 路径 | `/images/icon/apple-touch-icon.png` |
 | `VITE_WEATHER_KEY` | 高德地图 API Key（用于天气服务） | — |
 | `VITE_SITE_START` | 建站日期（用于时光胶囊功能） | `2025-10-18` |
-| `VITE_SITE_ICP` | ICP 备案号（非中国大陆可留空） | `京ICP备xxxxxxxx号` |
 | `VITE_SONG_API` | Meting API 地址 | `/music` |
 | `VITE_SONG_SERVER` | 音乐平台（`netease` / `tencent`） | `tencent` |
 | `VITE_SONG_TYPE` | 播放类型（`song` / `playlist` / `album`） | `playlist` |

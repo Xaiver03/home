@@ -249,7 +249,7 @@ alias home-ssh="ssh finlaw"
 ## 📞 联系方式
 
 - **作者**: 邓湘雷 / Xaiver / 灯下灯
-- **邮箱**: light@xaiverdeng.site
+- **邮箱**: allen030703@163.com
 - **网站**: https://xaiverdeng.site
 - **GitHub**: https://github.com/Xaiver03
 

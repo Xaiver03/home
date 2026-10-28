@@ -72,11 +72,11 @@ JWT_SECRET=xld_blog_jwt_secret_2025_dev
 
 ### 5. 邮件服务
 ```bash
-SMTP_HOST=gz-smtp.qcloudmail.com
+SMTP_HOST=                   # 未开通新域名邮箱，留空即关闭发信
 SMTP_PORT=465
-SMTP_USER=light@xaiverdeng.site
-SMTP_PASSWORD=               # 参考 CREDENTIALS.md
-MAIL_FROM=light@xaiverdeng.site
+SMTP_USER=allen030703@163.com
+SMTP_PASSWORD=               # 需要时填 163 邮箱授权码
+MAIL_FROM=allen030703@163.com
 MAIL_FROM_NAME=邓湘雷の博客
 ```
 

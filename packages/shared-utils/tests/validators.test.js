@@ -14,7 +14,7 @@ describe('isValidEmail', () => {
   it('应接受合法邮箱', () => {
     expect(isValidEmail('user@example.com')).toBe(true);
     expect(isValidEmail('user.name+tag@sub.domain.org')).toBe(true);
-    expect(isValidEmail('light@xaiverdeng.site')).toBe(true);
+    expect(isValidEmail('someone@example.net')).toBe(true);
   });
 
   it('应拒绝非法邮箱', () => {

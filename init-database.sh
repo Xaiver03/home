@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `configurations` (
 
 -- 插入默认管理员用户
 INSERT IGNORE INTO `users` (`username`, `email`, `password`, `role`) VALUES
-('admin', 'light@xaiverdeng.site', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+('admin', 'allen030703@163.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
 -- 插入默认分类
 INSERT IGNORE INTO `categories` (`name`, `slug`, `description`) VALUES
@@ -263,7 +263,7 @@ show_result() {
     echo ""
     echo "👤 默认管理员账号："
     echo "   用户名: admin"
-    echo "   邮箱: light@xaiverdeng.site"
+    echo "   邮箱: allen030703@163.com"
     echo "   密码: password (请登录后修改)"
     echo ""
     echo "🔧 后续步骤："

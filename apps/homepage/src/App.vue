@@ -424,7 +424,6 @@
     <footer class="site-footer">
       <span>{{ homeText.siteAuthor }}</span>
       <span>{{ homeText.siteUrl }}</span>
-      <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer">湘ICP备2026026942号-1</a>
       <a href="#top">回到顶部 ↑</a>
     </footer>
   </div>

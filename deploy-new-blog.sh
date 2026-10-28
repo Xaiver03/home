@@ -213,19 +213,19 @@ create_backend_config() {
     "publicUrl": "/uploads"
   },
   "mail": {
-    "smtp_host": "gz-smtp.qcloudmail.com",
+    "smtp_host": "",
     "smtp_port": 465,
-    "smtp_user": "light@xaiverdeng.site",
-    "smtp_password": "${SMTP_PASSWORD:-$(cat "$HOME/.config/tfa-credentials/spacep-smtp.password")}",
-    "from_email": "light@xaiverdeng.site",
+    "smtp_user": "allen030703@163.com",
+    "smtp_password": "",
+    "from_email": "allen030703@163.com",
     "from_name": "邓湘雷の博客"
   },
   "comment": {
     "entityType": ["Article", "Message"],
-    "adminCustomerEmail": ["light@xaiverdeng.site"]
+    "adminCustomerEmail": ["allen030703@163.com"]
   },
   "tokenSecretKey": "xld_blog_jwt_secret_2025_please_change_this",
-  "vipCustomerEmail": ["light@xaiverdeng.site"],
+  "vipCustomerEmail": ["allen030703@163.com"],
   "author": {
     "name": "邓湘雷",
     "website": "https://xaiverdeng.site"
