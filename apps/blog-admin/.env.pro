@@ -1,4 +1,0 @@
-VITE_BASE_URL=/api
-VITE_WS_BASE_URL=wss://xaiverdeng.site/ws
-VUE_APP_STORAGE_IMAGE_BASE_URL=
-VUE_APP_STORAGE_BASE_DIR=/uploads
