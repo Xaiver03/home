@@ -136,6 +136,12 @@ if [ -f "$REPO_DIR/.env.pro" ]; then
   set +a
 fi
 
+# 运行时环境变量会原样覆盖 nuxt.config 里经 normalizeApiUrl 处理过的 apiUrl，
+# 少 /api 时 SSR 会把接口当页面抓，文章详情页报「文章不存在」。
+if [ -z "${NUXT_PUBLIC_API_URL:-}" ] || ! printf '%s' "$NUXT_PUBLIC_API_URL" | grep -q '/api$'; then
+  error "NUXT_PUBLIC_API_URL 必须以 /api 结尾（当前：${NUXT_PUBLIC_API_URL:-<未设置>}）"
+fi
+
 # ---- Step 4: 重启后端服务 ----
 step "Step 4/6: 重启后端服务"
 
