@@ -140,24 +140,19 @@ fi
 step "Step 4/6: 重启后端服务"
 
 # blog-api (spaceP_pro)
+# 一律显式给 --name：ecosystem 里的 env_pro.name 不会被 PM2 用来重命名，
+# 依赖它会按脚本名成 www，导致下次部署判不到已存在的进程而重复启动。
 if pm2 list | grep -q "spaceP_pro"; then
   pm2 restart spaceP_pro --update-env 2>&1 | tail -3
 else
-  cd "$REPO_DIR/apps/blog-api"
-  pm2 start ecosystem.config.js --env pro 2>&1 | tail -5
+  NODE_ENV=pro pm2 start bin/www --name spaceP_pro --cwd "$REPO_DIR/apps/blog-api" 2>&1 | tail -5
 fi
 
 # music-api (Meting 代理)
 if pm2 list | grep -q "music-api"; then
   pm2 restart music-api 2>&1 | tail -3
 else
-  cd "$REPO_DIR/services/music-api"
-  pm2 start ecosystem.config.js --env pro 2>&1 | tail -5 2>/dev/null || {
-    pm2 start "node dist/index.js" \
-      --name music-api \
-      --cwd "$REPO_DIR/services/music-api" \
-      2>&1 | tail -5
-  }
+  PORT=4000 pm2 start node.js --name music-api --cwd "$REPO_DIR/services/music-api" 2>&1 | tail -5
 fi
 
 # ws-gateway (通用 WebSocket 网关)
@@ -175,11 +170,7 @@ fi
 if pm2 list | grep -q "ws-gateway"; then
   pm2 restart ws-gateway --update-env 2>&1 | tail -3
 else
-  cd "$REPO_DIR/services/ws-gateway"
-  pm2 start "node index.js" \
-    --name ws-gateway \
-    --cwd "$REPO_DIR/services/ws-gateway" \
-    2>&1 | tail -5
+  pm2 start index.js --name ws-gateway --cwd "$REPO_DIR/services/ws-gateway" 2>&1 | tail -5
 fi
 
 sleep 2
@@ -188,13 +179,7 @@ sleep 2
 if pm2 list | grep -q "blog-frontend"; then
   pm2 restart blog-frontend 2>&1 | tail -3
 else
-  cd "$REPO_DIR/apps/blog-frontend"
-  pm2 start ecosystem.config.cjs --env pro 2>&1 | tail -5 2>/dev/null || {
-    pm2 start "PORT=3004 node .output/server/index.mjs" \
-      --name blog-frontend \
-      --cwd "$REPO_DIR/apps/blog-frontend" \
-      2>&1 | tail -5
-  }
+  NODE_ENV=pro PORT=3004 DOTENV=.env.pro pm2 start .output/server/index.mjs --name blog-frontend --cwd "$REPO_DIR/apps/blog-frontend" 2>&1 | tail -5
 fi
 
 sleep 2
