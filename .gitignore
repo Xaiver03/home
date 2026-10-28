@@ -42,6 +42,11 @@ apps/blog-api/config/local.json
 .env.pro
 .env.beta
 .env.local
+apps/blog-admin/.env.pro
+apps/blog-admin/.env.dev
+apps/blog-frontend/.env.dev
+apps/blog-frontend/.env.local
+apps/homepage/.env
 apps/blog-api/database.dev.db
 apps/blog-api/public/uploads/
 
