@@ -213,10 +213,13 @@ blog-api 使用 `config` 包：按 `NODE_ENV` 读取 `config/{NODE_ENV}.json`，
 
 ## 6. 认证与权限
 
-- blog-api 使用 **JWT** 认证，密钥来自 `config.tokenSecretKey`。
-- 公开接口匹配正则 `/.*/.*\/reception\/.*/`，无需 token；其余 `/api/*` 路径默认需要有效 JWT。
-- 管理后台登录用户需邮箱在 `vipCustomerEmail` 列表中。
-- ws-gateway 同样使用 `tokenSecretKey` 校验 WebSocket 连接的 token。
+- 业务认证以 **host-only 产品会话** 为准：`__Host-home_session`（HttpOnly）+ `__Host-home_csrf`（双提交），`/api/*` 默认需要有效会话，公开接口匹配 `/.*/.*\/reception\/.*/`。
+- 两条登录路径，共用同一套 cookie/CSRF/能力模型：
+  - **中央 OIDC**（`/api/auth/oidc/*`）：会话每次请求向中央内省并核对能力；
+  - **本地管理员密码**（`POST /api/auth/password`）：校验 `admin.passwordHash` 后写入 `local_admin_sessions`，能力固定为 `home.blog.manage`，账号密码不再签发 JWT。
+- 管理后台登录用户必须是 `admin` 表中的管理员；`/api/admin/*` 需要 `home.blog.manage` 能力。
+- 旧 JWT（`config.tokenSecretKey` 签发）只在 `NODE_ENV=test` 的中间件单测里被接受，运行环境一律不认。
+- ws-gateway 仍使用 `tokenSecretKey` 校验 WebSocket 连接的 token。
 
 ## 7. 数据库与迁移
 
