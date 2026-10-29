@@ -120,7 +120,7 @@ const routes = [
     },
 ]
 
-import axios from 'axios';
+import { authClient } from '@/api/authClient';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.MODE === 'pro' ? '/admin/' : '/'),
@@ -134,7 +134,7 @@ router.beforeEach(async (to, from, next) => {
         return
     }
     try {
-        await axios.get('/api/auth/session?mode=management', { withCredentials: true })
+        await authClient.get('/api/auth/session?mode=management')
         next()
     } catch {
         next({ name: '登录', replace: true })

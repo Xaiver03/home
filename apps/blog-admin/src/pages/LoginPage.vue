@@ -55,8 +55,8 @@
 <script setup>
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
 import { notification } from 'ant-design-vue';
+import { authClient } from '@/api/authClient';
 import { DashboardOutlined, FileTextOutlined, SettingOutlined, BarChartOutlined } from '@ant-design/icons-vue';
 
 const route = useRoute();
@@ -76,7 +76,7 @@ const submitPassword = async () => {
   submitting.value = true;
   message.value = '';
   try {
-    await axios.post('/api/auth/password', { mail: form.mail, password: form.password }, { withCredentials: true });
+    await authClient.post('/api/auth/password', { mail: form.mail, password: form.password });
     form.password = '';
     router.replace('/');
   } catch (error) {
@@ -102,8 +102,7 @@ const submitClaim = async () => {
   }
   claiming.value = true;
   try {
-    await axios.post('/api/auth/claim', { kind: 'admin', mail: claim.mail, proofType: 'password', proof: claim.proof }, {
-      withCredentials: true,
+    await authClient.post('/api/auth/claim', { kind: 'admin', mail: claim.mail, proofType: 'password', proof: claim.proof }, {
       headers: { 'X-CSRF-Token': csrf() },
     });
     notification.success({ message: '绑定成功', description: '正在进入管理后台' });
