@@ -30,7 +30,7 @@
 
 <script setup>
 import { onMounted, ref, watch, getCurrentInstance, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { theme } from "ant-design-vue";
 import AdminSidebar from "./components/layout/AdminSidebar.vue";
 import GlobalTabBar from "./components/layout/GlobalTabBar.vue";
@@ -45,13 +45,11 @@ import {
 import { useStore } from "vuex";
 import { useAutoTab } from "./composables/useAutoTab";
 import { useTabStore } from "./composables/useTabStore";
-import { getToken } from "@/utils/auth";
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 const store = useStore();
 const route = useRoute();
-const router = useRouter();
 
 // 自动 Tab 系统
 useAutoTab();
@@ -61,13 +59,8 @@ const isLoginPage = ref(false);
 watch(
   () => route.path,
   (path) => {
-    const onLogin = path === "/login";
-    isLoginPage.value = onLogin;
-
-    // 非登录页且未认证 → 强制跳转登录
-    if (!onLogin && !getToken()) {
-      router.replace({ name: "登录" });
-    }
+    // 登录态由路由守卫按产品会话判定，这里只负责切换登录页布局
+    isLoginPage.value = path === "/login";
   },
   { immediate: true }
 );
