@@ -65,6 +65,12 @@
             <span v-if="!collapsed">收起菜单</span>
           </button>
         </li>
+        <li class="footer-menu-item">
+          <button id="exit" class="nav-menu-btn" @click="exit">
+            <LogoutOutlined class="nav-icon" />
+            <span v-if="!collapsed">退出登录</span>
+          </button>
+        </li>
       </ul>
     </div>
   </a-layout-sider>
@@ -95,7 +101,11 @@ import {
   CustomerServiceOutlined,
   BulbOutlined,
   BgColorsOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons-vue';
+import { notification } from 'ant-design-vue';
+import { getCsrfToken, removeToken } from '@/utils/auth';
+import { authClient } from '@/api/authClient';
 
 const route = useRoute();
 const router = useRouter();
@@ -106,6 +116,17 @@ const openGroups = reactive(new Set(['dashboard', 'content', 'user', 'site']));
 const currentTheme = ref(localStorage.getItem('theme') || 'Light');
 
 function toggleCollapse() { collapsed.value = !collapsed.value; }
+
+async function exit() {
+  try {
+    await authClient.post('/api/auth/logout', null, { headers: { 'X-CSRF-Token': getCsrfToken() || '' } });
+  } catch {
+    // 会话可能已失效，仍然回到登录页
+  }
+  removeToken();
+  notification.success({ message: '退出成功♻️', description: '继续探索世界，谱写自己的乐章叭🎷', duration: 3 });
+  router.push('/login');
+}
 function toggleGroup(key) { openGroups.has(key) ? openGroups.delete(key) : openGroups.add(key); }
 function toggleTheme() {
   const next = currentTheme.value === 'Dark' ? 'Light' : 'Dark';
