@@ -34,9 +34,9 @@ module.exports = {
   // unavailable, callers fail closed rather than allowing unlimited guesses.
   consumeRateLimits: async (windows) => {
     if (!Array.isArray(windows) || windows.length === 0 || windows.length > 8 ||
-      windows.some(({ key, limit, seconds }) => !/^oidc:claim:[a-z:0-9]+$/.test(key) ||
+      windows.some(({ key, limit, seconds }) => !/^(oidc:claim|local:login):[a-z:0-9]+$/.test(key) ||
         !Number.isInteger(limit) || limit < 1 || !Number.isInteger(seconds) || seconds < 1)) {
-      throw new Error('认领限流配置无效');
+      throw new Error('限流配置无效');
     }
     const result = await client.eval(`
       for i = 1, #KEYS do

@@ -2,14 +2,13 @@ const express = require('express');
 const {
   beginLogin,
   finishLogin,
-  sessionFromRequest,
-  csrfValid,
-  revokeSession,
   claimPendingIdentity,
   sendPendingClaimCode,
   STATE_COOKIE,
   MANAGEMENT_CAPABILITY,
 } = require('../services/centralOidcService');
+const { sessionFromRequest, csrfValid, revokeSession } = require('../services/sessionService');
+const { loginWithPassword } = require('../services/localSessionService');
 const utils = require('../utils');
 
 const router = express.Router();
@@ -53,6 +52,22 @@ router.get('/oidc/callback', async (req, res) => {
     res.redirect(result.returnTo || fallback);
   } catch (error) {
     redirectWith(res, fallback, 'auth_error', safeError(error));
+  }
+});
+
+// 本地管理员账号密码登录：校验通过后签发与中央会话同一套 cookie。
+router.post('/password', async (req, res) => {
+  try {
+    const admin = await loginWithPassword(req, res, req.body || {});
+    res.json(utils.postMessage(undefined, '登录成功', admin));
+  } catch (error) {
+    if (error?.message === '操作过于频繁') {
+      return res.status(429).json(utils.postMessage(-1, '操作过于频繁，请稍后再试', { code: 'rate_limited' }));
+    }
+    if (error?.message === '邮箱或密码错误') {
+      return res.status(401).json(utils.postMessage(-1, '邮箱或密码错误', { code: 'invalid_credentials' }));
+    }
+    res.status(503).json(utils.postMessage(-1, '登录服务暂时不可用', { code: 'authentication_unavailable' }));
   }
 });
 

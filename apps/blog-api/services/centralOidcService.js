@@ -500,4 +500,6 @@ module.exports = {
   sendPendingClaimCode,
   capabilities,
   createProductSession,
+  setSessionCookies,
+  clearSessionCookies,
 };

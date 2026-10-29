@@ -1,4 +1,5 @@
-const { sessionFromRequest, csrfValid, MANAGEMENT_CAPABILITY, PUBLIC_CAPABILITY } = require('../services/centralOidcService');
+const { sessionFromRequest, csrfValid } = require('../services/sessionService');
+const { MANAGEMENT_CAPABILITY, PUBLIC_CAPABILITY } = require('../services/centralOidcService');
 
 const publicPaths = [
   /\/.*\/reception\//,

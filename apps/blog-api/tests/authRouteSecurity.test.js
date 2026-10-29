@@ -11,7 +11,14 @@ jest.mock('../services/centralOidcService', () => ({
   PUBLIC_CAPABILITY: 'home.blog.use',
 }));
 
+jest.mock('../services/localSessionService', () => ({
+  loginWithPassword: jest.fn(),
+  localSessionFromRequest: jest.fn().mockResolvedValue(null),
+  revokeLocalSession: jest.fn().mockResolvedValue(false),
+}));
+
 const service = require('../services/centralOidcService');
+const localService = require('../services/localSessionService');
 const router = require('../routes/auth');
 
 const handlerFor = (path, method) => router.stack.find((layer) => layer.route?.path === path && layer.route.methods[method]).route.stack[0].handle;
@@ -61,6 +68,27 @@ describe('统一认证路由的能力边界', () => {
     await handlerFor('/session', 'get')({ query: { mode: 'management' } }, res);
     expect(res.status).not.toHaveBeenCalled();
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: expect.anything(), data: expect.objectContaining({ capabilities: [service.MANAGEMENT_CAPABILITY] }) }));
+  });
+
+  test('本地密码登录成功后只返回公开管理员字段', async () => {
+    localService.loginWithPassword.mockResolvedValue({ id: 2, mail: 'admin@example.test', username: 'allen' });
+    const res = response();
+    await handlerFor('/password', 'post')({ body: { mail: 'admin@example.test', password: 'secret' }, ip: '203.0.113.9' }, res);
+    expect(localService.loginWithPassword).toHaveBeenCalledWith(expect.anything(), res, { mail: 'admin@example.test', password: 'secret' });
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: { id: 2, mail: 'admin@example.test', username: 'allen' } }));
+  });
+
+  test.each([
+    ['邮箱或密码错误', 401, 'invalid_credentials'],
+    ['操作过于频繁', 429, 'rate_limited'],
+    [new Error('database down').message, 503, 'authentication_unavailable'],
+  ])('本地密码登录失败 %p 返回 %p', async (reason, status, code) => {
+    localService.loginWithPassword.mockRejectedValue(new Error(reason));
+    const res = response();
+    await handlerFor('/password', 'post')({ body: { mail: 'admin@example.test', password: 'x' }, ip: '203.0.113.9' }, res);
+    expect(res.status).toHaveBeenCalledWith(status);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: -1, data: { code } }));
   });
 
   test('中央退出失败时返回 503，不向客户端报告成功', async () => {

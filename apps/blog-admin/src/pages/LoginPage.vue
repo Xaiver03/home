@@ -16,9 +16,27 @@
       <div class="form-card">
         <div class="form-header">
           <h2 class="form-title">进入管理后台</h2>
-          <p class="form-desc">使用中央统一身份登录，管理能力由中央实时签发</p>
+          <p class="form-desc">使用管理员邮箱和密码登录</p>
         </div>
-        <a-button type="primary" size="large" block class="login-btn" @click="startLogin">
+        <a-form class="password-form" layout="vertical" @submit.prevent="submitPassword">
+          <a-input
+            v-model:value="form.mail"
+            size="large"
+            placeholder="管理员邮箱"
+            autocomplete="username"
+          />
+          <a-input-password
+            v-model:value="form.password"
+            size="large"
+            placeholder="密码"
+            autocomplete="current-password"
+          />
+          <a-button type="primary" size="large" block html-type="submit" :loading="submitting">
+            登录
+          </a-button>
+        </a-form>
+        <div class="login-divider"><span>或</span></div>
+        <a-button size="large" block class="login-btn" @click="startLogin">
           使用统一身份登录
         </a-button>
         <div v-if="claimRequired" class="claim-panel">
@@ -45,8 +63,28 @@ const route = useRoute();
 const router = useRouter();
 const claim = reactive({ mail: '', proof: '' });
 const claiming = ref(false);
+const form = reactive({ mail: '', password: '' });
+const submitting = ref(false);
 const message = ref('');
 const claimRequired = computed(() => route.query.auth_error === 'identity_binding_required');
+
+const submitPassword = async () => {
+  if (!form.mail || !form.password) {
+    message.value = '请输入邮箱和密码';
+    return;
+  }
+  submitting.value = true;
+  message.value = '';
+  try {
+    await axios.post('/api/auth/password', { mail: form.mail, password: form.password }, { withCredentials: true });
+    form.password = '';
+    router.replace('/');
+  } catch (error) {
+    message.value = error?.response?.data?.msg || '登录失败，请稍后再试';
+  } finally {
+    submitting.value = false;
+  }
+};
 
 const startLogin = () => {
   window.location.assign('/api/auth/oidc/start?mode=management&return_to=%2Fadmin%2F');
@@ -93,6 +131,10 @@ const submitClaim = async () => {
 .form-title { margin: 0 0 .5rem; font-size: 1.8rem; }
 .form-desc { color: #65706a; line-height: 1.6; }
 .login-btn { height: 3rem; }
+.password-form { display: grid; gap: .8rem; }
+.login-divider { position: relative; margin: 1.6rem 0; text-align: center; color: #9aa39d; font-size: 1.2rem; }
+.login-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 1px solid #dfe4da; }
+.login-divider span { position: relative; padding: 0 .8rem; background: rgba(255,255,255,.82); }
 .claim-panel { display: grid; gap: .8rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #dfe4da; }
 .claim-panel h3 { margin: 0; }
 .claim-panel p, .login-message { color: #65706a; line-height: 1.6; }
