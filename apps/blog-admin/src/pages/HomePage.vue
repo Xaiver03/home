@@ -22,7 +22,8 @@ import { notification } from "ant-design-vue";
 import { useRouter } from "vue-router";
 const router = useRouter()
 import { useStore } from 'vuex'
-import { removeToken } from '@/utils/auth';
+import { getCsrfToken, removeToken } from '@/utils/auth';
+import { authClient } from '@/api/authClient';
 import Cookies from 'js-cookie'
 const store = useStore()
 
@@ -39,7 +40,12 @@ const getDateBefore = (date) => { // 获取日期与现在之间的天数
   const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
   return daysDifference;
 }
-const exit = () => { // 退出登录函数
+const exit = async () => { // 退出登录函数
+  try {
+    await authClient.post('/api/auth/logout', null, { headers: { 'X-CSRF-Token': getCsrfToken() || '' } });
+  } catch {
+    // 会话可能已失效，仍然回到登录页
+  }
   removeToken();
   notification.success({
     message: "退出成功♻️",
