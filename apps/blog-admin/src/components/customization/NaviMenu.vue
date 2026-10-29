@@ -12,7 +12,8 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 import { notification } from "ant-design-vue";
 import { useStore } from 'vuex'
-import { removeToken } from '@/utils/auth';
+import { getCsrfToken, removeToken } from '@/utils/auth';
+import { authClient } from '@/api/authClient';
 const store = useStore()
 const naviItems = ref([
     {
@@ -88,7 +89,12 @@ const getLocalTheme = () => { // 获取本地主题
         currentTheme.value = 'Light'
     }
 }
-const exit = () => { // 退出登录函数
+const exit = async () => { // 退出登录函数
+  try {
+    await authClient.post('/api/auth/logout', null, { headers: { 'X-CSRF-Token': getCsrfToken() || '' } });
+  } catch {
+    // 会话可能已失效，仍然回到登录页
+  }
   removeToken();
   notification.success({
     message: "退出成功♻️",
