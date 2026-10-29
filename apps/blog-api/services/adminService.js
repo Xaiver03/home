@@ -11,6 +11,7 @@ module.exports = {
     return await Admin.findAndCountAll({
       offset,
       limit: parseInt(pageSize),
+      attributes: { exclude: ['passwordHash'] },
     });
   },
   // 分页筛选搜索管理员
@@ -21,6 +22,7 @@ module.exports = {
       limit: parseInt(pageSize),
       where: {},
       order: [],
+      attributes: { exclude: ['passwordHash'] },
     };
     for (let item in data) {
       if (utils.isNullOrEmpty(data[item])) continue; // 若值为空，跳出
